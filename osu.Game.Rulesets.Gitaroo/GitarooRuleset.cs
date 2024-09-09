@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Gitaroo.Beatmaps;
 using osu.Game.Rulesets.Gitaroo.Mods;
 using osu.Game.Rulesets.Gitaroo.UI;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Gitaroo
@@ -53,6 +54,13 @@ namespace osu.Game.Rulesets.Gitaroo
             Origin = Anchor.Centre,
             Text = ShortName[0].ToString(),
             Font = OsuFont.Default.With(size: 18),
+        };
+
+        protected override IEnumerable<HitResult> GetValidHitResults() => new[]
+        {
+            HitResult.Great,
+            HitResult.Good,
+            HitResult.Ok
         };
 
         // Leave this line intact. It will bake the correct version into the ruleset on each build/release.
