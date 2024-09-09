@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Gitaroo
             }
         }
 
-        public override string ShortName => "gitaroo";
+        public override string ShortName => "gitarooruleset";
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
