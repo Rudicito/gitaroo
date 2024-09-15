@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Gitaroo.UI
             AddRangeInternal(new Drawable[]
             {
                 HitObjectContainer,
+                new CenterCircle.CenterCircleContainer()
             });
         }
     }
