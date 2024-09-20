@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Gitaroo.UI
@@ -10,6 +11,8 @@ namespace osu.Game.Rulesets.Gitaroo.UI
     [Cached]
     public partial class GitarooPlayfield : ScrollingPlayfield
     {
+        protected override GameplayCursorContainer CreateCursor() => new();
+
         [BackgroundDependencyLoader]
         private void load()
         {
