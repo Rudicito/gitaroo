@@ -47,6 +47,10 @@ public class GitarooRuleset : Ruleset
     {
         new KeyBinding(InputKey.Z, GitarooAction.LeftButton),
         new KeyBinding(InputKey.X, GitarooAction.RightButton),
+        new KeyBinding(InputKey.Joystick2, GitarooAction.LeftButton),
+        new KeyBinding(InputKey.Joystick3, GitarooAction.RightButton),
+        new KeyBinding(InputKey.JoystickAxis2Negative, GitarooAction.JoystickUp),
+        new KeyBinding(InputKey.JoystickAxis1Positive, GitarooAction.JoystickRight),
     };
 
     public override Drawable CreateIcon() => new GitarooIcon();
@@ -83,7 +87,7 @@ internal partial class GitarooIcon : CompositeDrawable
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.525f),
                 Icon = FontAwesome.Solid.Guitar,
-            }
+            },
         ];
     }
 }

@@ -22,4 +22,10 @@ public enum GitarooAction
 
     [Description("Right button")]
     RightButton,
+
+    [Description("Joystick Up")]
+    JoystickUp,
+
+    [Description("Joystick Right")]
+    JoystickRight,
 }
