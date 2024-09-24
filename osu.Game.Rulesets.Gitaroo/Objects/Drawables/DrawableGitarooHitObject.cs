@@ -6,42 +6,41 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables
+namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
+
+public partial class DrawableGitarooHitObject : DrawableHitObject<GitarooHitObject>
 {
-    public partial class DrawableGitarooHitObject : DrawableHitObject<GitarooHitObject>
+    public DrawableGitarooHitObject(GitarooHitObject hitObject)
+        : base(hitObject)
     {
-        public DrawableGitarooHitObject(GitarooHitObject hitObject)
-            : base(hitObject)
+        Size = new Vector2(40);
+        Origin = Anchor.Centre;
+
+        // todo: add visuals.
+    }
+
+    protected override void CheckForResult(bool userTriggered, double timeOffset)
+    {
+        if (timeOffset >= 0)
+            // todo: implement judgement logic
+            ApplyMaxResult();
+    }
+
+    protected override void UpdateHitStateTransforms(ArmedState state)
+    {
+        const double duration = 1000;
+
+        switch (state)
         {
-            Size = new Vector2(40);
-            Origin = Anchor.Centre;
+            case ArmedState.Hit:
+                this.FadeOut(duration, Easing.OutQuint).Expire();
+                break;
 
-            // todo: add visuals.
-        }
+            case ArmedState.Miss:
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (timeOffset >= 0)
-                // todo: implement judgement logic
-                ApplyMaxResult();
-        }
-
-        protected override void UpdateHitStateTransforms(ArmedState state)
-        {
-            const double duration = 1000;
-
-            switch (state)
-            {
-                case ArmedState.Hit:
-                    this.FadeOut(duration, Easing.OutQuint).Expire();
-                    break;
-
-                case ArmedState.Miss:
-
-                    this.FadeColour(Color4.Red, duration);
-                    this.FadeOut(duration, Easing.InQuint).Expire();
-                    break;
-            }
+                this.FadeColour(Color4.Red, duration);
+                this.FadeOut(duration, Easing.InQuint).Expire();
+                break;
         }
     }
 }

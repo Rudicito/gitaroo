@@ -7,23 +7,22 @@ using osu.Framework.Input.StateChanges;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 
-namespace osu.Game.Rulesets.Gitaroo.Replays
+namespace osu.Game.Rulesets.Gitaroo.Replays;
+
+public class GitarooFramedReplayInputHandler : FramedReplayInputHandler<GitarooReplayFrame>
 {
-    public class GitarooFramedReplayInputHandler : FramedReplayInputHandler<GitarooReplayFrame>
+    public GitarooFramedReplayInputHandler(Replay replay)
+        : base(replay)
     {
-        public GitarooFramedReplayInputHandler(Replay replay)
-            : base(replay)
-        {
-        }
+    }
 
-        protected override bool IsImportant(GitarooReplayFrame frame) => frame.Actions.Any();
+    protected override bool IsImportant(GitarooReplayFrame frame) => frame.Actions.Any();
 
-        protected override void CollectReplayInputs(List<IInput> inputs)
+    protected override void CollectReplayInputs(List<IInput> inputs)
+    {
+        inputs.Add(new ReplayState<GitarooAction>
         {
-            inputs.Add(new ReplayState<GitarooAction>
-            {
-                PressedActions = CurrentFrame?.Actions ?? new List<GitarooAction>(),
-            });
-        }
+            PressedActions = CurrentFrame?.Actions ?? new List<GitarooAction>(),
+        });
     }
 }

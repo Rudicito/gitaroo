@@ -6,11 +6,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Gitaroo.Replays;
 using osu.Game.Rulesets.Mods;
 
-namespace osu.Game.Rulesets.Gitaroo.Mods
+namespace osu.Game.Rulesets.Gitaroo.Mods;
+
+public class GitarooModAutoplay : ModAutoplay
 {
-    public class GitarooModAutoplay : ModAutoplay
-    {
-        public override ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
-            => new ModReplayData(new GitarooAutoGenerator(beatmap).Generate(), new ModCreatedUser { Username = "sample" });
-    }
+    public override ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+        => new ModReplayData(new GitarooAutoGenerator(beatmap).Generate(), new ModCreatedUser { Username = "sample" });
 }

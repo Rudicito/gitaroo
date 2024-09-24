@@ -5,22 +5,21 @@ using System.ComponentModel;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.UI;
 
-namespace osu.Game.Rulesets.Gitaroo
+namespace osu.Game.Rulesets.Gitaroo;
+
+public partial class GitarooInputManager : RulesetInputManager<GitarooAction>
 {
-    public partial class GitarooInputManager : RulesetInputManager<GitarooAction>
+    public GitarooInputManager(RulesetInfo ruleset)
+        : base(ruleset, 0, SimultaneousBindingMode.Unique)
     {
-        public GitarooInputManager(RulesetInfo ruleset)
-            : base(ruleset, 0, SimultaneousBindingMode.Unique)
-        {
-        }
     }
+}
 
-    public enum GitarooAction
-    {
-        [Description("Left button")]
-        LeftButton,
+public enum GitarooAction
+{
+    [Description("Left button")]
+    LeftButton,
 
-        [Description("Right button")]
-        RightButton,
-    }
+    [Description("Right button")]
+    RightButton,
 }

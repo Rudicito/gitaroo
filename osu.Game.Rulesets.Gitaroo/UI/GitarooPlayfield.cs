@@ -6,21 +6,20 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
-namespace osu.Game.Rulesets.Gitaroo.UI
-{
-    [Cached]
-    public partial class GitarooPlayfield : ScrollingPlayfield
-    {
-        protected override GameplayCursorContainer CreateCursor() => new();
+namespace osu.Game.Rulesets.Gitaroo.UI;
 
-        [BackgroundDependencyLoader]
-        private void load()
+[Cached]
+public partial class GitarooPlayfield : ScrollingPlayfield
+{
+    protected override GameplayCursorContainer CreateCursor() => new();
+
+    [BackgroundDependencyLoader]
+    private void load()
+    {
+        AddRangeInternal(new Drawable[]
         {
-            AddRangeInternal(new Drawable[]
-            {
-                HitObjectContainer,
-                new CenterCircle.CenterCircleContainer()
-            });
-        }
+            HitObjectContainer,
+            new CenterCircle.CenterCircleContainer()
+        });
     }
 }

@@ -24,8 +24,8 @@ public partial class FanShaped : Container
         RelativeSizeAxes = Axes.Both;
         Anchor = Anchor.Centre;
         Origin = Anchor.Centre;
-        InternalChildren = new[]
-        {
+        InternalChildren =
+        [
             rotatingContainer = new Container
             {
                 AutoSizeAxes = Axes.Both,
@@ -76,7 +76,7 @@ public partial class FanShaped : Container
                     }
                 }
             }
-        };
+        ];
     }
 
     private float fan_shaped_get_x(float angle)

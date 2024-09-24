@@ -11,10 +11,10 @@ public partial class CenterCircleContainer : Container
         Anchor = Anchor.Centre;
         Origin = Anchor.Centre;
 
-        InternalChildren = new Container[]
-        {
+        InternalChildren =
+        [
             new FanShaped(),
             new CenterCircle()
-        };
+        ];
     }
 }

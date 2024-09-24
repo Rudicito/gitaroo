@@ -5,29 +5,28 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Replays;
 
-namespace osu.Game.Rulesets.Gitaroo.Replays
+namespace osu.Game.Rulesets.Gitaroo.Replays;
+
+public class GitarooAutoGenerator : AutoGenerator<GitarooReplayFrame>
 {
-    public class GitarooAutoGenerator : AutoGenerator<GitarooReplayFrame>
+    public new Beatmap<GitarooHitObject> Beatmap => (Beatmap<GitarooHitObject>)base.Beatmap;
+
+    public GitarooAutoGenerator(IBeatmap beatmap)
+        : base(beatmap)
     {
-        public new Beatmap<GitarooHitObject> Beatmap => (Beatmap<GitarooHitObject>)base.Beatmap;
+    }
 
-        public GitarooAutoGenerator(IBeatmap beatmap)
-            : base(beatmap)
+    protected override void GenerateFrames()
+    {
+        Frames.Add(new GitarooReplayFrame());
+
+        foreach (GitarooHitObject hitObject in Beatmap.HitObjects)
         {
-        }
-
-        protected override void GenerateFrames()
-        {
-            Frames.Add(new GitarooReplayFrame());
-
-            foreach (GitarooHitObject hitObject in Beatmap.HitObjects)
+            Frames.Add(new GitarooReplayFrame
             {
-                Frames.Add(new GitarooReplayFrame
-                {
-                    Time = hitObject.StartTime
-                    // todo: add required inputs and extra frames.
-                });
-            }
+                Time = hitObject.StartTime
+                // todo: add required inputs and extra frames.
+            });
         }
     }
 }

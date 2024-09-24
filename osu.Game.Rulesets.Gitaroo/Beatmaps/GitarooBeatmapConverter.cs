@@ -7,26 +7,25 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects;
 
-namespace osu.Game.Rulesets.Gitaroo.Beatmaps
+namespace osu.Game.Rulesets.Gitaroo.Beatmaps;
+
+public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 {
-    public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
+    public GitarooBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+        : base(beatmap, ruleset)
     {
-        public GitarooBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
-            : base(beatmap, ruleset)
-        {
-        }
+    }
 
-        // todo: Check for conversion types that should be supported (ie. Beatmap.HitObjects.Any(h => h is IHasXPosition))
-        // https://github.com/ppy/osu/tree/master/osu.Game/Rulesets/Objects/Types
-        public override bool CanConvert() => true;
+    // todo: Check for conversion types that should be supported (ie. Beatmap.HitObjects.Any(h => h is IHasXPosition))
+    // https://github.com/ppy/osu/tree/master/osu.Game/Rulesets/Objects/Types
+    public override bool CanConvert() => true;
 
-        protected override IEnumerable<GitarooHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
+    protected override IEnumerable<GitarooHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
+    {
+        yield return new GitarooHitObject
         {
-            yield return new GitarooHitObject
-            {
-                Samples = original.Samples,
-                StartTime = original.StartTime,
-            };
-        }
+            Samples = original.Samples,
+            StartTime = original.StartTime,
+        };
     }
 }

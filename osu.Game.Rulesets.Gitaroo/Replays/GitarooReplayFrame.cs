@@ -4,16 +4,15 @@
 using System.Collections.Generic;
 using osu.Game.Rulesets.Replays;
 
-namespace osu.Game.Rulesets.Gitaroo.Replays
-{
-    public class GitarooReplayFrame : ReplayFrame
-    {
-        public List<GitarooAction> Actions = new List<GitarooAction>();
+namespace osu.Game.Rulesets.Gitaroo.Replays;
 
-        public GitarooReplayFrame(GitarooAction? button = null)
-        {
-            if (button.HasValue)
-                Actions.Add(button.Value);
-        }
+public class GitarooReplayFrame : ReplayFrame
+{
+    public List<GitarooAction> Actions = new List<GitarooAction>();
+
+    public GitarooReplayFrame(GitarooAction? button = null)
+    {
+        if (button.HasValue)
+            Actions.Add(button.Value);
     }
 }

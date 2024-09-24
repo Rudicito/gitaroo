@@ -7,12 +7,11 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Gitaroo.Objects
-{
-    public class GitarooHitObject : HitObject
-    {
-        public override Judgement CreateJudgement() => new GitarooJudgement();
+namespace osu.Game.Rulesets.Gitaroo.Objects;
 
-        protected override HitWindows CreateHitWindows() => new GitarooHitWindows();
-    }
+public class GitarooHitObject : HitObject
+{
+    public override Judgement CreateJudgement() => new GitarooJudgement();
+
+    protected override HitWindows CreateHitWindows() => new GitarooHitWindows();
 }
