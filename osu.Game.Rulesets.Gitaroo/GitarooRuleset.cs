@@ -44,8 +44,8 @@ namespace osu.Game.Rulesets.Gitaroo
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
-            new KeyBinding(InputKey.Z, GitarooAction.Button1),
-            new KeyBinding(InputKey.X, GitarooAction.Button2),
+            new KeyBinding(InputKey.Z, GitarooAction.LeftButton),
+            new KeyBinding(InputKey.X, GitarooAction.RightButton),
         };
 
         public override Drawable CreateIcon() => new SpriteText

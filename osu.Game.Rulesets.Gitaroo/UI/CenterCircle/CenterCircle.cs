@@ -72,8 +72,8 @@ public partial class CenterCircle : Circle, IKeyBindingHandler<GitarooAction>
     {
         switch (e.Action)
         {
-            case GitarooAction.Button1:
-            case GitarooAction.Button2:
+            case GitarooAction.LeftButton:
+            case GitarooAction.RightButton:
                 downCount++;
                 UpdateCircle(downCount);
                 break;
@@ -86,8 +86,8 @@ public partial class CenterCircle : Circle, IKeyBindingHandler<GitarooAction>
     {
         switch (e.Action)
         {
-            case GitarooAction.Button1:
-            case GitarooAction.Button2:
+            case GitarooAction.LeftButton:
+            case GitarooAction.RightButton:
                 downCount = Math.Max(0, downCount - 1);
 
                 if (downCount == 0)

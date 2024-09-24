@@ -17,10 +17,10 @@ namespace osu.Game.Rulesets.Gitaroo
 
     public enum GitarooAction
     {
-        [Description("Button 1")]
-        Button1,
+        [Description("Left button")]
+        LeftButton,
 
-        [Description("Button 2")]
-        Button2,
+        [Description("Right button")]
+        RightButton,
     }
 }
