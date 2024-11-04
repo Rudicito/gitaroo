@@ -1,10 +1,13 @@
 using System;
+using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osuTK;
 using osuTK.Graphics;
 
@@ -18,6 +21,8 @@ public partial class FanShaped : Container
     private const float right_arrow_max_x = 86;
     private const float fan_shaped_max_y = 155;
     private const float fan_shape_angle = 70;
+    private GitarooInputManager inputManager;
+    private Vector2 joystick = Vector2.Zero;
 
     public FanShaped()
     {
@@ -161,8 +166,76 @@ public partial class FanShaped : Container
     }
 
     // todo: implement joystick support
+
+    private (JoystickAxisSource joystickAxisSource, JoystickButton joystickButton, bool IsNegative)? joyX => inputManager?.JoyX;
+    private (JoystickAxisSource joystickAxisSource, JoystickButton joystickButton, bool IsNegative)? joyY => inputManager?.JoyY;
+
+    protected override void LoadComplete()
+    {
+        base.LoadComplete();
+        inputManager = (GitarooInputManager)GetContainingInputManager();
+    }
+
     protected override bool OnJoystickAxisMove(JoystickAxisMoveEvent e)
     {
+        if (!joyX.HasValue || !joyY.HasValue) return base.OnJoystickAxisMove(e);
+
+        bool maybeFadeIn = joystick == Vector2.Zero;
+        bool maybeFadeOut = joystick != Vector2.Zero;
+
+        if (e.Axes.Any(a => a.Source == joyX.Value.joystickAxisSource))
+        {
+            float value = e.Axes.First(a => a.Source == joyX.Value.joystickAxisSource).Value;
+            joystick.X = joyX.Value.IsNegative ? -value : value;
+        }
+
+        if (e.Axes.Any(a => a.Source == joyY.Value.joystickAxisSource))
+        {
+            float value = e.Axes.First(a => a.Source == joyY.Value.joystickAxisSource).Value;
+            joystick.Y = joyY.Value.IsNegative ? -value : value;
+        }
+
+        // if (MathF.Abs(e.Delta) > 0.25 && MathF.Abs(value) < MathF.Abs(e.LastValue))
+        // {
+        // }
+
+        if (joystick != Vector2.Zero)
+        {
+            rotatingContainer.Rotation = getDegreesFromPosition(Vector2.Zero, joystick);
+            if (maybeFadeIn) fanShapeFadeIn();
+            Logger.Log($"X = {joystick.X}, Y = {joystick.Y}");
+        }
+        else
+        {
+            if (maybeFadeOut) fanShapeFadeOut();
+            Logger.Log($"X = {joystick.X}, Y = {joystick.Y}");
+        }
+
         return base.OnJoystickAxisMove(e);
     }
+
+    /*protected override void OnJoystickRelease(JoystickReleaseEvent e)
+    {
+        if (!joyX.HasValue || !joyY.HasValue) return;
+
+        bool joystickUpdated = false;
+
+        if (joyX.Value.joystickButton == e.Button)
+        {
+            joystick.X = 0;
+            joystickUpdated = true;
+        }
+        else if (joyY.Value.joystickButton == e.Button)
+        {
+            joystick.Y = 0;
+            joystickUpdated = true;
+        }
+
+        if (joystickUpdated && joystick == Vector2.Zero)
+        {
+            fanShapeFadeOut();
+        }
+
+        Logger.Log("Testttt");
+    }*/
 }

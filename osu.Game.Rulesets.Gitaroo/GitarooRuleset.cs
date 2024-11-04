@@ -49,7 +49,7 @@ public class GitarooRuleset : Ruleset
         new KeyBinding(InputKey.X, GitarooAction.RightButton),
         new KeyBinding(InputKey.Joystick2, GitarooAction.LeftButton),
         new KeyBinding(InputKey.Joystick3, GitarooAction.RightButton),
-        new KeyBinding(InputKey.JoystickAxis2Negative, GitarooAction.JoystickUp),
+        new KeyBinding(InputKey.JoystickAxis2Positive, GitarooAction.JoystickDown),
         new KeyBinding(InputKey.JoystickAxis1Positive, GitarooAction.JoystickRight),
     };
 
