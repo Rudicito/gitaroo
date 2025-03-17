@@ -3,9 +3,12 @@
 
 using System.Collections.Generic;
 using System.Threading;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Gitaroo.Beatmaps.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Gitaroo.Beatmaps;
 
@@ -22,10 +25,34 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
     protected override IEnumerable<GitarooHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
     {
-        yield return new GitarooHitObject
+        // if ((original as IHasCombo)?.NewCombo ?? false)
+        //     patternGenerator.StartNextPattern();
+
+        switch (original)
         {
-            Samples = original.Samples,
-            StartTime = original.StartTime,
-        };
+            // If a osu Slider
+            case IHasPathWithRepeats:
+                return new Slider
+                {
+                    Samples = original.Samples,
+                    StartTime = original.StartTime,
+                }.Yield();
+
+            // If a osu Spinner
+            case IHasDuration:
+                return new Slider
+                {
+                    Samples = original.Samples,
+                    StartTime = original.StartTime,
+                }.Yield();
+
+            // If a osu HitCircle
+            default:
+                return new HitCircle
+                {
+                    Samples = original.Samples,
+                    StartTime = original.StartTime,
+                }.Yield();
+        }
     }
 }
