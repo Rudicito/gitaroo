@@ -13,6 +13,8 @@ public partial class CenterCircle : Circle, IKeyBindingHandler<GitarooAction>
 {
     private int downCount;
 
+    private const double expand_duration = 400;
+
     private readonly ColourInfo notPressedColor = new ColourInfo
     {
         TopLeft = new Color4(183, 115, 229, byte.MaxValue),
@@ -31,8 +33,11 @@ public partial class CenterCircle : Circle, IKeyBindingHandler<GitarooAction>
         HasSingleColour = false
     };
 
+    private readonly Color4 borderNotPressedColor = new Color4(34, 43, 117, byte.MaxValue);
+    private readonly Color4 borderPressedColor = new Color4(52, 9, 121, byte.MaxValue);
+
+    private const float not_pressed_scale = 1f;
     private const float pressed_scale = 1.15f;
-    private const float released_scale = 1f;
 
     public CenterCircle()
     {
@@ -41,29 +46,35 @@ public partial class CenterCircle : Circle, IKeyBindingHandler<GitarooAction>
         Size = new Vector2(25);
         Colour = notPressedColor;
         Masking = true;
-        BorderThickness = 2.5f;
-        BorderColour = Color4.Gray;
+        BorderThickness = 2.625f;
+        BorderColour = borderNotPressedColor;
     }
 
     internal void UpdateCircle(int downCount)
     {
-        Colour = downCount > 0 ? pressedColor : notPressedColor;
-
         if (downCount > 0)
+        {
+            Colour = pressedColor;
+            BorderColour = borderPressedColor;
             expand();
+        }
         else
+        {
+            Colour = notPressedColor;
+            BorderColour = borderNotPressedColor;
             contract();
+        }
     }
 
     private void expand()
     {
-        this.ScaleTo(released_scale)
-            .ScaleTo(pressed_scale, 400, Easing.OutElasticHalf);
+        this.ScaleTo(not_pressed_scale)
+            .ScaleTo(pressed_scale, expand_duration, Easing.OutElasticHalf);
     }
 
     private void contract()
     {
-        this.ScaleTo(released_scale, 400, Easing.OutQuad);
+        this.ScaleTo(not_pressed_scale, expand_duration, Easing.OutQuad);
     }
 
     // Code below based of osu.Game.Rulesets.Osu/UI/Cursor/OsuCursorContainer.cs
