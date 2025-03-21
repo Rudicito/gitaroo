@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Threading;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Gitaroo.Beatmaps.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Objects.Types;
