@@ -30,19 +30,21 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
         switch (original)
         {
             // If a osu Slider
-            case IHasPathWithRepeats:
+            case IHasPathWithRepeats slider:
                 return new Slider
                 {
                     Samples = original.Samples,
                     StartTime = original.StartTime,
+                    Duration = slider.Duration,
                 }.Yield();
 
             // If a osu Spinner
-            case IHasDuration:
+            case IHasDuration spinner:
                 return new Slider
                 {
                     Samples = original.Samples,
                     StartTime = original.StartTime,
+                    Duration = spinner.Duration,
                 }.Yield();
 
             // If a osu HitCircle
