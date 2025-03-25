@@ -14,6 +14,8 @@ using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Play;
+using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
@@ -34,4 +36,9 @@ public partial class DrawableGitarooRuleset : DrawableScrollingRuleset<GitarooHi
     public override DrawableHitObject<GitarooHitObject> CreateDrawableRepresentation(GitarooHitObject h) => new DrawableGitarooHitObject(h);
 
     protected override PassThroughInputManager CreateInputManager() => new GitarooInputManager(Ruleset?.RulesetInfo);
+
+    protected override ResumeOverlay CreateResumeOverlay()
+    {
+        return new DelayedResumeOverlay { Scale = new Vector2(0.65f) };
+    }
 }
