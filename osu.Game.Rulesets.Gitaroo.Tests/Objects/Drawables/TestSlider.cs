@@ -16,6 +16,19 @@ public partial class TestSlider : OsuTestScene
     private readonly SliderPiece drawablePath;
     private SliderPath path;
 
+    protected override void LoadComplete()
+    {
+        base.LoadComplete();
+
+        AddToggleStep("Fade to Miss colour", v =>
+        {
+            if (v)
+                drawablePath.FadeToMiss();
+            else
+                drawablePath.FadeToNormal();
+        });
+    }
+
     public TestSlider()
     {
         Child = drawablePath = new SliderPiece
