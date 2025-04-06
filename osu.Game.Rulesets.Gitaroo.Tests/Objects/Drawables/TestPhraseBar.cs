@@ -11,7 +11,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Gitaroo.Tests.Objects.Drawables;
 
 // Basically copied from osu/osu.Game.Tests/Visual/Gameplay/TestSceneSliderPath.cs
-public partial class TestSlider : OsuTestScene
+public partial class TestPhraseBar : OsuTestScene
 {
     private readonly SliderPiece drawablePath;
     private SliderPath path;
@@ -29,7 +29,7 @@ public partial class TestSlider : OsuTestScene
         });
     }
 
-    public TestSlider()
+    public TestPhraseBar()
     {
         Child = drawablePath = new SliderPiece
         {
