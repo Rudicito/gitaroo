@@ -31,7 +31,7 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
         {
             // If a osu Slider
             case IHasPathWithRepeats slider:
-                return new PhraseBar
+                return new HoldNote
                 {
                     Samples = original.Samples,
                     StartTime = original.StartTime,
@@ -40,7 +40,7 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
             // If a osu Spinner
             case IHasDuration spinner:
-                return new PhraseBar
+                return new HoldNote
                 {
                     Samples = original.Samples,
                     StartTime = original.StartTime,
@@ -49,7 +49,7 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
             // If a osu HitCircle
             default:
-                return new AttackPoint
+                return new Note
                 {
                     Samples = original.Samples,
                     StartTime = original.StartTime,

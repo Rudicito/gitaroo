@@ -3,9 +3,9 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Gitaroo.Tests.Objects.Drawables;
 
-public partial class TestAttackPoint : OsuTestScene
+public partial class TestNote : OsuTestScene
 {
-    public TestAttackPoint()
+    public TestNote()
     {
         Add(new HitCirclePiece());
     }
