@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Gitaroo;
 
 public class GitarooRuleset : Ruleset
 {
-    public override string Description => "a very gitaroo ruleset";
+    public override string Description => "Gitaroo";
 
     public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableGitarooRuleset(this, beatmap, mods);
 
@@ -41,7 +41,9 @@ public class GitarooRuleset : Ruleset
         }
     }
 
-    public override string ShortName => "gitarooruleset";
+    public override string ShortName => "gitaroo";
+
+    public override string PlayingVerb => base.PlayingVerb;
 
     public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
     {
