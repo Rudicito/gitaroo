@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
@@ -13,10 +12,7 @@ public partial class DrawableGitarooHitObject : DrawableHitObject<GitarooHitObje
     public DrawableGitarooHitObject(GitarooHitObject hitObject)
         : base(hitObject)
     {
-        Size = new Vector2(40);
-        Origin = Anchor.Centre;
-
-        // todo: add visuals.
+        // RelativeSizeAxes = Axes.X;
     }
 
     protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -42,5 +38,16 @@ public partial class DrawableGitarooHitObject : DrawableHitObject<GitarooHitObje
                 this.FadeOut(duration, Easing.InQuint).Expire();
                 break;
         }
+    }
+}
+
+public abstract partial class DrawableGitarooHitObject<TObject> : DrawableGitarooHitObject
+    where TObject : GitarooHitObject
+{
+    public new TObject HitObject => (TObject)base.HitObject;
+
+    protected DrawableGitarooHitObject(TObject hitObject)
+        : base(hitObject)
+    {
     }
 }
