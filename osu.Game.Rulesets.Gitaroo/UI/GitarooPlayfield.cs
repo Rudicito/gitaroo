@@ -3,6 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Gitaroo.Objects;
+using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -21,5 +23,11 @@ public partial class GitarooPlayfield : ScrollingPlayfield
             HitObjectContainer,
             new CenterCircle.CenterCircleContainer()
         });
+
+        RegisterPool<Note, DrawableNote>(10, 50);
+        RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
+        // RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
+        // RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
+        // RegisterPool<HoldNoteBody, DrawableHoldNoteBody>(10, 50);
     }
 }

@@ -10,7 +10,6 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.Objects;
-using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -33,7 +32,7 @@ public partial class DrawableGitarooRuleset : DrawableScrollingRuleset<GitarooHi
 
     protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new GitarooFramedReplayInputHandler(replay);
 
-    public override DrawableHitObject<GitarooHitObject> CreateDrawableRepresentation(GitarooHitObject h) => new DrawableGitarooHitObject(h);
+    public override DrawableHitObject<GitarooHitObject> CreateDrawableRepresentation(GitarooHitObject h) => null;
 
     protected override PassThroughInputManager CreateInputManager() => new GitarooInputManager(Ruleset?.RulesetInfo);
 
