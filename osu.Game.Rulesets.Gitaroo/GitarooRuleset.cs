@@ -43,7 +43,7 @@ public class GitarooRuleset : Ruleset
 
     public override string ShortName => "gitaroo";
 
-    public override string PlayingVerb => base.PlayingVerb;
+    // public override string PlayingVerb => base.PlayingVerb;
 
     public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
     {
