@@ -2,14 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Gitaroo.Objects;
-using osu.Game.Rulesets.Gitaroo.UI;
 
 namespace osu.Game.Rulesets.Gitaroo.Beatmaps;
 
 public class GitarooBeatmap : Beatmap<GitarooHitObject>
 {
-    public LineTrace LineTrace;
-
     public override IEnumerable<BeatmapStatistic> GetStatistics()
     {
         int notes = HitObjects.Count(s => s is Note);

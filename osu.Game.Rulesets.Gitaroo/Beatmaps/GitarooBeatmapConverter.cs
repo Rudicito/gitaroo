@@ -7,7 +7,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects;
-using osu.Game.Rulesets.Gitaroo.UI;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Gitaroo.Beatmaps;
@@ -31,7 +30,12 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
     protected override Beatmap<GitarooHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
     {
         var beatmap = (GitarooBeatmap)base.ConvertBeatmap(original, cancellationToken);
-        beatmap.LineTrace = generateLineTrace(beatmap);
+
+        beatmap.HitObjects.AddRange(generateLineTrace(beatmap));
+
+        // Can be more optimized?
+        beatmap.HitObjects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
+
         return beatmap;
     }
 
@@ -70,9 +74,20 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
         }
     }
 
-    private LineTrace generateLineTrace(GitarooBeatmap beatmap)
+    private List<LineTrace> generateLineTrace(GitarooBeatmap beatmap)
     {
         // todo: Add LineTrace generator algorithm
-        return new LineTrace();
+        List<LineTrace> lineTraces =
+        [
+            new()
+            {
+                StartTime = 20000
+            },
+            new()
+            {
+                StartTime = 40000
+            }
+        ];
+        return lineTraces;
     }
 }
