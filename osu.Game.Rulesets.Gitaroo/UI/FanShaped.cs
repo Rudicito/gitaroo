@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Gitaroo.MathUtils;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Gitaroo.UI.CenterCircle;
+namespace osu.Game.Rulesets.Gitaroo.UI;
 
 public partial class FanShaped : Container
 {

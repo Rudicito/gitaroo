@@ -7,7 +7,7 @@ using osu.Framework.Input.Events;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Gitaroo.UI.CenterCircle;
+namespace osu.Game.Rulesets.Gitaroo.UI;
 
 public partial class CenterCircle : Circle, IKeyBindingHandler<GitarooAction>
 {

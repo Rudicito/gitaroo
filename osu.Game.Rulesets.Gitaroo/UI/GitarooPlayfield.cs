@@ -15,13 +15,23 @@ public partial class GitarooPlayfield : ScrollingPlayfield
 {
     protected override GameplayCursorContainer CreateCursor() => new();
 
+    private readonly FanShaped fanShaped;
+    private readonly CenterCircle centerCircle;
+
+    public GitarooPlayfield()
+    {
+        fanShaped = new FanShaped();
+        centerCircle = new CenterCircle();
+    }
+
     [BackgroundDependencyLoader]
     private void load()
     {
         AddRangeInternal(new Drawable[]
         {
-            HitObjectContainer,
-            new CenterCircle.CenterCircleContainer()
+            fanShaped,
+            centerCircle,
+            HitObjectContainer
         });
 
         RegisterPool<Note, DrawableNote>(10, 50);
