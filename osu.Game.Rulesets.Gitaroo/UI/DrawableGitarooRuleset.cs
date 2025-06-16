@@ -12,20 +12,17 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.Replays;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
 [Cached]
-public partial class DrawableGitarooRuleset : DrawableScrollingRuleset<GitarooHitObject>
+public partial class DrawableGitarooRuleset : DrawableRuleset<GitarooHitObject>
 {
     public DrawableGitarooRuleset(GitarooRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
         : base(ruleset, beatmap, mods)
     {
-        Direction.Value = ScrollingDirection.Left;
-        TimeRange.Value = 6000;
     }
 
     protected override Playfield CreatePlayfield() => new GitarooPlayfield();
