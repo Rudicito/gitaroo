@@ -7,7 +7,7 @@
     <RootNamespace>osu.Game.Rulesets.Gitaroo</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\**\*"/>
+    <EmbeddedResource Include="Resources\**\*" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ppy.osu.Game" Version="2025.607.0" />
