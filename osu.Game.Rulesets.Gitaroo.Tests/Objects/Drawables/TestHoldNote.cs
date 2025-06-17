@@ -5,13 +5,12 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Tests.Objects.Drawables;
 
 // Basically copied from osu/osu.Game.Tests/Visual/Gameplay/TestSceneSliderPath.cs
-public partial class TestHoldNote : OsuTestScene
+public partial class TestHoldNote : TestSceneOsuGitaroo
 {
     private readonly SliderPiece drawablePath;
     private SliderPath path;
