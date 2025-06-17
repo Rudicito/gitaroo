@@ -1,3 +1,5 @@
+// Inspired/copied from osu!framework sh_CircularProgress.fs
+
 #ifndef FAN_SHAPED_FS
 #define FAN_SHAPED_FS
 
@@ -13,7 +15,7 @@ layout(location = 2) in highp vec2 v_TexCoord;
 
 layout(std140, set = 0, binding = 0) uniform m_FanShapedParameters
 {
-    mediump float progress;
+    mediump float angle;
     highp float texelSize;
 };
 
@@ -30,7 +32,7 @@ void main(void)
     highp vec2 wrappedCoord = wrap(v_TexCoord, v_TexRect);
     lowp vec4 textureColour = getRoundedColor(wrappedSampler(wrappedCoord, v_TexRect, m_Texture, m_Sampler, -0.9), wrappedCoord);
 
-    o_Colour = vec4(textureColour.rgb, textureColour.a * progressAlphaAt(pixelPos, progress, texelSize));
+    o_Colour = vec4(textureColour.rgb, textureColour.a * progressAlphaAt(pixelPos, angle, texelSize));
 }
 
 #endif

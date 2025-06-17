@@ -11,20 +11,20 @@ namespace osu.Game.Rulesets.Gitaroo.UI;
 
 public partial class FanShapedSprite : Sprite
 {
-    private double progress;
+    private double angle;
 
-    public double Progress
+    public double Angle
     {
-        get => progress;
+        get => angle;
         set
         {
             if (!double.IsFinite(value))
-                throw new ArgumentException($"{nameof(Progress)} must be finite, but is {value}.");
+                throw new ArgumentException($"{nameof(Angle)} must be finite, but is {value}.");
 
-            if (progress == value)
+            if (angle == value)
                 return;
 
-            progress = value;
+            angle = value;
 
             if (IsLoaded)
                 Invalidate(Invalidation.DrawNode);
@@ -49,7 +49,7 @@ public partial class FanShapedSprite : Sprite
         {
         }
 
-        protected float Progress { get; private set; }
+        protected float Angle { get; private set; }
 
         protected float TexelSize { get; private set; }
 
@@ -57,7 +57,7 @@ public partial class FanShapedSprite : Sprite
         {
             base.ApplyState();
 
-            Progress = Math.Abs((float)Source.progress);
+            Angle = Math.Abs((float)Source.angle);
 
             // smoothstep looks too sharp with 1px, let's give it a bit more
             TexelSize = 1.5f / ScreenSpaceDrawQuad.Size.X;
@@ -72,7 +72,7 @@ public partial class FanShapedSprite : Sprite
             parametersBuffer ??= renderer.CreateUniformBuffer<FanShapedParameters>();
             parametersBuffer.Data = new FanShapedParameters
             {
-                Progress = Progress,
+                Angle = Angle,
                 TexelSize = TexelSize,
             };
 
@@ -90,8 +90,10 @@ public partial class FanShapedSprite : Sprite
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private record struct FanShapedParameters
         {
-            public UniformFloat Progress;
+            public UniformFloat Angle;
             public UniformFloat TexelSize;
+
+            private readonly UniformPadding8 Padding;
         }
     }
 }
