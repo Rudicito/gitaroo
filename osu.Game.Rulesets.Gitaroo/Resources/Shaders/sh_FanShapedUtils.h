@@ -48,33 +48,35 @@ lowp float alphaAtFar(highp float dist, highp float texelSize, lowp float min_al
         lowp float edge = smoothstep(0.5 + texelSize, 0.5, dist);
         return edge * min_alpha;
     }
+    
+    return 0.f;
 }
 
-// Returns distance to the progress shape (to closest pixel on it's border)
 lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float angle, highp float texelSize)
 {
-    // Compute angle of the current pixel in the (0, 2*PI) range
     mediump float pixelAngle = atan(0.5 - pixelPos.y, 0.5 - pixelPos.x) - HALF_PI;
 
-    mediump float progressAngle = radians(angle) / 2;
-    mediump float pathRadius = 0;
+    mediump float halfAngle = radians(angle / 2);
     highp float halfTexel = texelSize * 0.5;
 
-    if (abs(pixelAngle) < progressAngle) // Pixel inside the sector
+    if (abs(pixelAngle) < halfAngle) // Pixel inside the sector
     {
-        highp float dist = abs(distance(pixelPos, vec2(0.5)));
+        highp float dist = distance(pixelPos, vec2(0.5));
         return alphaAtFar(dist, texelSize, 0.1, 1.0);
     }
 
-    highp vec2 cs = vec2(cos(progressAngle - HALF_PI), sin(progressAngle - HALF_PI));
-    
-    highp vec2 EdgeLeft = vec2(0.5) + vec2(-cs.x, cs.y) * vec2(0.5 - texelSize);
-    highp float dstToEdgeLeft = dstToLine(EdgeLeft, vec2(0.5), pixelPos);
-    
-    highp vec2 EdgeRight = vec2(0.5) + cs * vec2(0.5 - texelSize);
-    highp float dstToEdgeRight = dstToLine(EdgeRight, vec2(0.5), pixelPos);
+    // Calculate edge vectors rotated to align with vertical axis
+    highp vec2 csRight = vec2(cos(halfAngle - HALF_PI), sin(halfAngle - HALF_PI));
+    highp vec2 csLeft = vec2(cos(-halfAngle - HALF_PI), sin(-halfAngle - HALF_PI));
 
-    return alphaAt(min(dstToEdgeLeft, dstToEdgeRight), texelSize, 0.0f, 1.0f);
+    // Now the edges will properly extend from center along the fan boundaries
+    highp vec2 edgeRight = vec2(0.5) + vec2(0.5) * csRight;
+    highp float dstToEdgeRight = dstToLine(vec2(0.5), edgeRight, pixelPos);
+
+    highp vec2 edgeLeft = vec2(0.5) + vec2(0.5) * csLeft;
+    highp float dstToEdgeLeft = dstToLine(vec2(0.5), edgeLeft, pixelPos);
+
+    return alphaAt(min(dstToEdgeLeft, dstToEdgeRight), texelSize, 0.0, 1.0);
 }
 
 #endif
