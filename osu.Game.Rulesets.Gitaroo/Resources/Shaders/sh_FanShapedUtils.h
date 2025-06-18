@@ -24,18 +24,47 @@ highp float dstToLine(highp vec2 start, highp vec2 end, highp vec2 pixelPos)
     return distance(closest, pixelPos);
 }
 
+lowp float alphaAt(highp float dist, highp float texelSize, lowp float min_alpha, lowp float max_alpha)
+{
+    lowp float subAAMultiplier = clamp(1.0 / (texelSize * 2.0), 0.1, 1.0);
+
+    lowp float edge = smoothstep(texelSize, 0.0, dist) * subAAMultiplier;
+
+    return min_alpha + edge * (max_alpha - min_alpha);
+}
+
+lowp float alphaAtFar(highp float dist, highp float texelSize, lowp float min_alpha, lowp float max_alpha)
+{
+
+    //  For inside the shape, 0.5 is the radius of the circle, vec(0.5f) is the center of the circle
+    if (dist <= 0.5) {
+        // Interpolate from min_alpha at edge to max_alpha at center
+        return min_alpha + (0.5 - dist) * (max_alpha - min_alpha);
+    }
+    // For the edges
+    else
+    {
+        // Smooth transition at the edge - from min_alpha to 0
+        lowp float edge = smoothstep(0.5 + texelSize, 0.5, dist);
+        return edge * min_alpha;
+    }
+}
+
 // Returns distance to the progress shape (to closest pixel on it's border)
-highp float distanceToProgress(highp vec2 pixelPos, mediump float angle, highp float texelSize)
+lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float angle, highp float texelSize)
 {
     // Compute angle of the current pixel in the (0, 2*PI) range
     mediump float pixelAngle = atan(0.5 - pixelPos.y, 0.5 - pixelPos.x) - HALF_PI;
 
     mediump float progressAngle = radians(angle) / 2;
-    mediump float pathRadius = 0.25;
+    mediump float pathRadius = 0;
     highp float halfTexel = texelSize * 0.5;
 
-    if (angle >= 360.0 || abs(pixelAngle) < progressAngle) // Pixel inside the sector
-        return abs(distance(pixelPos, vec2(0.5)) - (0.5 - pathRadius - halfTexel)) - pathRadius + halfTexel;
+    if (abs(pixelAngle) < progressAngle) // Pixel inside the sector
+    {
+        highp float dist = abs(distance(pixelPos, vec2(0.5)));
+        return alphaAtFar(dist, texelSize, 0.1, 1.0);
+    }
 
     highp vec2 cs = vec2(cos(progressAngle - HALF_PI), sin(progressAngle - HALF_PI));
     
@@ -45,14 +74,7 @@ highp float distanceToProgress(highp vec2 pixelPos, mediump float angle, highp f
     highp vec2 EdgeRight = vec2(0.5) + cs * vec2(0.5 - texelSize);
     highp float dstToEdgeRight = dstToLine(EdgeRight, vec2(0.5), pixelPos);
 
-    return min(dstToEdgeLeft, dstToEdgeRight);
-}
-
-lowp float progressAlphaAt(highp vec2 pixelPos, mediump float angle, highp float texelSize)
-{
-    lowp float subAAMultiplier = clamp(1.0 / (texelSize * 2.0), 0.1, 1.0);
-    
-    return smoothstep(texelSize, 0.0, distanceToProgress(pixelPos, angle, texelSize)) * subAAMultiplier;
+    return alphaAt(min(dstToEdgeLeft, dstToEdgeRight), texelSize, 0.0f, 1.0f);
 }
 
 #endif
