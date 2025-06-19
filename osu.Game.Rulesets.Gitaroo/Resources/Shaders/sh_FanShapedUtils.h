@@ -24,59 +24,67 @@ highp float dstToLine(highp vec2 start, highp vec2 end, highp vec2 pixelPos)
     return distance(closest, pixelPos);
 }
 
-lowp float alphaAt(highp float dist, highp float texelSize, lowp float min_alpha, lowp float max_alpha)
+lowp float alphaAtLines(highp float dist, highp float texelSize, lowp float max_alpha, highp float halfLinesWidth)
 {
-    lowp float subAAMultiplier = clamp(1.0 / (texelSize * 2.0), 0.1, 1.0);
+    lowp float edge = 0.0;
 
-    lowp float edge = smoothstep(texelSize, 0.0, dist) * subAAMultiplier;
+    if (dist < halfLinesWidth - texelSize) {
+        edge = 1.0;
+    } else if (dist < halfLinesWidth + texelSize) {
+        edge = smoothstep(halfLinesWidth + texelSize, halfLinesWidth - texelSize, dist);
+    } else {
+        edge = 0.0;
+    }
 
-    return min_alpha + edge * (max_alpha - min_alpha);
+    return mix(0.0, max_alpha, edge);
 }
 
 lowp float alphaAtFar(highp float dist, highp float texelSize, lowp float min_alpha, lowp float max_alpha)
 {
-
-    //  For inside the shape, 0.5 is the radius of the circle, vec(0.5f) is the center of the circle
-    if (dist <= 0.5) {
-        // Interpolate from min_alpha at edge to max_alpha at center
-        return min_alpha + (0.5 - dist) * (max_alpha - min_alpha);
+    //  Inside the shape
+    if (dist <= 0.5 - texelSize) {
+        return mix(min_alpha, max_alpha, (0.5 - dist) / 0.5);
     }
-    // For the edges
+            
+    // Outside, too far
     else
     {
-        // Smooth transition at the edge - from min_alpha to 0
-        lowp float edge = smoothstep(0.5 + texelSize, 0.5, dist);
+        lowp float edge = smoothstep(0.5, 0.5 - texelSize, dist);
         return edge * min_alpha;
     }
-    
-    return 0.f;
 }
 
-lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float angle, highp float texelSize)
+lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float angle, highp float texelSize, highp float linesWidth, mediump float linesAlpha, mediump float fanShapedMinAlpha, mediump float fanShapedMaxAlpha)
 {
+    highp vec2 origin = vec2(0.5);
+    highp float radius = 0.5;
+    
     mediump float pixelAngle = atan(0.5 - pixelPos.y, 0.5 - pixelPos.x) - HALF_PI;
-
     mediump float halfAngle = radians(angle / 2);
-    highp float halfTexel = texelSize * 0.5;
+    highp float halfLinesWidth = linesWidth * 0.5;
 
-    if (abs(pixelAngle) < halfAngle) // Pixel inside the sector
-    {
-        highp float dist = distance(pixelPos, vec2(0.5));
-        return alphaAtFar(dist, texelSize, 0.1, 1.0);
-    }
+    highp float dist = distance(pixelPos, origin);
 
-    // Calculate edge vectors rotated to align with vertical axis
     highp vec2 csRight = vec2(cos(halfAngle - HALF_PI), sin(halfAngle - HALF_PI));
-    highp vec2 csLeft = vec2(cos(-halfAngle - HALF_PI), sin(-halfAngle - HALF_PI));
+    highp vec2 csLeft = vec2(-csRight.x, csRight.y);
+    
+    highp vec2 edgeRight = origin + csRight * vec2(radius - texelSize - halfLinesWidth);
+    highp float dstToEdgeRight = dstToLine(origin, edgeRight, pixelPos);
 
-    // Now the edges will properly extend from center along the fan boundaries
-    highp vec2 edgeRight = vec2(0.5) + vec2(0.5) * csRight;
-    highp float dstToEdgeRight = dstToLine(vec2(0.5), edgeRight, pixelPos);
+    highp vec2 edgeLeft = origin + csLeft * vec2(radius - texelSize - halfLinesWidth);
+    highp float dstToEdgeLeft = dstToLine(origin, edgeLeft, pixelPos);
 
-    highp vec2 edgeLeft = vec2(0.5) + vec2(0.5) * csLeft;
-    highp float dstToEdgeLeft = dstToLine(vec2(0.5), edgeLeft, pixelPos);
+    highp float edgeDist = min(dstToEdgeLeft, dstToEdgeRight);
 
-    return alphaAt(min(dstToEdgeLeft, dstToEdgeRight), texelSize, 0.0, 1.0);
+    if (abs(pixelAngle) < halfAngle) {
+        // Inside sector
+        lowp float centerAlpha = alphaAtFar(dist, texelSize, fanShapedMinAlpha, fanShapedMaxAlpha);
+        lowp float edgeAlpha = alphaAtLines(edgeDist, texelSize, linesAlpha, halfLinesWidth);
+        return max(centerAlpha, edgeAlpha); // Choose stronger effect
+    } else {
+        // Outside sector
+        return alphaAtLines(edgeDist, texelSize, linesAlpha, halfLinesWidth);
+    }
 }
 
 #endif

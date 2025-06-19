@@ -11,6 +11,11 @@ namespace osu.Game.Rulesets.Gitaroo.UI;
 
 public partial class FanShapedSprite : Sprite
 {
+    private const double lines_width = 0.005;
+    private const double lines_alpha = 1;
+    private const double fan_shaped_min_alpha = 0.1;
+    private const double fan_shaped_max_alpha = 1;
+
     private double angle;
 
     public double Angle
@@ -50,14 +55,21 @@ public partial class FanShapedSprite : Sprite
         }
 
         protected float Angle { get; private set; }
-
         protected float TexelSize { get; private set; }
+        protected float LinesWidth { get; private set; }
+        protected float LinesAlpha { get; private set; }
+        protected float FanShapedMinAlpha { get; private set; }
+        protected float FanShapedMaxAlpha { get; private set; }
 
         public override void ApplyState()
         {
             base.ApplyState();
 
             Angle = Math.Abs((float)Source.angle);
+            LinesWidth = Math.Abs((float)lines_width);
+            LinesAlpha = Math.Abs((float)lines_alpha);
+            FanShapedMinAlpha = Math.Abs((float)fan_shaped_min_alpha);
+            FanShapedMaxAlpha = Math.Abs((float)fan_shaped_max_alpha);
 
             // smoothstep looks too sharp with 1px, let's give it a bit more
             TexelSize = 1.5f / ScreenSpaceDrawQuad.Size.X;
@@ -74,6 +86,10 @@ public partial class FanShapedSprite : Sprite
             {
                 Angle = Angle,
                 TexelSize = TexelSize,
+                LinesWidth = LinesWidth,
+                LinesAlpha = LinesAlpha,
+                FanShapedMinAlpha = FanShapedMinAlpha,
+                FanShapedMaxAlpha = FanShapedMaxAlpha,
             };
 
             shader.BindUniformBlock("m_FanShapedParameters", parametersBuffer);
@@ -92,6 +108,10 @@ public partial class FanShapedSprite : Sprite
         {
             public UniformFloat Angle;
             public UniformFloat TexelSize;
+            public UniformFloat LinesWidth;
+            public UniformFloat LinesAlpha;
+            public UniformFloat FanShapedMinAlpha;
+            public UniformFloat FanShapedMaxAlpha;
 
             private readonly UniformPadding8 Padding;
         }
