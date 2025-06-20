@@ -52,7 +52,8 @@ public partial class FanShaped : Container
                 {
                     new FanShapedSprite // Fan Shaped
                     {
-                        Size = new Vector2(400, 400),
+                        Size = new Vector2(fan_shaped_max_y * 2),
+                        Angle = FanShapedAngle,
                         Origin = Anchor.Centre,
                         Anchor = Anchor.TopCentre,
                         Colour = Color4.Cyan,
@@ -93,16 +94,6 @@ public partial class FanShaped : Container
                 }
             }
         ];
-    }
-
-    private float fan_shaped_get_x(float angle)
-    {
-        if (angle is >= 180 or <= 0)
-        {
-            throw new InvalidOperationException($"Invalid FanShaped angle: {angle}°. The angle must be less than 180° and more than 0°.");
-        }
-
-        return (float)(Math.Tan(MathHelper.DegreesToRadians(angle / 2f)) * fan_shaped_max_y * 2f);
     }
 
     private void fanShapeFadeIn()
