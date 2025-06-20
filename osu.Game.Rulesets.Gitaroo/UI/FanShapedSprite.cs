@@ -11,24 +11,81 @@ namespace osu.Game.Rulesets.Gitaroo.UI;
 
 public partial class FanShapedSprite : Sprite
 {
-    private double progress;
+    private double angle = 45;
 
-    public double Progress
+    public double Angle
     {
-        get => progress;
+        get => angle;
         set
         {
             if (!double.IsFinite(value))
-                throw new ArgumentException($"{nameof(Progress)} must be finite, but is {value}.");
+                throw new ArgumentException($"{nameof(Angle)} must be finite, but is {value}.");
 
-            if (progress == value)
+            if (angle == value)
                 return;
 
-            progress = value;
+            angle = value;
 
             if (IsLoaded)
                 Invalidate(Invalidation.DrawNode);
         }
+    }
+
+    private double linesWidth = 0.005;
+
+    protected double LinesWidth
+    {
+        get => linesWidth;
+        set
+        {
+            if (!double.IsFinite(value))
+                throw new ArgumentException($"{nameof(LinesWidth)} must be finite, but is {value}.");
+
+            if (linesWidth == value)
+                return;
+
+            linesWidth = value;
+
+            if (IsLoaded)
+                Invalidate(Invalidation.DrawNode);
+        }
+    }
+
+    private float linesAlpha = 1;
+
+    protected float LinesAlpha
+    {
+        get => linesAlpha;
+        set => alphaSetter(ref linesAlpha, value);
+    }
+
+    private float fanShapedMinAlpha = 0.1f;
+
+    protected float FanShapedMinAlpha
+    {
+        get => fanShapedMinAlpha;
+        set => alphaSetter(ref fanShapedMinAlpha, value);
+    }
+
+    private float fanShapedMaxAlpha = 1;
+
+    protected float FanShapedMaxAlpha
+    {
+        get => fanShapedMaxAlpha;
+        set => alphaSetter(ref fanShapedMaxAlpha, value);
+    }
+
+    private void alphaSetter(ref float field, float newValue)
+    {
+        newValue = float.Clamp(newValue, 0, 1);
+
+        if (field == newValue)
+            return;
+
+        field = newValue;
+
+        if (IsLoaded)
+            Invalidate(Invalidation.DrawNode);
     }
 
     [BackgroundDependencyLoader]
@@ -49,15 +106,22 @@ public partial class FanShapedSprite : Sprite
         {
         }
 
-        protected float Progress { get; private set; }
-
+        protected float Angle { get; private set; }
         protected float TexelSize { get; private set; }
+        protected float LinesWidth { get; private set; }
+        protected float LinesAlpha { get; private set; }
+        protected float FanShapedMinAlpha { get; private set; }
+        protected float FanShapedMaxAlpha { get; private set; }
 
         public override void ApplyState()
         {
             base.ApplyState();
 
-            Progress = Math.Abs((float)Source.progress);
+            Angle = Math.Abs((float)Source.angle);
+            LinesWidth = Math.Abs((float)Source.linesWidth);
+            LinesAlpha = Math.Abs(Source.linesAlpha);
+            FanShapedMinAlpha = Math.Abs(Source.fanShapedMinAlpha);
+            FanShapedMaxAlpha = Math.Abs(Source.fanShapedMaxAlpha);
 
             // smoothstep looks too sharp with 1px, let's give it a bit more
             TexelSize = 1.5f / ScreenSpaceDrawQuad.Size.X;
@@ -72,8 +136,12 @@ public partial class FanShapedSprite : Sprite
             parametersBuffer ??= renderer.CreateUniformBuffer<FanShapedParameters>();
             parametersBuffer.Data = new FanShapedParameters
             {
-                Progress = Progress,
+                Angle = Angle,
                 TexelSize = TexelSize,
+                LinesWidth = LinesWidth,
+                LinesAlpha = LinesAlpha,
+                FanShapedMinAlpha = FanShapedMinAlpha,
+                FanShapedMaxAlpha = FanShapedMaxAlpha,
             };
 
             shader.BindUniformBlock("m_FanShapedParameters", parametersBuffer);
@@ -90,8 +158,14 @@ public partial class FanShapedSprite : Sprite
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private record struct FanShapedParameters
         {
-            public UniformFloat Progress;
+            public UniformFloat Angle;
             public UniformFloat TexelSize;
+            public UniformFloat LinesWidth;
+            public UniformFloat LinesAlpha;
+            public UniformFloat FanShapedMinAlpha;
+            public UniformFloat FanShapedMaxAlpha;
+
+            private readonly UniformPadding8 Padding;
         }
     }
 }

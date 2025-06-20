@@ -1,3 +1,5 @@
+// Inspired/copied from osu!framework sh_CircularProgressUtils.h
+
 #ifndef FAN_SHAPED_UTILS_H
 #define FAN_SHAPED_UTILS_H
 
@@ -22,37 +24,67 @@ highp float dstToLine(highp vec2 start, highp vec2 end, highp vec2 pixelPos)
     return distance(closest, pixelPos);
 }
 
-// Returns distance to the progress shape (to closest pixel on it's border)
-highp float distanceToProgress(highp vec2 pixelPos, mediump float progress, highp float texelSize)
+lowp float alphaAtLines(highp float dist, highp float texelSize, lowp float max_alpha, highp float halfLinesWidth)
 {
-    // Compute angle of the current pixel in the (0, 2*PI) range
-    mediump float pixelAngle = atan(0.5 - pixelPos.y, 0.5 - pixelPos.x) - HALF_PI;
-    if (pixelAngle < 0.0)
-        pixelAngle += TWO_PI;
+    lowp float edge = 0.0;
 
-    mediump float progressAngle = TWO_PI * progress;
-    mediump float pathRadius = 0.25;
-    highp float halfTexel = texelSize * 0.5;
+    if (dist < halfLinesWidth - texelSize) {
+        edge = 1.0;
+    } else if (dist < halfLinesWidth + texelSize) {
+        edge = smoothstep(halfLinesWidth + texelSize, halfLinesWidth - texelSize, dist);
+    } else {
+        edge = 0.0;
+    }
 
-    if (progress >= 1.0 || pixelAngle < progressAngle) // Pixel inside the sector
-        return abs(distance(pixelPos, vec2(0.5)) - (0.5 - pathRadius - halfTexel)) - pathRadius + halfTexel;
-
-    highp vec2 cs = vec2(cos(progressAngle - HALF_PI), sin(progressAngle - HALF_PI));
-
-    highp float dstToIdleEdge = dstToLine(vec2(0.5, texelSize), vec2(0.5, 2.0 * pathRadius), pixelPos);
-
-    highp vec2 rotatingEdgeTop = vec2(0.5) + cs * vec2(0.5 - texelSize);
-    highp vec2 rotatingEdgeBottom = vec2(0.5) + cs * vec2(0.5 - 2.0 * pathRadius);
-    highp float dstToRotatingEdge = dstToLine(rotatingEdgeTop, rotatingEdgeBottom, pixelPos);
-
-    return min(dstToIdleEdge, dstToRotatingEdge);
+    return mix(0.0, max_alpha, edge);
 }
 
-lowp float progressAlphaAt(highp vec2 pixelPos, mediump float progress, highp float texelSize)
+lowp float alphaAtFar(highp float dist, highp float texelSize, lowp float min_alpha, lowp float max_alpha)
 {
-    lowp float subAAMultiplier = clamp(1.0 / (texelSize * 2.0), 0.1, 1.0);
+    //  Inside the shape
+    if (dist <= 0.5 - texelSize) {
+        return mix(min_alpha, max_alpha, (0.5 - dist) / 0.5);
+    }
+            
+    // Outside, too far
+    else
+    {
+        lowp float edge = smoothstep(0.5, 0.5 - texelSize, dist);
+        return edge * min_alpha;
+    }
+}
+
+lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float angle, highp float texelSize, highp float linesWidth, mediump float linesAlpha, mediump float fanShapedMinAlpha, mediump float fanShapedMaxAlpha)
+{
+    highp vec2 origin = vec2(0.5);
+    highp float radius = 0.5;
     
-    return smoothstep(texelSize, 0.0, distanceToProgress(pixelPos, progress, texelSize)) * subAAMultiplier;
+    mediump float pixelAngle = atan(0.5 - pixelPos.y, 0.5 - pixelPos.x) - HALF_PI;
+    mediump float halfAngle = radians(angle / 2);
+    highp float halfLinesWidth = linesWidth * 0.5;
+
+    highp float dist = distance(pixelPos, origin);
+
+    highp vec2 csRight = vec2(cos(halfAngle - HALF_PI), sin(halfAngle - HALF_PI));
+    highp vec2 csLeft = vec2(-csRight.x, csRight.y);
+    
+    highp vec2 edgeRight = origin + csRight * vec2(radius - texelSize - halfLinesWidth);
+    highp float dstToEdgeRight = dstToLine(origin, edgeRight, pixelPos);
+
+    highp vec2 edgeLeft = origin + csLeft * vec2(radius - texelSize - halfLinesWidth);
+    highp float dstToEdgeLeft = dstToLine(origin, edgeLeft, pixelPos);
+
+    highp float edgeDist = min(dstToEdgeLeft, dstToEdgeRight);
+
+    if (abs(pixelAngle) < halfAngle) {
+        // Inside sector
+        lowp float centerAlpha = alphaAtFar(dist, texelSize, fanShapedMinAlpha, fanShapedMaxAlpha);
+        lowp float edgeAlpha = alphaAtLines(edgeDist, texelSize, linesAlpha, halfLinesWidth);
+        return max(centerAlpha, edgeAlpha); // Choose stronger effect
+    } else {
+        // Outside sector
+        return alphaAtLines(edgeDist, texelSize, linesAlpha, halfLinesWidth);
+    }
 }
 
 #endif

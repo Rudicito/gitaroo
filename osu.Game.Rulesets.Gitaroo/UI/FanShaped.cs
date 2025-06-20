@@ -1,9 +1,8 @@
 using System;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Gitaroo.MathUtils;
 using osuTK;
@@ -49,14 +48,16 @@ public partial class FanShaped : Container
                 Origin = Anchor.TopCentre,
                 Alpha = 0f,
                 Rotation = FanShapedRotation,
-                Children = new[]
+                Children = new Sprite[]
                 {
-                    new Triangle // Fan Shaped
+                    new FanShapedSprite // Fan Shaped
                     {
-                        Origin = Anchor.TopCentre,
+                        Size = new Vector2(fan_shaped_max_y * 2),
+                        Angle = FanShapedAngle,
+                        Origin = Anchor.Centre,
                         Anchor = Anchor.TopCentre,
-                        Size = new Vector2(fan_shaped_get_x(FanShapedAngle), fan_shaped_max_y),
-                        Colour = ColourInfo.GradientVertical(Color4.Cyan, Color4.Cyan.Opacity(0)),
+                        Colour = Color4.Cyan,
+                        Rotation = 180,
                     },
 
                     new Triangle // Middle arrow
@@ -93,16 +94,6 @@ public partial class FanShaped : Container
                 }
             }
         ];
-    }
-
-    private float fan_shaped_get_x(float angle)
-    {
-        if (angle is >= 180 or <= 0)
-        {
-            throw new InvalidOperationException($"Invalid FanShaped angle: {angle}°. The angle must be less than 180° and more than 0°.");
-        }
-
-        return (float)(Math.Tan(MathHelper.DegreesToRadians(angle / 2f)) * fan_shaped_max_y * 2f);
     }
 
     private void fanShapeFadeIn()
