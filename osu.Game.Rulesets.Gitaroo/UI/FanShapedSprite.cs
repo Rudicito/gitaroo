@@ -11,12 +11,7 @@ namespace osu.Game.Rulesets.Gitaroo.UI;
 
 public partial class FanShapedSprite : Sprite
 {
-    private const double lines_width = 0.005;
-    private const double lines_alpha = 1;
-    private const double fan_shaped_min_alpha = 0.1;
-    private const double fan_shaped_max_alpha = 1;
-
-    private double angle;
+    private double angle = 45;
 
     public double Angle
     {
@@ -34,6 +29,63 @@ public partial class FanShapedSprite : Sprite
             if (IsLoaded)
                 Invalidate(Invalidation.DrawNode);
         }
+    }
+
+    private double linesWidth = 0.005;
+
+    protected double LinesWidth
+    {
+        get => linesWidth;
+        set
+        {
+            if (!double.IsFinite(value))
+                throw new ArgumentException($"{nameof(LinesWidth)} must be finite, but is {value}.");
+
+            if (linesWidth == value)
+                return;
+
+            linesWidth = value;
+
+            if (IsLoaded)
+                Invalidate(Invalidation.DrawNode);
+        }
+    }
+
+    private float linesAlpha = 1;
+
+    protected float LinesAlpha
+    {
+        get => linesAlpha;
+        set => alphaSetter(ref linesAlpha, value);
+    }
+
+    private float fanShapedMinAlpha = 0.1f;
+
+    protected float FanShapedMinAlpha
+    {
+        get => fanShapedMinAlpha;
+        set => alphaSetter(ref fanShapedMinAlpha, value);
+    }
+
+    private float fanShapedMaxAlpha = 1;
+
+    protected float FanShapedMaxAlpha
+    {
+        get => fanShapedMaxAlpha;
+        set => alphaSetter(ref fanShapedMaxAlpha, value);
+    }
+
+    private void alphaSetter(ref float field, float newValue)
+    {
+        newValue = float.Clamp(newValue, 0, 1);
+
+        if (field == newValue)
+            return;
+
+        field = newValue;
+
+        if (IsLoaded)
+            Invalidate(Invalidation.DrawNode);
     }
 
     [BackgroundDependencyLoader]
@@ -66,10 +118,10 @@ public partial class FanShapedSprite : Sprite
             base.ApplyState();
 
             Angle = Math.Abs((float)Source.angle);
-            LinesWidth = Math.Abs((float)lines_width);
-            LinesAlpha = Math.Abs((float)lines_alpha);
-            FanShapedMinAlpha = Math.Abs((float)fan_shaped_min_alpha);
-            FanShapedMaxAlpha = Math.Abs((float)fan_shaped_max_alpha);
+            LinesWidth = Math.Abs((float)Source.linesWidth);
+            LinesAlpha = Math.Abs(Source.linesAlpha);
+            FanShapedMinAlpha = Math.Abs(Source.fanShapedMinAlpha);
+            FanShapedMaxAlpha = Math.Abs(Source.fanShapedMaxAlpha);
 
             // smoothstep looks too sharp with 1px, let's give it a bit more
             TexelSize = 1.5f / ScreenSpaceDrawQuad.Size.X;

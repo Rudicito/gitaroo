@@ -19,14 +19,14 @@ using SixLabors.ImageSharp.PixelFormats;
 namespace osu.Game.Rulesets.Gitaroo.Tests.Objects.Drawables
 {
     /// <remarks>
-    /// Taken from osu!framework TestSceneCircularProgress
+    /// Heavily based of TestSceneCircularProgress from osu!framework
     /// </remarks>
     public partial class TestShaderFanShaped : TestSceneOsuGitaroo
     {
         [Resolved]
         private IRenderer renderer { get; set; }
 
-        private FanShapedSprite fanShapedSprite;
+        private FanShapedCustom fanShapedSprite;
 
         // private int rotateMode;
         // private const double period = 4000;
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Gitaroo.Tests.Objects.Drawables
                     Origin = Anchor.Centre,
                     Size = new Vector2(250),
                     CornerRadius = 20,
-                    Child = fanShapedSprite = new FanShapedSprite
+                    Child = fanShapedSprite = new FanShapedCustom
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -139,7 +139,12 @@ namespace osu.Game.Rulesets.Gitaroo.Tests.Objects.Drawables
             AddToggleStep("Toggle masking", m => maskingContainer.Masking = m);
             AddToggleStep("Toggle aspect ratio", r => fanShapedSprite.Size = r ? new Vector2(600, 400) : new Vector2(400));
             AddToggleStep("Toggle background", b => background.Alpha = b ? 1 : 0);
-            AddSliderStep("Angle", 0f, 180f, 45f, s => fanShapedSprite.Angle = s);
+
+            AddSliderStep("Angle", 0, 180, fanShapedSprite.Angle, s => fanShapedSprite.Angle = s);
+            AddSliderStep("Lines Width", 0, 0.1, fanShapedSprite.LinesWidth, s => fanShapedSprite.LinesWidth = s);
+            AddSliderStep("Lines Alpha", 0f, 1f, 45f, s => fanShapedSprite.LinesAlpha = s);
+            AddSliderStep("FanShaped Min Alpha", 0f, 1f, fanShapedSprite.FanShapedMinAlpha, s => fanShapedSprite.FanShapedMinAlpha = s);
+            AddSliderStep("FanShaped Max Alpha", 0f, 1f, fanShapedSprite.FanShapedMaxAlpha, s => fanShapedSprite.FanShapedMaxAlpha = s);
             AddSliderStep("Scale", 0f, 2f, 1f, s => fanShapedSprite.Scale = new Vector2(s));
         }
 
@@ -270,5 +275,32 @@ namespace osu.Game.Rulesets.Gitaroo.Tests.Objects.Drawables
         //             break;
         //     }
         // }
+    }
+
+    internal partial class FanShapedCustom : FanShapedSprite
+    {
+        public new double LinesWidth
+        {
+            get => base.LinesWidth;
+            set => base.LinesWidth = value;
+        }
+
+        public new float LinesAlpha
+        {
+            get => base.LinesAlpha;
+            set => base.LinesAlpha = value;
+        }
+
+        public new float FanShapedMinAlpha
+        {
+            get => base.FanShapedMinAlpha;
+            set => base.FanShapedMinAlpha = value;
+        }
+
+        public new float FanShapedMaxAlpha
+        {
+            get => base.FanShapedMaxAlpha;
+            set => base.FanShapedMaxAlpha = value;
+        }
     }
 }
