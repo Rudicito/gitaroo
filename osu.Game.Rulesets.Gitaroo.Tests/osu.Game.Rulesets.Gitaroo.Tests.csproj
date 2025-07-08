@@ -20,5 +20,6 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>osu.Game.Rulesets.Gitaroo.Tests</RootNamespace>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 </Project>
