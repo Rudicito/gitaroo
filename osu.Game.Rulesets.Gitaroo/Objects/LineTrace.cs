@@ -13,7 +13,7 @@ public class LineTrace : GitarooHitObject, IHasPath
     }
 
     public override Judgement CreateJudgement() => new IgnoreJudgement();
-    protected override HitWindows CreateHitWindows() => null;
+    protected override HitWindows? CreateHitWindows() => null;
 
     public double EndTime
     {

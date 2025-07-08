@@ -23,7 +23,7 @@ public class GitarooRuleset : Ruleset
 {
     public override string Description => "Gitaroo";
 
-    public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableGitarooRuleset(this, beatmap, mods);
+    public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableGitarooRuleset(this, beatmap, mods);
 
     public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new GitarooBeatmapConverter(beatmap, this);
 

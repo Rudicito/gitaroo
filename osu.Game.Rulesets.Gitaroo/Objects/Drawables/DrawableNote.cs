@@ -7,7 +7,7 @@ public partial class DrawableNote : DrawableGitarooHitObject<Note>
     {
     }
 
-    public DrawableNote(Note hitObject)
+    public DrawableNote(Note? hitObject)
         : base(hitObject)
     {
         // AutoSizeAxes = Axes.Y;

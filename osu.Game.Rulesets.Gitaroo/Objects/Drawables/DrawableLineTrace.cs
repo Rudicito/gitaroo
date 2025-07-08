@@ -7,7 +7,7 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>
     {
     }
 
-    public DrawableLineTrace(LineTrace hitObject)
+    public DrawableLineTrace(LineTrace? hitObject)
         : base(hitObject)
     {
     }

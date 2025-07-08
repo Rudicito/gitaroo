@@ -7,6 +7,8 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
+#nullable disable
+
 namespace osu.Game.Rulesets.Gitaroo.Tests.Objects.Drawables;
 
 // Basically copied from osu/osu.Game.Tests/Visual/Gameplay/TestSceneSliderPath.cs

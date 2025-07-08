@@ -9,8 +9,8 @@ namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
 public partial class DrawableGitarooHitObject : DrawableHitObject<GitarooHitObject>
 {
-    public DrawableGitarooHitObject(GitarooHitObject hitObject)
-        : base(hitObject)
+    public DrawableGitarooHitObject(GitarooHitObject? hitObject)
+        : base(hitObject!)
     {
         // RelativeSizeAxes = Axes.X;
     }
@@ -19,7 +19,7 @@ public partial class DrawableGitarooHitObject : DrawableHitObject<GitarooHitObje
     /// Whether this <see cref="DrawableGitarooHitObject"/> can be hit, given a time value.
     /// If non-null, judgements will be ignored whilst the function returns false.
     /// </summary>
-    public Func<DrawableHitObject, double, bool> CheckHittable;
+    public Func<DrawableHitObject, double, bool>? CheckHittable;
 
     // protected override void CheckForResult(bool userTriggered, double timeOffset)
     // {
@@ -53,7 +53,7 @@ public abstract partial class DrawableGitarooHitObject<TObject> : DrawableGitaro
 {
     public new TObject HitObject => (TObject)base.HitObject;
 
-    protected DrawableGitarooHitObject(TObject hitObject)
+    protected DrawableGitarooHitObject(TObject? hitObject)
         : base(hitObject)
     {
     }

@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Gitaroo.UI;
 [Cached]
 public partial class DrawableGitarooRuleset : DrawableRuleset<GitarooHitObject>
 {
-    public DrawableGitarooRuleset(GitarooRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+    public DrawableGitarooRuleset(GitarooRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
         : base(ruleset, beatmap, mods)
     {
     }
@@ -29,9 +29,9 @@ public partial class DrawableGitarooRuleset : DrawableRuleset<GitarooHitObject>
 
     protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new GitarooFramedReplayInputHandler(replay);
 
-    public override DrawableHitObject<GitarooHitObject> CreateDrawableRepresentation(GitarooHitObject h) => null;
+    public override DrawableHitObject<GitarooHitObject>? CreateDrawableRepresentation(GitarooHitObject h) => null;
 
-    protected override PassThroughInputManager CreateInputManager() => new GitarooInputManager(Ruleset?.RulesetInfo);
+    protected override PassThroughInputManager CreateInputManager() => new GitarooInputManager(Ruleset.RulesetInfo);
 
     protected override ResumeOverlay CreateResumeOverlay()
     {
