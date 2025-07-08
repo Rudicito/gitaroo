@@ -127,7 +127,7 @@ public partial class FanShapedSprite : Sprite
             TexelSize = 1.5f / ScreenSpaceDrawQuad.Size.X;
         }
 
-        private IUniformBuffer<FanShapedParameters> parametersBuffer;
+        private IUniformBuffer<FanShapedParameters>? parametersBuffer;
 
         protected override void BindUniformResources(IShader shader, IRenderer renderer)
         {
