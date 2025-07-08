@@ -79,14 +79,14 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
         // todo: Add LineTrace generator algorithm
         List<LineTrace> lineTraces =
         [
-            new(new SliderPath())
-            {
-                StartTime = 20000
-            },
-            new(new SliderPath())
-            {
-                StartTime = 40000
-            }
+            // new(new SliderPath())
+            // {
+            //     StartTime = 20000
+            // },
+            // new(new SliderPath())
+            // {
+            //     StartTime = 40000
+            // }
         ];
         return lineTraces;
     }

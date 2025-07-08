@@ -7,9 +7,8 @@ namespace osu.Game.Rulesets.Gitaroo.Objects;
 
 public class LineTrace : GitarooHitObject, IHasPath
 {
-    public LineTrace(SliderPath path)
+    public LineTrace()
     {
-        Path = path;
     }
 
     public override Judgement CreateJudgement() => new IgnoreJudgement();
@@ -23,5 +22,5 @@ public class LineTrace : GitarooHitObject, IHasPath
 
     public double Duration { get; set; }
     public double Distance => Path.Distance;
-    public SliderPath Path { get; }
+    public required SliderPath Path { get; set; }
 }

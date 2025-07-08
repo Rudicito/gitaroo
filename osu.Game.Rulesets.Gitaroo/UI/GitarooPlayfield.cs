@@ -42,7 +42,7 @@ public partial class GitarooPlayfield : Playfield
 
         RegisterPool<Note, DrawableNote>(10, 50);
         RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
-        // RegisterPool<LineTrace, DrawableLineTrace>(2, 5);
+        RegisterPool<LineTrace, DrawableLineTrace>(2, 5);
     }
 
     protected override void LoadComplete()
