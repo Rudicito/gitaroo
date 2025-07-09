@@ -51,7 +51,7 @@ public partial class DrawableGitarooHitObject : DrawableHitObject<GitarooHitObje
 public abstract partial class DrawableGitarooHitObject<TObject> : DrawableGitarooHitObject
     where TObject : GitarooHitObject
 {
-    public new TObject HitObject => (TObject)base.HitObject;
+    public new TObject? HitObject => (TObject?)base.HitObject;
 
     protected DrawableGitarooHitObject(TObject? hitObject)
         : base(hitObject)
