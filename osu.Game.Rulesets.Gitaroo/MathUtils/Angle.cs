@@ -1,3 +1,6 @@
+using System;
+using osuTK;
+
 namespace osu.Game.Rulesets.Gitaroo.MathUtils;
 
 internal static class Angle
@@ -31,5 +34,18 @@ internal static class Angle
             return angle >= start && angle <= end;
         else // Wrap-around case
             return angle >= start || angle <= end;
+    }
+
+    public static float GetDegreesFromPosition(Vector2 a, Vector2 b)
+    {
+        var direction = b - a;
+        return NormalizeAngle(MathHelper.RadiansToDegrees(MathF.Atan2(direction.Y, direction.X)));
+    }
+
+    public static Vector2 MovePoint(Vector2 start, float angleDegrees, float distance)
+    {
+        float angleRadians = MathHelper.DegreesToRadians(angleDegrees);
+        Vector2 direction = new Vector2((float)Math.Cos(angleRadians), (float)Math.Sin(angleRadians));
+        return start + direction * distance;
     }
 }

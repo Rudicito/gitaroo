@@ -76,17 +76,17 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
     private List<LineTrace> generateLineTrace(GitarooBeatmap beatmap)
     {
+        double velocity = beatmap.Difficulty.SliderMultiplier;
         // todo: Add LineTrace generator algorithm
         List<LineTrace> lineTraces =
         [
-            // new(new SliderPath())
-            // {
-            //     StartTime = 20000
-            // },
-            // new(new SliderPath())
-            // {
-            //     StartTime = 40000
-            // }
+            new LineTrace
+            {
+                Velocity = velocity,
+                StartTime = 1000,
+                EndTime, 10000,
+                Path = new SliderPath(),
+            }
         ];
         return lineTraces;
     }

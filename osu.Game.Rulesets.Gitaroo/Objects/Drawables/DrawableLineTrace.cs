@@ -1,6 +1,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Gitaroo.MathUtils;
 using osu.Game.Rulesets.Gitaroo.Skinning;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -40,11 +41,32 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IH
     {
         base.UpdateAfterChildren();
 
-        double completionProgress = Math.Clamp((Time.Current - HitObject.StartTime) / HitObject.Duration, 0, 1);
+        if (HitObject == null) return;
+        if (SliderBody == null) return;
 
-        SliderBody?.UpdateProgress(completionProgress);
-        Size = SliderBody?.Size ?? Vector2.Zero;
-        OriginPosition = SliderBody?.PathOffset ?? Vector2.Zero;
+        Size = SliderBody.Size;
+        Anchor = Anchor.Centre;
+        Origin = Anchor.TopLeft;
+
+        double completionProgress = (Time.Current - HitObject.StartTime) / HitObject.Duration;
+
+        if (completionProgress < 0)
+        {
+            // Move the LineTrace towards the center
+            if (SliderBody.AngleStart != null)
+            {
+                SliderBody.UpdateProgress(0);
+
+                Position = Angle.MovePoint(-SliderBody.PathStartOffset, SliderBody.AngleStart.Value, (float)(HitObject.Velocity * (HitObject.StartTime - Time.Current)));
+            }
+        }
+
+        else
+        {
+            // Move the LineTrace current progression to the center
+            SliderBody.UpdateProgress(Math.Clamp(completionProgress, 0, 1));
+            Position = -SliderBody.PathOffset ?? Vector2.Zero;
+        }
     }
 
     protected override void OnApply()

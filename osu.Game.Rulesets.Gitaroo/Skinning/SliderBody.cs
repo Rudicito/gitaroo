@@ -23,7 +23,7 @@ public abstract partial class SliderBody : CompositeDrawable
     /// <summary>
     /// Offset in absolute coordinates from the start of the curve.
     /// </summary>
-    public virtual Vector2 PathOffset => path.PositionInBoundingBox(path.Vertices[0]);
+    public virtual Vector2 PathStartOffset => path.PositionInBoundingBox(path.Vertices[0]);
 
     /// <summary>
     /// Offset in absolute coordinates from the end of the curve.

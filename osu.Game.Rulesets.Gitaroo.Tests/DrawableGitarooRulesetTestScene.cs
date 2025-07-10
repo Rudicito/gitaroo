@@ -4,7 +4,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.UI;
 using osu.Game.Rulesets.Objects;
 
@@ -41,7 +40,7 @@ public abstract partial class DrawableGitarooRulesetTestScene : TestSceneOsuGita
     {
         return new Beatmap
         {
-            HitObjects = new List<HitObject> { new Note() },
+            HitObjects = new List<HitObject>(),
             BeatmapInfo = new BeatmapInfo
             {
                 Difficulty = new BeatmapDifficulty(),

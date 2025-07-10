@@ -22,5 +22,18 @@ public class LineTrace : GitarooHitObject, IHasPath
 
     public double Duration { get; set; }
     public double Distance => Path.Distance;
-    public required SliderPath Path { get; set; }
+
+    private SliderPath path;
+
+    public required SliderPath Path
+    {
+        get => path;
+        set
+        {
+            path = value;
+            path.ExpectedDistance.Value = Velocity * Duration;
+        }
+    }
+
+    public required double Velocity { get; set; }
 }

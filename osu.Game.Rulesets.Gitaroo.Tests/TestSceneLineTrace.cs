@@ -23,11 +23,12 @@ public partial class TestSceneLineTrace : DrawableGitarooRulesetTestScene
 
     private void addLineTrace(double duration = default_duration, bool kiai = false)
     {
-        var d = new LineTrace()
+        var d = new LineTrace
         {
-            StartTime = DrawableRuleset.Playfield.Time.Current,
+            Velocity = 0.2,
+            StartTime = DrawableRuleset.Playfield.Time.Current + 5000,
             Duration = duration,
-            Path = new SliderPath(PathType.LINEAR, new[]
+            Path = new SliderPath(PathType.BEZIER, new[]
             {
                 Vector2.Zero,
                 new Vector2(max_line_trace_length * 0.375f, max_line_trace_length * 0.18f),

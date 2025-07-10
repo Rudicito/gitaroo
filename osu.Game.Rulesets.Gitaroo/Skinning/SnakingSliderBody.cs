@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Gitaroo.MathUtils;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
@@ -31,7 +32,15 @@ public abstract partial class SnakingSliderBody : SliderBody
         }
     }
 
-    public override Vector2 PathOffset => snakedPathOffset;
+    /// <summary>
+    /// Path Offset of the current curve
+    /// </summary>
+    public Vector2? PathOffset => Path.PositionInBoundingBox(Path.Vertices[0]);
+
+    public float? AngleStart;
+    public float? AngleEnd;
+
+    public override Vector2 PathStartOffset => snakedPathOffset;
 
     public override Vector2 PathEndOffset => snakedPathEndOffset;
 
@@ -90,6 +99,9 @@ public abstract partial class SnakingSliderBody : SliderBody
         snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
         snakedPathEndOffset = Path.PositionInBoundingBox(Path.Vertices[^1]);
 
+        AngleStart = Angle.GetDegreesFromPosition(Path.Vertices[1], Path.Vertices[2]);
+        AngleEnd = Angle.GetDegreesFromPosition(Path.Vertices[^3], Path.Vertices[^2]);
+
         double lastSnakedStart = SnakedStart ?? 0;
         double lastSnakedEnd = SnakedEnd ?? 0;
 
@@ -122,15 +134,8 @@ public abstract partial class SnakingSliderBody : SliderBody
         SnakedStart = p0;
         SnakedEnd = p1;
 
-        drawableSlider.HitObjectPath.GetPathToProgress(CurrentCurve, p0, p1);
+        drawableSlider.HitObjectPath!.GetPathToProgress(CurrentCurve, p0, p1);
 
         SetVertices(CurrentCurve);
-
-        // The bounding box of the path expands as it snakes, which in turn shifts the position of the path.
-        // Depending on the direction of expansion, it may appear as if the path is expanding towards the position of the slider
-        // rather than expanding out from the position of the slider.
-        // To remove this effect, the path's position is shifted towards its final snaked position
-
-        Path.Position = snakedPosition - Path.PositionInBoundingBox(Vector2.Zero);
     }
 }
