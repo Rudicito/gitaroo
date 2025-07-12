@@ -66,10 +66,11 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
             // If a osu HitCircle
             default:
-                return new Note
+                return new HoldNote()
                 {
                     Samples = original.Samples,
                     StartTime = original.StartTime,
+                    Duration = 100,
                 }.Yield();
         }
     }
@@ -80,13 +81,13 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
         // todo: Add LineTrace generator algorithm
         List<LineTrace> lineTraces =
         [
-            // new LineTrace
-            // {
-            //     Velocity = velocity,
-            //     StartTime = 1000,
-            //     EndTime = 10000,
-            //     Path = new SliderPath(),
-            // }
+            new LineTrace
+            {
+                Velocity = velocity,
+                StartTime = 1000,
+                EndTime = 10000,
+                Path = new SliderPath(),
+            }
         ];
         return lineTraces;
     }

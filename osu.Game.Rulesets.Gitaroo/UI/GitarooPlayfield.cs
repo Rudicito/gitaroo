@@ -66,7 +66,7 @@ public partial class GitarooPlayfield : Playfield
 
         if (drawableHitObject is DrawableLineTraceHitObject dho)
         {
-            dho.GetCurrentLineTrace = GetCurrentDrawableLineTrace;
+            dho.GetLineTrace = GetCurrentDrawableLineTrace;
             dho.CheckHittable = hitPolicy.IsHittable;
         }
     }
@@ -79,6 +79,6 @@ public partial class GitarooPlayfield : Playfield
 
     public DrawableLineTrace? GetCurrentDrawableLineTrace(double time)
     {
-        return HitObjectContainer.AliveObjects.OfType<DrawableLineTrace>().FirstOrDefault(x => x.IsActiveAtTime(time));
+        return HitObjectContainer.Objects.OfType<DrawableLineTrace>().FirstOrDefault(x => x.IsActiveAtTime(time));
     }
 }

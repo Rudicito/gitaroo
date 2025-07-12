@@ -102,7 +102,7 @@ public abstract partial class SliderBody : CompositeDrawable
     /// Sets the vertices of the path which should be drawn by this <see cref="SliderBody"/>.
     /// </summary>
     /// <param name="vertices">The vertices</param>
-    protected void SetVertices(IReadOnlyList<Vector2> vertices) => path.Vertices = vertices;
+    public void SetVertices(IReadOnlyList<Vector2> vertices) => path.Vertices = vertices;
 
     protected virtual DrawableSliderPath CreateSliderPath() => new DefaultDrawableSliderPath();
 

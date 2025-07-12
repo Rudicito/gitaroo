@@ -18,15 +18,40 @@ public partial class TestSceneLineTrace : DrawableGitarooRulesetTestScene
     [Test]
     public void TestLineTrace()
     {
-        AddStep("addLineTrace", () => addLineTrace());
+        AddStep("addLineTrace", () => addHitObjects());
     }
 
-    private void addLineTrace(double duration = default_duration, bool kiai = false)
+    private void addHitObjects(double duration = default_duration, bool kiai = false)
     {
-        var d = new LineTrace
+        // Create control point info once
+        var cpi = createControlPointInfo(kiai);
+        var difficulty = new BeatmapDifficulty();
+        double currentTime = DrawableRuleset.Playfield.Time.Current;
+
+        // Add LineTrace
+        var lineTrace = createLineTrace(currentTime + 5000, duration);
+        lineTrace.ApplyDefaults(cpi, difficulty);
+        DrawableRuleset.Playfield.Add(new DrawableLineTrace(lineTrace));
+
+        // Add HoldNote
+        var holdNote = createHoldNote(currentTime + 6000, 1000);
+        holdNote.ApplyDefaults(cpi, difficulty);
+        DrawableRuleset.Playfield.Add(new DrawableHoldNote(holdNote));
+    }
+
+    private ControlPointInfo createControlPointInfo(bool kiai)
+    {
+        var cpi = new ControlPointInfo();
+        cpi.Add(-10000, new EffectControlPoint { KiaiMode = kiai });
+        return cpi;
+    }
+
+    private LineTrace createLineTrace(double startTime, double duration)
+    {
+        return new LineTrace
         {
             Velocity = 0.2,
-            StartTime = DrawableRuleset.Playfield.Time.Current + 5000,
+            StartTime = startTime,
             Duration = duration,
             Path = new SliderPath(PathType.BEZIER, new[]
             {
@@ -38,12 +63,14 @@ public partial class TestSceneLineTrace : DrawableGitarooRulesetTestScene
                 new Vector2(max_line_trace_length, 0)
             }),
         };
+    }
 
-        var cpi = new ControlPointInfo();
-        cpi.Add(-10000, new EffectControlPoint { KiaiMode = kiai });
-
-        d.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-        DrawableRuleset.Playfield.Add(new DrawableLineTrace(d));
+    private HoldNote createHoldNote(double startTime, double duration)
+    {
+        return new HoldNote
+        {
+            StartTime = startTime,
+            Duration = duration,
+        };
     }
 }

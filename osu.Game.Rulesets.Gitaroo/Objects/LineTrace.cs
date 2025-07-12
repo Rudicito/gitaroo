@@ -36,5 +36,4 @@ public class LineTrace : GitarooHitObject, IHasPath
     }
 
     public required double Velocity { get; set; }
-
 }

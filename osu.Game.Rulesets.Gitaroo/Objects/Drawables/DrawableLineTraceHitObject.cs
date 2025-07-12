@@ -43,20 +43,20 @@ public partial class DrawableLineTraceHitObject : DrawableGitarooHitObject
     /// </summary>
     public Func<DrawableHitObject, double, bool>? CheckHittable;
 
-    public Func<double, DrawableLineTrace?>? GetCurrentLineTrace { get; set; }
+    public Func<double, DrawableLineTrace?>? GetLineTrace { get; set; }
 
-    public DrawableLineTrace? CurrentLineTrace { get; set; }
+    public DrawableLineTrace? LineTrace { get; set; }
 
     protected override void OnApply()
     {
         base.OnApply();
-        CurrentLineTrace = GetCurrentLineTrace!(HitObject!.StartTime);
+        LineTrace = GetLineTrace!(HitObject!.StartTime);
     }
 
     protected override void OnFree()
     {
         base.OnFree();
-        CurrentLineTrace = null;
+        LineTrace = null;
     }
 }
 

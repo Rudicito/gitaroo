@@ -69,13 +69,10 @@ public abstract partial class SnakingSliderBody : SliderBody
         Refresh();
     }
 
-    public void UpdateProgress(double completionProgress)
+    public void UpdateProgress(double start, double end = 1)
     {
         if (drawableSlider.HitObjectPath == null)
             return;
-
-        double start = completionProgress;
-        const double end = 1;
 
         setRange(start, end);
     }
