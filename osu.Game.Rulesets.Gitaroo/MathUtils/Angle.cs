@@ -36,12 +36,19 @@ internal static class Angle
             return angle >= start || angle <= end;
     }
 
-    public static float GetDegreesFromPosition(Vector2 a, Vector2 b)
+    public static float GetDegreesFromPosition(Vector2 a, Vector2 b, float angle = 0)
     {
         var direction = b - a;
-        return NormalizeAngle(MathHelper.RadiansToDegrees(MathF.Atan2(direction.Y, direction.X)));
+        return NormalizeAngle(MathHelper.RadiansToDegrees(MathF.Atan2(direction.Y, direction.X)) + angle);
     }
 
+    /// <summary>
+    /// Moves a point from a starting position in a given direction by a specified distance.
+    /// </summary>
+    /// <param name="start">The initial position.</param>
+    /// <param name="angleDegrees">The angle in degrees to move towards (0° is along the positive X axis).</param>
+    /// <param name="distance">The distance to move from the start position.</param>
+    /// <returns>The new position after moving the specified distance at the given angle.</returns>
     public static Vector2 MovePoint(Vector2 start, float angleDegrees, float distance)
     {
         float angleRadians = MathHelper.DegreesToRadians(angleDegrees);

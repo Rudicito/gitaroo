@@ -69,15 +69,22 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IH
         }
     }
 
+    public bool IsActive => HitObject != null && Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime;
+
+    public bool IsActiveAtTime(double time)
+    {
+        return HitObject != null && time >= HitObject.StartTime && time <= HitObject.EndTime;
+    }
+
     protected override void OnApply()
     {
         base.OnApply();
     }
 
-    protected override void OnFree()
-    {
-        base.OnFree();
-    }
+    // protected override void OnFree()
+    // {
+    //     base.OnFree();
+    // }
 
     public override void OnKilled()
     {

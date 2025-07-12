@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.Objects;
@@ -63,14 +64,21 @@ public partial class GitarooPlayfield : Playfield
     {
         base.OnNewDrawableHitObject(drawableHitObject);
 
-        DrawableGitarooHitObject gitarooObject = (DrawableGitarooHitObject)drawableHitObject;
-
-        gitarooObject.CheckHittable = hitPolicy.IsHittable;
+        if (drawableHitObject is DrawableLineTraceHitObject dho)
+        {
+            dho.GetCurrentLineTrace = GetCurrentDrawableLineTrace;
+            dho.CheckHittable = hitPolicy.IsHittable;
+        }
     }
 
     internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
     {
         if (result.IsHit)
             hitPolicy.HandleHit(judgedObject);
+    }
+
+    public DrawableLineTrace? GetCurrentDrawableLineTrace(double time)
+    {
+        return HitObjectContainer.AliveObjects.OfType<DrawableLineTrace>().FirstOrDefault(x => x.IsActiveAtTime(time));
     }
 }

@@ -1,6 +1,6 @@
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
-public partial class DrawableNote : DrawableGitarooHitObject<Note>
+public partial class DrawableNote : DrawableLineTraceHitObject<Note>
 {
     public DrawableNote()
         : this(null)

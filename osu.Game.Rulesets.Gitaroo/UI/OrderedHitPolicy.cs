@@ -51,7 +51,7 @@ public class OrderedHitPolicy
             if (obj.Judged)
                 continue;
 
-            ((DrawableGitarooHitObject)obj).MissForcefully();
+            ((DrawableLineTraceHitObject)obj).MissForcefully();
         }
     }
 

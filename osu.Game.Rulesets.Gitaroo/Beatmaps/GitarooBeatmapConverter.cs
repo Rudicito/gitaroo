@@ -80,13 +80,13 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
         // todo: Add LineTrace generator algorithm
         List<LineTrace> lineTraces =
         [
-            new LineTrace
-            {
-                Velocity = velocity,
-                StartTime = 1000,
-                EndTime, 10000,
-                Path = new SliderPath(),
-            }
+            // new LineTrace
+            // {
+            //     Velocity = velocity,
+            //     StartTime = 1000,
+            //     EndTime = 10000,
+            //     Path = new SliderPath(),
+            // }
         ];
         return lineTraces;
     }

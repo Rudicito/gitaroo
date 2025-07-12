@@ -57,7 +57,7 @@ public partial class FanShaped : Container
                         Origin = Anchor.Centre,
                         Anchor = Anchor.TopCentre,
                         Colour = Color4.Cyan,
-                        Rotation = 180,
+                        Rotation = 0,
                     },
 
                     new Triangle // Middle arrow
@@ -67,7 +67,7 @@ public partial class FanShaped : Container
                         Size = new Vector2(17, 50),
                         Colour = Color4.White,
                         Alpha = 0.5f,
-                        Rotation = 180,
+                        Rotation = 0,
                     },
 
                     leftArrow = new Triangle // Left Arrow
@@ -78,7 +78,7 @@ public partial class FanShaped : Container
                         Position = new Vector2(left_arrow_max_x, 5),
                         Colour = Color4.Cyan,
                         Alpha = 0.5f,
-                        Rotation = 180,
+                        Rotation = 0,
                     },
 
                     rightArrow = new Triangle // Right Arrow
@@ -89,7 +89,7 @@ public partial class FanShaped : Container
                         Position = new Vector2(right_arrow_max_x, 5),
                         Colour = Color4.Cyan,
                         Alpha = 0.5f,
-                        Rotation = 180,
+                        Rotation = 0,
                     }
                 }
             }
@@ -140,17 +140,9 @@ public partial class FanShaped : Container
         fanShapeFadeOut();
     }
 
-    private float getDegreesFromPosition(Vector2 a, Vector2 b)
-    {
-        Vector2 direction = b - a;
-        float rawAngle = MathHelper.RadiansToDegrees(MathF.Atan2(direction.Y, direction.X));
-
-        return Angle.NormalizeAngle(rawAngle - 90);
-    }
-
     protected override bool OnMouseMove(MouseMoveEvent e)
     {
-        FanShapedRotation = getDegreesFromPosition(AnchorPosition, e.MousePosition);
+        FanShapedRotation = Angle.GetDegreesFromPosition(AnchorPosition, e.MousePosition, 90);
         return base.OnMouseMove(e);
     }
 
