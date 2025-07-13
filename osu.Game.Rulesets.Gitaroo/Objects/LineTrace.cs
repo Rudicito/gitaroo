@@ -1,3 +1,4 @@
+using System;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -31,6 +32,9 @@ public class LineTrace : GitarooHitObject, IHasPath
         set
         {
             path = value;
+
+            if (Velocity == 0) throw new InvalidOperationException("LineTrace Velocity cannot be 0");
+
             path.ExpectedDistance.Value = Velocity * Duration;
         }
     }

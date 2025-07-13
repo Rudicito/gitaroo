@@ -76,15 +76,18 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IH
         return HitObject != null && time >= HitObject.StartTime && time <= HitObject.EndTime;
     }
 
-    // protected override void OnApply()
-    // {
-    //     base.OnApply();
-    // }
+    protected override void OnApply()
+    {
+        base.OnApply();
 
-    // protected override void OnFree()
-    // {
-    //     base.OnFree();
-    // }
+        SliderBody?.Refresh();
+    }
+
+    protected override void OnFree()
+    {
+        base.OnFree();
+        SliderBody?.RecyclePath();
+    }
 
     public override void OnKilled()
     {

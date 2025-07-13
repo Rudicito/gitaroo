@@ -66,7 +66,7 @@ public abstract partial class SnakingSliderBody : SliderBody
     {
         drawableSlider = (IHasHitObjectPath)drawableObject;
 
-        Refresh();
+        // Refresh();
     }
 
     public void UpdateProgress(double start, double end = 1)
@@ -77,13 +77,16 @@ public abstract partial class SnakingSliderBody : SliderBody
         setRange(start, end);
     }
 
-    public void Refresh()
+    public void Refresh(double start = 0, double end = 1)
     {
+        SnakedStart = start;
+        SnakedEnd = end;
+
         if (drawableSlider.HitObjectPath == null)
             return;
 
-        // Generate the entire curve
-        drawableSlider.HitObjectPath.GetPathToProgress(CurrentCurve, 0, 1);
+        // Generate the curve
+        drawableSlider.HitObjectPath.GetPathToProgress(CurrentCurve, SnakedStart.Value, SnakedEnd.Value);
         SetVertices(CurrentCurve);
 
         // Force the body to be the final path size to avoid excessive autosize computations
@@ -96,8 +99,17 @@ public abstract partial class SnakingSliderBody : SliderBody
         snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
         snakedPathEndOffset = Path.PositionInBoundingBox(Path.Vertices[^1]);
 
-        AngleStart = Angle.GetDegreesFromPosition(Path.Vertices[1], Path.Vertices[2]);
-        AngleEnd = Angle.GetDegreesFromPosition(Path.Vertices[^3], Path.Vertices[^2]);
+        if (Path.Vertices.Count >= 3)
+        {
+            AngleStart = Angle.GetDegreesFromPosition(Path.Vertices[1], Path.Vertices[2]);
+            AngleEnd = Angle.GetDegreesFromPosition(Path.Vertices[^3], Path.Vertices[^2]);
+        }
+
+        else
+        {
+            AngleStart = null;
+            AngleEnd = null;
+        }
 
         double lastSnakedStart = SnakedStart ?? 0;
         double lastSnakedEnd = SnakedEnd ?? 0;

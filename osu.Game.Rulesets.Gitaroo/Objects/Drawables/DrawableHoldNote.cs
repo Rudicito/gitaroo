@@ -65,17 +65,17 @@ public partial class DrawableHoldNote : DrawableLineTraceHitObject<HoldNote>, IH
             // (Time.Current - HitObject.StartTime) / HitObject.Duration
 
             SliderBody.UpdateProgress(start, ProgressEnd.Value);
-            Position = LineTrace.Position + HitObjectPath.PositionAt(start);
+            Position = -SliderBody.PathOffset ?? Vector2.Zero;
         }
 
         else
         {
             SliderBody.UpdateProgress(ProgressStart.Value, ProgressEnd.Value);
             var result = HitObjectPath.PositionAt(ProgressStart.Value);
-            Position = LineTrace.Position + result;
+            Position = LineTrace.Position;
         }
 
-        Position = Position = -SliderBody.PathOffset ?? Vector2.Zero;
+        // Position = -SliderBody.PathOffset ?? Vector2.Zero;
     }
 
     protected override void OnApply()
@@ -84,10 +84,12 @@ public partial class DrawableHoldNote : DrawableLineTraceHitObject<HoldNote>, IH
 
         if (LineTrace?.HitObject == null) return;
 
-        HitObjectPath = LineTrace.HitObject.Path;
+        HitObjectPath = LineTrace.HitObjectPath;
 
         ProgressStart = (HitObject!.StartTime - LineTrace.HitObject.StartTime) / LineTrace.HitObject.Duration;
         ProgressEnd = (HitObject!.EndTime - LineTrace.HitObject.StartTime) / LineTrace.HitObject.Duration;
+
+        SliderBody?.Refresh(ProgressStart.Value, ProgressEnd.Value);
     }
 
     protected override void OnFree()
@@ -98,6 +100,8 @@ public partial class DrawableHoldNote : DrawableLineTraceHitObject<HoldNote>, IH
 
         ProgressStart = null;
         ProgressEnd = null;
+
+        SliderBody?.RecyclePath();
     }
 
     public override void OnKilled()

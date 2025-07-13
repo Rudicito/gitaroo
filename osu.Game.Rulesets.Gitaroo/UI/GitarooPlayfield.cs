@@ -79,6 +79,6 @@ public partial class GitarooPlayfield : Playfield
 
     public DrawableLineTrace? GetCurrentDrawableLineTrace(double time)
     {
-        return HitObjectContainer.Objects.OfType<DrawableLineTrace>().FirstOrDefault(x => x.IsActiveAtTime(time));
+        return HitObjectContainer.AliveObjects.OfType<DrawableLineTrace>().FirstOrDefault(x => x.IsActiveAtTime(time));
     }
 }

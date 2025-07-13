@@ -22,6 +22,7 @@ public abstract partial class DrawableGitarooRulesetTestScene : TestSceneOsuGita
     private void load()
     {
         controlPointInfo = new ControlPointInfo();
+        // controlPointInfo.Add(-10000, new EffectControlPoint());
         controlPointInfo.Add(0, new TimingControlPoint());
 
         IWorkingBeatmap beatmap = CreateWorkingBeatmap(CreateBeatmap(new GitarooRuleset().RulesetInfo));
