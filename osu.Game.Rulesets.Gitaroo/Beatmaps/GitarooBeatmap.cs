@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -11,6 +12,9 @@ public class GitarooBeatmap : Beatmap<GitarooHitObject>
     {
         int notes = HitObjects.Count(s => s is Note);
         int holdNotes = HitObjects.Count(s => s is HoldNote);
+        int max = Math.Max(1, notes + holdNotes);
+
+        int lineTraces = HitObjects.Count(s => s is LineTrace);
 
         return new[]
         {
@@ -19,13 +23,21 @@ public class GitarooBeatmap : Beatmap<GitarooHitObject>
                 Name = @"Notes",
                 CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                 Content = notes.ToString(),
+                BarDisplayLength = notes / max,
             },
             new BeatmapStatistic
             {
                 Name = @"Hold Notes",
                 CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                 Content = holdNotes.ToString(),
+                BarDisplayLength = holdNotes / max,
             },
+            new BeatmapStatistic
+            {
+                Name = @"Line Traces",
+                CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
+                Content = lineTraces.ToString(),
+            }
         };
     }
 }
