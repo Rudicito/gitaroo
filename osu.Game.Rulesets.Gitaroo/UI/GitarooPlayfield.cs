@@ -37,10 +37,9 @@ public partial class GitarooPlayfield : Playfield
         AddRangeInternal(new Drawable[]
         {
             fanShaped,
-            centerCircle,
-            HitObjectContainer
+            HitObjectContainer,
+            centerCircle
         });
-
         RegisterPool<Note, DrawableNote>(10, 50);
         RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
         RegisterPool<TraceLine, DrawableTraceLine>(2, 5);
