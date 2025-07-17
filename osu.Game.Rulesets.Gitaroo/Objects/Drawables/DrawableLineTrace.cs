@@ -4,7 +4,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.MathUtils;
 using osu.Game.Rulesets.Gitaroo.Skinning;
 using osu.Game.Rulesets.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
@@ -22,7 +21,7 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IH
 
     public SliderPath? HitObjectPath => HitObject?.Path;
 
-    public SnakingSliderBody? SliderBody;
+    public SnakingSliderBody SliderBody = null!;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -42,15 +41,20 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IH
         base.UpdateAfterChildren();
 
         if (HitObject == null) return;
-        if (SliderBody == null) return;
 
         Size = SliderBody.Size;
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
-        double completionProgress = (Time.Current - HitObject.StartTime) / HitObject.Duration;
+        if (Time.Current >= HitObject.StartTime)
+        {
+            // Move the LineTrace current progression to the center
+            double completionProgress = (Time.Current - HitObject.StartTime) / HitObject.Duration;
+            SliderBody.UpdateProgress(Math.Clamp(completionProgress, 0, 1));
+            Position = -SliderBody.PathOffset;
+        }
 
-        if (completionProgress < 0)
+        else
         {
             // Move the LineTrace towards the center
             if (SliderBody.AngleStart != null)
@@ -59,13 +63,6 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IH
 
                 Position = Angle.MovePoint(-SliderBody.PathStartOffset, SliderBody.AngleStart.Value, (float)(HitObject.Velocity * (HitObject.StartTime - Time.Current)));
             }
-        }
-
-        else
-        {
-            // Move the LineTrace current progression to the center
-            SliderBody.UpdateProgress(Math.Clamp(completionProgress, 0, 1));
-            Position = -SliderBody.PathOffset ?? Vector2.Zero;
         }
     }
 
@@ -80,18 +77,18 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IH
     {
         base.OnApply();
 
-        SliderBody?.Refresh();
+        SliderBody.Refresh();
     }
 
     protected override void OnFree()
     {
         base.OnFree();
-        SliderBody?.RecyclePath();
+        SliderBody.RecyclePath();
     }
 
     public override void OnKilled()
     {
         base.OnKilled();
-        SliderBody?.RecyclePath();
+        SliderBody.RecyclePath();
     }
 }

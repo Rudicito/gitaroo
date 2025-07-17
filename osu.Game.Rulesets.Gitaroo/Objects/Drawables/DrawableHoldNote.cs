@@ -1,8 +1,8 @@
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.Skinning;
 using osu.Game.Rulesets.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
@@ -28,9 +28,12 @@ public partial class DrawableHoldNote : DrawableLineTraceHitObject<HoldNote>, IH
     /// </summary>
     public double? ProgressEnd;
 
-    public SnakingSliderBody? SliderBody;
+    public SnakingSliderBody SliderBody = null!;
 
-    public SliderPath? HitObjectPath { get; set; } = null;
+    /// <summary>
+    /// The SliderPath of the related LineTrace
+    /// </summary>
+    public SliderPath? HitObjectPath { get; set; }
 
     [BackgroundDependencyLoader]
     private void load()
@@ -49,33 +52,20 @@ public partial class DrawableHoldNote : DrawableLineTraceHitObject<HoldNote>, IH
     {
         base.UpdateAfterChildren();
 
-        if (HitObject == null) return;
-        if (SliderBody == null) return;
         if (LineTrace?.HitObject == null) return;
         if (HitObjectPath == null) return;
-        if (ProgressStart == null || ProgressEnd == null) return;
 
         Size = SliderBody.Size;
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
-        if (Time.Current >= HitObject.StartTime)
-        {
-            double start = (Time.Current - LineTrace.HitObject.StartTime) / LineTrace.HitObject.Duration;
-            // (Time.Current - HitObject.StartTime) / HitObject.Duration
+        double start = Math.Clamp((Time.Current - LineTrace.HitObject.StartTime) / LineTrace.HitObject.Duration, ProgressStart!.Value, ProgressEnd!.Value);
+        SliderBody.UpdateProgress(start, ProgressEnd.Value);
 
-            SliderBody.UpdateProgress(start, ProgressEnd.Value);
-            Position = -SliderBody.PathOffset ?? Vector2.Zero;
-        }
+        var pathPosition = HitObjectPath.PositionAt(start);
+        var positionInBoundingBox = LineTrace.SliderBody.GetPositionInBoundingBox(pathPosition);
 
-        else
-        {
-            SliderBody.UpdateProgress(ProgressStart.Value, ProgressEnd.Value);
-            var result = HitObjectPath.PositionAt(ProgressStart.Value);
-            Position = LineTrace.Position;
-        }
-
-        // Position = -SliderBody.PathOffset ?? Vector2.Zero;
+        Position = LineTrace.Position + positionInBoundingBox - SliderBody.PathOffset;
     }
 
     protected override void OnApply()
@@ -89,7 +79,7 @@ public partial class DrawableHoldNote : DrawableLineTraceHitObject<HoldNote>, IH
         ProgressStart = (HitObject!.StartTime - LineTrace.HitObject.StartTime) / LineTrace.HitObject.Duration;
         ProgressEnd = (HitObject!.EndTime - LineTrace.HitObject.StartTime) / LineTrace.HitObject.Duration;
 
-        SliderBody?.Refresh(ProgressStart.Value, ProgressEnd.Value);
+        SliderBody.Refresh(ProgressStart.Value, ProgressEnd.Value, true);
     }
 
     protected override void OnFree()
@@ -101,12 +91,12 @@ public partial class DrawableHoldNote : DrawableLineTraceHitObject<HoldNote>, IH
         ProgressStart = null;
         ProgressEnd = null;
 
-        SliderBody?.RecyclePath();
+        SliderBody.RecyclePath();
     }
 
     public override void OnKilled()
     {
         base.OnKilled();
-        SliderBody?.RecyclePath();
+        SliderBody.RecyclePath();
     }
 }

@@ -30,6 +30,8 @@ public abstract partial class SliderBody : CompositeDrawable
     /// </summary>
     public virtual Vector2 PathEndOffset => path.PositionInBoundingBox(path.Vertices[^1]);
 
+    public virtual Vector2 GetPositionInBoundingBox(Vector2 position) => Path.PositionInBoundingBox(position);
+
     /// <summary>
     /// Used to colour the path.
     /// </summary>
