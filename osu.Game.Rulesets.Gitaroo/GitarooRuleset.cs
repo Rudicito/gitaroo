@@ -57,7 +57,7 @@ public class GitarooRuleset : Ruleset
     {
         HitResult.Great,
         HitResult.Good,
-        HitResult.Ok
+        HitResult.Meh
     };
 
     // Leave this line intact. It will bake the correct version into the ruleset on each build/release.

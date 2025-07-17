@@ -7,14 +7,14 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
-public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IHasHitObjectPath
+public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IHasHitObjectPath
 {
-    public DrawableLineTrace()
+    public DrawableTraceLine()
         : this(null)
     {
     }
 
-    public DrawableLineTrace(LineTrace? hitObject)
+    public DrawableTraceLine(TraceLine? hitObject)
         : base(hitObject)
     {
     }
@@ -28,11 +28,11 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IH
     {
         AddRangeInternal(new Drawable[]
         {
-            SliderBody = new DefaultLineTraceBody()
+            SliderBody = new DefaultTraceLineBody()
         });
     }
 
-    private partial class DefaultLineTraceBody : SnakingSliderBody
+    private partial class DefaultTraceLineBody : SnakingSliderBody
     {
     }
 
@@ -48,7 +48,7 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IH
 
         if (Time.Current >= HitObject.StartTime)
         {
-            // Move the LineTrace current progression to the center
+            // Move the TraceLine current progression to the center
             double completionProgress = (Time.Current - HitObject.StartTime) / HitObject.Duration;
             SliderBody.UpdateProgress(Math.Clamp(completionProgress, 0, 1));
             Position = -SliderBody.PathOffset;
@@ -56,7 +56,7 @@ public partial class DrawableLineTrace : DrawableGitarooHitObject<LineTrace>, IH
 
         else
         {
-            // Move the LineTrace towards the center
+            // Move the TraceLine towards the center
             if (SliderBody.AngleStart != null)
             {
                 SliderBody.UpdateProgress(0);

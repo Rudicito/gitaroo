@@ -6,9 +6,9 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects;
 
-public class LineTrace : GitarooHitObject, IHasPath
+public class TraceLine : GitarooHitObject, IHasPath
 {
-    public LineTrace()
+    public TraceLine()
     {
     }
 
@@ -33,7 +33,7 @@ public class LineTrace : GitarooHitObject, IHasPath
         {
             path = value;
 
-            if (Velocity == 0) throw new InvalidOperationException("LineTrace Velocity cannot be 0");
+            if (Velocity == 0) throw new InvalidOperationException("TraceLine Velocity cannot be 0");
 
             path.ExpectedDistance.Value = Velocity * Duration;
         }

@@ -51,7 +51,7 @@ public class OrderedHitPolicy
             if (obj.Judged)
                 continue;
 
-            ((DrawableLineTraceHitObject)obj).MissForcefully();
+            ((DrawableTraceLineHitObject)obj).MissForcefully();
         }
     }
 

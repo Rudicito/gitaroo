@@ -36,7 +36,7 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
         if (!isForCurrentRuleset)
         {
-            beatmap.HitObjects.AddRange(generateLineTrace(beatmap));
+            beatmap.HitObjects.AddRange(generateTraceLine(beatmap));
         }
 
         // Can be more optimized?
@@ -101,13 +101,13 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
         }
     }
 
-    private List<LineTrace> generateLineTrace(GitarooBeatmap beatmap)
+    private List<TraceLine> generateTraceLine(GitarooBeatmap beatmap)
     {
         double velocity = beatmap.Difficulty.SliderMultiplier;
-        // todo: Add LineTrace generator algorithm
-        List<LineTrace> lineTraces =
+        // todo: Add TraceLine generator algorithm
+        List<TraceLine> traceLines =
         [
-            new LineTrace
+            new TraceLine
             {
                 Velocity = velocity,
                 StartTime = 1000,
@@ -115,6 +115,6 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
                 Path = new SliderPath(),
             }
         ];
-        return lineTraces;
+        return traceLines;
     }
 }

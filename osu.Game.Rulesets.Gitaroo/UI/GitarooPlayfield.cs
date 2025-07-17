@@ -43,7 +43,7 @@ public partial class GitarooPlayfield : Playfield
 
         RegisterPool<Note, DrawableNote>(10, 50);
         RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
-        RegisterPool<LineTrace, DrawableLineTrace>(2, 5);
+        RegisterPool<TraceLine, DrawableTraceLine>(2, 5);
     }
 
     protected override void LoadComplete()
@@ -64,9 +64,9 @@ public partial class GitarooPlayfield : Playfield
     {
         base.OnNewDrawableHitObject(drawableHitObject);
 
-        if (drawableHitObject is DrawableLineTraceHitObject dho)
+        if (drawableHitObject is DrawableTraceLineHitObject dho)
         {
-            dho.GetLineTrace = GetCurrentDrawableLineTrace;
+            dho.GetTraceLine = GetCurrentDrawableTraceLine;
             dho.CheckHittable = hitPolicy.IsHittable;
         }
     }
@@ -77,8 +77,8 @@ public partial class GitarooPlayfield : Playfield
             hitPolicy.HandleHit(judgedObject);
     }
 
-    public DrawableLineTrace? GetCurrentDrawableLineTrace(double time)
+    public DrawableTraceLine? GetCurrentDrawableTraceLine(double time)
     {
-        return HitObjectContainer.AliveObjects.OfType<DrawableLineTrace>().FirstOrDefault(x => x.IsActiveAtTime(time));
+        return HitObjectContainer.AliveObjects.OfType<DrawableTraceLine>().FirstOrDefault(x => x.IsActiveAtTime(time));
     }
 }

@@ -7,21 +7,21 @@ using osuTK;
 namespace osu.Game.Rulesets.Gitaroo.Tests;
 
 [TestFixture]
-public partial class TestSceneLineTrace : DrawableGitarooRulesetTestScene
+public partial class TestSceneTraceLine : DrawableGitarooRulesetTestScene
 {
     private const double default_duration = 3000;
     private const float max_line_trace_length = 200;
     private const double delay = 1000;
 
     [Test]
-    public void TestLineTrace()
+    public void TestTraceLine()
     {
-        AddStep("1 LineTrace with 1 HoLdNote", () => addLineTraceAndHoldNote());
+        AddStep("1 TraceLine with 1 HoLdNote", () => addTraceLineAndHoldNote());
     }
 
-    private void addLineTraceAndHoldNote(double duration = default_duration)
+    private void addTraceLineAndHoldNote(double duration = default_duration)
     {
-        DrawableRuleset.Playfield.Add(new LineTrace
+        DrawableRuleset.Playfield.Add(new TraceLine
         {
             StartTime = DrawableRuleset.Playfield.Time.Current + delay,
             EndTime = DrawableRuleset.Playfield.Time.Current + delay + duration,

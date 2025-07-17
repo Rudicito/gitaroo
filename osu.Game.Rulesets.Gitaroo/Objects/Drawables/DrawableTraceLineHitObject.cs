@@ -4,9 +4,9 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
-public partial class DrawableLineTraceHitObject : DrawableGitarooHitObject
+public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
 {
-    public DrawableLineTraceHitObject(GitarooHitObject? hitObject)
+    public DrawableTraceLineHitObject(GitarooHitObject? hitObject)
         : base(hitObject)
     {
     }
@@ -43,29 +43,29 @@ public partial class DrawableLineTraceHitObject : DrawableGitarooHitObject
     /// </summary>
     public Func<DrawableHitObject, double, bool>? CheckHittable;
 
-    public Func<double, DrawableLineTrace?>? GetLineTrace { get; set; }
+    public Func<double, DrawableTraceLine?>? GetTraceLine { get; set; }
 
-    public DrawableLineTrace? LineTrace { get; set; }
+    public DrawableTraceLine? TraceLine { get; set; }
 
     protected override void OnApply()
     {
         base.OnApply();
-        LineTrace = GetLineTrace!(HitObject!.StartTime);
+        TraceLine = GetTraceLine!(HitObject!.StartTime);
     }
 
     protected override void OnFree()
     {
         base.OnFree();
-        LineTrace = null;
+        TraceLine = null;
     }
 }
 
-public abstract partial class DrawableLineTraceHitObject<TObject> : DrawableLineTraceHitObject
+public abstract partial class DrawableTraceLineHitObject<TObject> : DrawableTraceLineHitObject
     where TObject : GitarooHitObject
 {
     public new TObject? HitObject => (TObject?)base.HitObject;
 
-    protected DrawableLineTraceHitObject(TObject? hitObject)
+    protected DrawableTraceLineHitObject(TObject? hitObject)
         : base(hitObject)
     {
     }
