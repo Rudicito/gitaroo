@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Gitaroo.Objects;
 
 public class GitarooHitObject : HitObject
 {
+    public override required double StartTime { get; set; }
+
     public override Judgement CreateJudgement() => new GitarooJudgement();
 
     protected override HitWindows? CreateHitWindows() => new GitarooHitWindows();

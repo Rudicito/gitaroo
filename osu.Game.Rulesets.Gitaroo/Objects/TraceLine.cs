@@ -1,3 +1,4 @@
+using System;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -5,11 +6,10 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects;
 
-public class LineTrace : GitarooHitObject, IHasPath
+public class TraceLine : GitarooHitObject, IHasPath
 {
-    public LineTrace(SliderPath path)
+    public TraceLine()
     {
-        Path = path;
     }
 
     public override Judgement CreateJudgement() => new IgnoreJudgement();
@@ -23,5 +23,21 @@ public class LineTrace : GitarooHitObject, IHasPath
 
     public double Duration { get; set; }
     public double Distance => Path.Distance;
-    public SliderPath Path { get; }
+
+    private SliderPath path;
+
+    public required SliderPath Path
+    {
+        get => path;
+        set
+        {
+            path = value;
+
+            if (Velocity == 0) throw new InvalidOperationException("TraceLine Velocity cannot be 0");
+
+            path.ExpectedDistance.Value = Velocity * Duration;
+        }
+    }
+
+    public required double Velocity { get; set; }
 }

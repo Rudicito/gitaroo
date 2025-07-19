@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.Objects;
@@ -36,13 +37,12 @@ public partial class GitarooPlayfield : Playfield
         AddRangeInternal(new Drawable[]
         {
             fanShaped,
-            centerCircle,
-            HitObjectContainer
+            HitObjectContainer,
+            centerCircle
         });
-
         RegisterPool<Note, DrawableNote>(10, 50);
         RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
-        // RegisterPool<LineTrace, DrawableLineTrace>(2, 5);
+        RegisterPool<TraceLine, DrawableTraceLine>(2, 5);
     }
 
     protected override void LoadComplete()
@@ -63,14 +63,21 @@ public partial class GitarooPlayfield : Playfield
     {
         base.OnNewDrawableHitObject(drawableHitObject);
 
-        DrawableGitarooHitObject gitarooObject = (DrawableGitarooHitObject)drawableHitObject;
-
-        gitarooObject.CheckHittable = hitPolicy.IsHittable;
+        if (drawableHitObject is DrawableTraceLineHitObject dho)
+        {
+            dho.GetTraceLine = GetCurrentDrawableTraceLine;
+            dho.CheckHittable = hitPolicy.IsHittable;
+        }
     }
 
     internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
     {
         if (result.IsHit)
             hitPolicy.HandleHit(judgedObject);
+    }
+
+    public DrawableTraceLine? GetCurrentDrawableTraceLine(double time)
+    {
+        return HitObjectContainer.AliveObjects.OfType<DrawableTraceLine>().FirstOrDefault(x => x.IsActiveAtTime(time));
     }
 }
