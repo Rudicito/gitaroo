@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -78,7 +77,7 @@ public abstract partial class SnakingSliderBody : SliderBody
         setRange(start, end);
     }
 
-    public void Refresh(double start = 0, double end = 1, bool customSize = false)
+    public void Refresh(double start = 0, double end = 1)
     {
         SnakedStart = start;
         SnakedEnd = end;
@@ -90,35 +89,42 @@ public abstract partial class SnakingSliderBody : SliderBody
         drawableSlider.HitObjectPath.GetPathToProgress(CurrentCurve, SnakedStart.Value, SnakedEnd.Value);
         SetVertices(CurrentCurve);
 
+        // todo: Path auto-sizing calculation "acts like" there is a vertex at (0,0), causing the bounding box to be larger than expected,
+        // needs fix in the osu!framework?
+
         // Force the body to be the final path size to avoid excessive autosize computations
-        if (!customSize)
-        {
-            Path.AutoSizeAxes = Axes.Both;
-            Size = Path.Size;
+        Path.AutoSizeAxes = Axes.None;
+        Path.AutoSizeAxes = Axes.Both;
+        Size = Path.Size;
 
-            updatePathSize();
-        }
-
-        else
-        {
-            Path.Size = this.customSize();
-            Size = Path.Size;
-        }
+        updatePathSize();
 
         snakedPosition = Path.PositionInBoundingBox(Vector2.Zero);
         snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
         snakedPathEndOffset = Path.PositionInBoundingBox(Path.Vertices[^1]);
 
-        if (Path.Vertices.Count >= 3)
-        {
-            AngleStart = Angle.GetDegreesFromPosition(Path.Vertices[1], Path.Vertices[2]);
-            AngleEnd = Angle.GetDegreesFromPosition(Path.Vertices[^3], Path.Vertices[^2]);
-        }
+        AngleStart = null;
+        AngleEnd = null;
 
-        else
+        int vertexCount = Path.Vertices.Count;
+
+        if (vertexCount >= 2)
         {
-            AngleStart = null;
-            AngleEnd = null;
+            for (int i = 0; i < vertexCount - 1; i++)
+            {
+                if (Path.Vertices[i] == Path.Vertices[i + 1]) continue;
+
+                AngleStart = Angle.GetDegreesFromPosition(Path.Vertices[i], Path.Vertices[i + 1]);
+                break;
+            }
+
+            for (int i = vertexCount - 1; i > 0; i--)
+            {
+                if (Path.Vertices[i - 1] == Path.Vertices[i]) continue;
+
+                AngleEnd = Angle.GetDegreesFromPosition(Path.Vertices[i - 1], Path.Vertices[i]);
+                break;
+            }
         }
 
         double lastSnakedStart = SnakedStart ?? 0;
@@ -128,29 +134,6 @@ public abstract partial class SnakingSliderBody : SliderBody
         SnakedEnd = null;
 
         setRange(lastSnakedStart, lastSnakedEnd);
-    }
-
-    private Vector2 customSize()
-    {
-        if (Path.Vertices.Count > 0)
-        {
-            float minX = float.PositiveInfinity;
-            float minY = float.PositiveInfinity;
-            float maxX = float.NegativeInfinity;
-            float maxY = float.NegativeInfinity;
-
-            foreach (var v in Path.Vertices)
-            {
-                minX = Math.Min(minX, v.X - PathRadius);
-                minY = Math.Min(minY, v.Y - PathRadius);
-                maxX = Math.Max(maxX, v.X + PathRadius);
-                maxY = Math.Max(maxY, v.Y + PathRadius);
-            }
-
-            return new Vector2(maxX - minX, maxY - minY);
-        }
-
-        return Vector2.Zero;
     }
 
     public override void RecyclePath()

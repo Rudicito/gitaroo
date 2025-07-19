@@ -79,7 +79,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         ProgressStart = (HitObject!.StartTime - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration;
         ProgressEnd = (HitObject!.EndTime - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration;
 
-        SliderBody.Refresh(ProgressStart.Value, ProgressEnd.Value, true);
+        SliderBody.Refresh(ProgressStart.Value, ProgressEnd.Value);
     }
 
     protected override void OnFree()
