@@ -1,7 +1,8 @@
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Gitaroo.Skinning;
+using osu.Game.Rulesets.Gitaroo.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
@@ -21,19 +22,22 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     /// <summary>
     /// The progress start of the HoldNote in the TraceLine SliderBody
     /// </summary>
-    public double? ProgressStart;
+    public double? ProgressStart { get; set; }
 
     /// <summary>
     /// The progress end of the HoldNote in the TraceLine SliderBody
     /// </summary>
-    public double? ProgressEnd;
+    public double? ProgressEnd { get; set; }
 
-    public SnakingSliderBody SliderBody = null!;
+    public PlaySliderBody SliderBody = null!;
 
     /// <summary>
     /// The SliderPath of the related TraceLine
     /// </summary>
     public SliderPath? HitObjectPath { get; set; }
+
+    public IBindable<int> PathVersion => pathVersion;
+    private readonly Bindable<int> pathVersion = new Bindable<int>();
 
     [BackgroundDependencyLoader]
     private void load()
@@ -44,7 +48,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         });
     }
 
-    private partial class DefaultHoldNoteBody : SnakingSliderBody
+    private partial class DefaultHoldNoteBody : PlaySliderBody
     {
     }
 
@@ -79,12 +83,16 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         ProgressStart = (HitObject!.StartTime - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration;
         ProgressEnd = (HitObject!.EndTime - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration;
 
-        SliderBody.Refresh(ProgressStart.Value, ProgressEnd.Value);
+        // Ensure that the version will change after the upcoming BindTo().
+        pathVersion.Value = int.MaxValue;
+        PathVersion.BindTo(HitObjectPath?.Version);
     }
 
     protected override void OnFree()
     {
         base.OnFree();
+
+        PathVersion.UnbindFrom(HitObjectPath?.Version);
 
         HitObjectPath = null;
 

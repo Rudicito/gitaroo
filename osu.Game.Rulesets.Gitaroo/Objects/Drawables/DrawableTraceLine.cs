@@ -1,8 +1,9 @@
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.MathUtils;
-using osu.Game.Rulesets.Gitaroo.Skinning;
+using osu.Game.Rulesets.Gitaroo.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
@@ -21,7 +22,13 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
 
     public SliderPath? HitObjectPath => HitObject?.Path;
 
-    public SnakingSliderBody SliderBody = null!;
+    public IBindable<int> PathVersion => pathVersion;
+    private readonly Bindable<int> pathVersion = new Bindable<int>();
+
+    public double? ProgressStart { get; set; } = 0;
+    public double? ProgressEnd { get; set; } = 1;
+
+    public TraceLineBody SliderBody = null!;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -32,7 +39,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         });
     }
 
-    private partial class DefaultTraceLineBody : SnakingSliderBody
+    private partial class DefaultTraceLineBody : TraceLineBody
     {
     }
 
@@ -77,13 +84,17 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
         base.OnApply();
 
-        SliderBody.Refresh();
+        // Ensure that the version will change after the upcoming BindTo().
+        pathVersion.Value = int.MaxValue;
+        PathVersion.BindTo(HitObject!.Path.Version);
     }
 
     protected override void OnFree()
     {
         base.OnFree();
         SliderBody.RecyclePath();
+
+        PathVersion.UnbindFrom(HitObjectPath!.Version);
     }
 
     public override void OnKilled()

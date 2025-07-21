@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Gitaroo.MathUtils;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
@@ -36,9 +35,6 @@ public abstract partial class SnakingSliderBody : SliderBody
     /// Path Offset of the current curve
     /// </summary>
     public Vector2 PathOffset => Path.PositionInBoundingBox(Path.Vertices[0]);
-
-    public float? AngleStart;
-    public float? AngleEnd;
 
     public override Vector2 PathStartOffset => snakedPathOffset;
 
@@ -77,10 +73,10 @@ public abstract partial class SnakingSliderBody : SliderBody
         setRange(start, end);
     }
 
-    public void Refresh(double start = 0, double end = 1)
+    public virtual void Refresh()
     {
-        SnakedStart = start;
-        SnakedEnd = end;
+        SnakedStart = drawableSlider.ProgressStart;
+        SnakedEnd = drawableSlider.ProgressEnd;
 
         if (drawableSlider.HitObjectPath == null)
             return;
@@ -93,7 +89,6 @@ public abstract partial class SnakingSliderBody : SliderBody
         // needs fix in the osu!framework?
 
         // Force the body to be the final path size to avoid excessive autosize computations
-        Path.AutoSizeAxes = Axes.None;
         Path.AutoSizeAxes = Axes.Both;
         Size = Path.Size;
 
@@ -102,30 +97,6 @@ public abstract partial class SnakingSliderBody : SliderBody
         snakedPosition = Path.PositionInBoundingBox(Vector2.Zero);
         snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
         snakedPathEndOffset = Path.PositionInBoundingBox(Path.Vertices[^1]);
-
-        AngleStart = null;
-        AngleEnd = null;
-
-        int vertexCount = Path.Vertices.Count;
-
-        if (vertexCount >= 2)
-        {
-            for (int i = 0; i < vertexCount - 1; i++)
-            {
-                if (Path.Vertices[i] == Path.Vertices[i + 1]) continue;
-
-                AngleStart = Angle.GetDegreesFromPosition(Path.Vertices[i], Path.Vertices[i + 1]);
-                break;
-            }
-
-            for (int i = vertexCount - 1; i > 0; i--)
-            {
-                if (Path.Vertices[i - 1] == Path.Vertices[i]) continue;
-
-                AngleEnd = Angle.GetDegreesFromPosition(Path.Vertices[i - 1], Path.Vertices[i]);
-                break;
-            }
-        }
 
         double lastSnakedStart = SnakedStart ?? 0;
         double lastSnakedEnd = SnakedEnd ?? 0;
