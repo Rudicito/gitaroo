@@ -19,7 +19,7 @@ public partial class PlaySliderBody : SnakingSliderBody
         AccentColourBindable = drawableObject.AccentColour.GetBoundCopy();
         AccentColourBindable.BindValueChanged(accent => AccentColour = GetBodyAccentColour(skin, accent.NewValue), true);
 
-        if (drawableObject is IHasHitObjectPath drawableSlider)
+        if (drawableObject is IHasSnakingSlider drawableSlider)
         {
             pathVersion = drawableSlider.PathVersion.GetBoundCopy();
             pathVersion.BindValueChanged(_ => Scheduler.AddOnce(Refresh));

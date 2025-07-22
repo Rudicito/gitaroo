@@ -8,7 +8,10 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
-public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IHasHitObjectPath
+/// <summary>
+/// Visualises a <see cref="TraceLine"/> hit object.
+/// </summary>
+public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IHasSnakingSlider
 {
     public DrawableTraceLine()
         : this(null)
@@ -20,13 +23,13 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
     }
 
-    public SliderPath? HitObjectPath => HitObject?.Path;
+    public SliderPath? Path => HitObject?.Path;
 
     public IBindable<int> PathVersion => pathVersion;
     private readonly Bindable<int> pathVersion = new Bindable<int>();
 
-    public double? ProgressStart { get; set; } = 0;
-    public double? ProgressEnd { get; set; } = 1;
+    public double? PathStart { get; set; } = 0;
+    public double? PathEnd { get; set; } = 1;
 
     public TraceLineBody SliderBody = null!;
 
@@ -94,7 +97,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         base.OnFree();
         SliderBody.RecyclePath();
 
-        PathVersion.UnbindFrom(HitObjectPath!.Version);
+        PathVersion.UnbindFrom(Path!.Version);
     }
 
     public override void OnKilled()

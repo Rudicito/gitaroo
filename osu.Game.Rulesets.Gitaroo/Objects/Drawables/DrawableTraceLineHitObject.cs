@@ -4,6 +4,9 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
+/// <summary>
+/// A DrawableHitObject who is in set in a <see cref="TraceLine"/>
+/// </summary>
 public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
 {
     public DrawableTraceLineHitObject(GitarooHitObject? hitObject)

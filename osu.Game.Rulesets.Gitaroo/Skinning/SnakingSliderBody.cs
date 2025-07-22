@@ -55,19 +55,19 @@ public abstract partial class SnakingSliderBody : SliderBody
     /// </summary>
     private Vector2 snakedPathEndOffset;
 
-    private IHasHitObjectPath drawableSlider = null!;
+    private IHasSnakingSlider drawableSlider = null!;
 
     [BackgroundDependencyLoader]
     private void load(DrawableHitObject drawableObject)
     {
-        drawableSlider = (IHasHitObjectPath)drawableObject;
+        drawableSlider = (IHasSnakingSlider)drawableObject;
 
         // Refresh();
     }
 
     public void UpdateProgress(double start, double end = 1)
     {
-        if (drawableSlider.HitObjectPath == null)
+        if (drawableSlider.Path == null)
             return;
 
         setRange(start, end);
@@ -75,14 +75,14 @@ public abstract partial class SnakingSliderBody : SliderBody
 
     public virtual void Refresh()
     {
-        SnakedStart = drawableSlider.ProgressStart;
-        SnakedEnd = drawableSlider.ProgressEnd;
+        SnakedStart = drawableSlider.PathStart;
+        SnakedEnd = drawableSlider.PathEnd;
 
-        if (drawableSlider.HitObjectPath == null)
+        if (drawableSlider.Path == null)
             return;
 
         // Generate the curve
-        drawableSlider.HitObjectPath.GetPathToProgress(CurrentCurve, SnakedStart.Value, SnakedEnd.Value);
+        drawableSlider.Path.GetPathToProgress(CurrentCurve, SnakedStart!.Value, SnakedEnd!.Value);
         SetVertices(CurrentCurve);
 
         // todo: Path auto-sizing calculation "acts like" there is a vertex at (0,0), causing the bounding box to be larger than expected,
@@ -130,7 +130,7 @@ public abstract partial class SnakingSliderBody : SliderBody
         SnakedStart = p0;
         SnakedEnd = p1;
 
-        drawableSlider.HitObjectPath!.GetPathToProgress(CurrentCurve, p0, p1);
+        drawableSlider.Path!.GetPathToProgress(CurrentCurve, p0, p1);
 
         SetVertices(CurrentCurve);
     }

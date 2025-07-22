@@ -10,25 +10,25 @@ namespace osu.Game.Rulesets.Gitaroo.Skinning;
 
 public abstract partial class SliderBody : CompositeDrawable
 {
-    private DrawableSliderPath path;
+    private DrawableSliderPath? path;
 
-    protected Path Path => path;
+    protected Path Path => path!;
 
     public virtual float PathRadius
     {
-        get => path.PathRadius;
-        set => path.PathRadius = value;
+        get => path!.PathRadius;
+        set => path!.PathRadius = value;
     }
 
     /// <summary>
     /// Offset in absolute coordinates from the start of the curve.
     /// </summary>
-    public virtual Vector2 PathStartOffset => path.PositionInBoundingBox(path.Vertices[0]);
+    public virtual Vector2 PathStartOffset => path!.PositionInBoundingBox(path.Vertices[0]);
 
     /// <summary>
     /// Offset in absolute coordinates from the end of the curve.
     /// </summary>
-    public virtual Vector2 PathEndOffset => path.PositionInBoundingBox(path.Vertices[^1]);
+    public virtual Vector2 PathEndOffset => path!.PositionInBoundingBox(path.Vertices[^1]);
 
     public virtual Vector2 GetPositionInBoundingBox(Vector2 position) => Path.PositionInBoundingBox(position);
 
@@ -37,10 +37,10 @@ public abstract partial class SliderBody : CompositeDrawable
     /// </summary>
     public Color4 AccentColour
     {
-        get => path.AccentColour;
+        get => path!.AccentColour;
         set
         {
-            if (path.AccentColour == value)
+            if (path!.AccentColour == value)
                 return;
 
             path.AccentColour = value;
@@ -52,10 +52,10 @@ public abstract partial class SliderBody : CompositeDrawable
     /// </summary>
     public new Color4 BorderColour
     {
-        get => path.BorderColour;
+        get => path!.BorderColour;
         set
         {
-            if (path.BorderColour == value)
+            if (path!.BorderColour == value)
                 return;
 
             path.BorderColour = value;
@@ -67,10 +67,10 @@ public abstract partial class SliderBody : CompositeDrawable
     /// </summary>
     public float BorderSize
     {
-        get => path.BorderSize;
+        get => path!.BorderSize;
         set
         {
-            if (path.BorderSize == value)
+            if (path!.BorderSize == value)
                 return;
 
             path.BorderSize = value;
@@ -104,7 +104,7 @@ public abstract partial class SliderBody : CompositeDrawable
     /// Sets the vertices of the path which should be drawn by this <see cref="SliderBody"/>.
     /// </summary>
     /// <param name="vertices">The vertices</param>
-    public void SetVertices(IReadOnlyList<Vector2> vertices) => path.Vertices = vertices;
+    public void SetVertices(IReadOnlyList<Vector2> vertices) => path!.Vertices = vertices;
 
     protected virtual DrawableSliderPath CreateSliderPath() => new DefaultDrawableSliderPath();
 
