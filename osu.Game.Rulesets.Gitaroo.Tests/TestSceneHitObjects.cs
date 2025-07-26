@@ -43,6 +43,12 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
             addTraceLine(0, 2000, linearToBottomLeft);
             addHoldNote(250, 1750);
         });
+
+        AddStep("1 TraceLine, 1 Note", () =>
+        {
+            addTraceLine(0, 2000, bezier);
+            addNote(1000);
+        });
     }
 
     private void addHoldNote(double start, double end)
@@ -51,6 +57,14 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
         {
             StartTime = currentTime + start + delay,
             EndTime = currentTime + end + delay
+        });
+    }
+
+    private void addNote(double start)
+    {
+        DrawableRuleset.Playfield.Add(new Note
+        {
+            StartTime = currentTime + start + delay,
         });
     }
 

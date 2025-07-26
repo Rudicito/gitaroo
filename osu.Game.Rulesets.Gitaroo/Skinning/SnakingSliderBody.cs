@@ -81,8 +81,12 @@ public abstract partial class SnakingSliderBody : SliderBody
         if (drawableSlider.Path == null)
             return;
 
+        // Early return if we don't have valid path bounds
+        if (!SnakedStart.HasValue || !SnakedEnd.HasValue)
+            return;
+
         // Generate the curve
-        drawableSlider.Path.GetPathToProgress(CurrentCurve, SnakedStart!.Value, SnakedEnd!.Value);
+        drawableSlider.Path.GetPathToProgress(CurrentCurve, SnakedStart.Value, SnakedEnd.Value);
         SetVertices(CurrentCurve);
 
         // todo: Path auto-sizing calculation "acts like" there is a vertex at (0,0), causing the bounding box to be larger than expected,

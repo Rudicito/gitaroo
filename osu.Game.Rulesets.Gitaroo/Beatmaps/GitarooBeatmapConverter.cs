@@ -91,11 +91,10 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
                 // If a osu HitCircle
                 default:
-                    return new HoldNote
+                    return new Note
                     {
                         Samples = original.Samples,
                         StartTime = original.StartTime,
-                        Duration = 100,
                     }.Yield();
             }
         }
