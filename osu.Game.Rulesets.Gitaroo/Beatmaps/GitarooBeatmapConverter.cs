@@ -13,9 +13,12 @@ namespace osu.Game.Rulesets.Gitaroo.Beatmaps;
 
 public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 {
+    private readonly bool isForCurrentRuleset;
+
     public GitarooBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
         : base(beatmap, ruleset)
     {
+        isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
     }
 
     // todo: Check for conversion types that should be supported (ie. Beatmap.HitObjects.Any(h => h is IHasXPosition))
@@ -31,7 +34,10 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
     {
         var beatmap = (GitarooBeatmap)base.ConvertBeatmap(original, cancellationToken);
 
-        beatmap.HitObjects.AddRange(generateLineTrace(beatmap));
+        if (!isForCurrentRuleset)
+        {
+            beatmap.HitObjects.AddRange(generateTraceLine(beatmap));
+        }
 
         // Can be more optimized?
         beatmap.HitObjects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
@@ -44,50 +50,70 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
         // if ((original as IHasCombo)?.NewCombo ?? false)
         //     patternGenerator.StartNextPattern();
 
-        switch (original)
+        if (isForCurrentRuleset)
         {
-            // If a osu Slider
-            case IHasPathWithRepeats slider:
-                return new HoldNote
-                {
-                    Samples = original.Samples,
-                    StartTime = original.StartTime,
-                    Duration = slider.Duration,
-                }.Yield();
+            switch (original)
+            {
+                case GitarooHitObject gitarooObj:
+                    return gitarooObj.Yield();
 
-            // If a osu Spinner
-            case IHasDuration spinner:
-                return new HoldNote
-                {
-                    Samples = original.Samples,
-                    StartTime = original.StartTime,
-                    Duration = spinner.Duration,
-                }.Yield();
+                default:
+                    return [];
+            }
+        }
 
-            // If a osu HitCircle
-            default:
-                return new Note
+        else
+        {
+            switch (original)
+            {
+                case GitarooHitObject gitarooObj:
                 {
-                    Samples = original.Samples,
-                    StartTime = original.StartTime,
-                }.Yield();
+                    return gitarooObj.Yield();
+                }
+
+                // If a osu Slider
+                case IHasPathWithRepeats slider:
+                    return new HoldNote
+                    {
+                        Samples = original.Samples,
+                        StartTime = original.StartTime,
+                        Duration = slider.Duration,
+                    }.Yield();
+
+                // If a osu Spinner
+                case IHasDuration spinner:
+                    return new HoldNote
+                    {
+                        Samples = original.Samples,
+                        StartTime = original.StartTime,
+                        Duration = spinner.Duration,
+                    }.Yield();
+
+                // If a osu HitCircle
+                default:
+                    return new Note
+                    {
+                        Samples = original.Samples,
+                        StartTime = original.StartTime,
+                    }.Yield();
+            }
         }
     }
 
-    private List<LineTrace> generateLineTrace(GitarooBeatmap beatmap)
+    private List<TraceLine> generateTraceLine(GitarooBeatmap beatmap)
     {
-        // todo: Add LineTrace generator algorithm
-        List<LineTrace> lineTraces =
+        double velocity = beatmap.Difficulty.SliderMultiplier;
+        // todo: Add TraceLine generator algorithm
+        List<TraceLine> traceLines =
         [
-            new(new SliderPath())
+            new TraceLine
             {
-                StartTime = 20000
-            },
-            new(new SliderPath())
-            {
-                StartTime = 40000
+                Velocity = velocity,
+                StartTime = 1000,
+                EndTime = 10000,
+                Path = new SliderPath(),
             }
         ];
-        return lineTraces;
+        return traceLines;
     }
 }

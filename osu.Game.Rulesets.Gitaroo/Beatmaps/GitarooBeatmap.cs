@@ -14,7 +14,7 @@ public class GitarooBeatmap : Beatmap<GitarooHitObject>
         int holdNotes = HitObjects.Count(s => s is HoldNote);
         int max = Math.Max(1, notes + holdNotes);
 
-        int lineTraces = HitObjects.Count(s => s is LineTrace);
+        int traceLines = HitObjects.Count(s => s is TraceLine);
 
         return new[]
         {
@@ -34,9 +34,9 @@ public class GitarooBeatmap : Beatmap<GitarooHitObject>
             },
             new BeatmapStatistic
             {
-                Name = @"Line Traces",
+                Name = @"Trace Lines",
                 CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
-                Content = lineTraces.ToString(),
+                Content = traceLines.ToString(),
             }
         };
     }
