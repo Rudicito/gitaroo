@@ -1,4 +1,6 @@
 using NUnit.Framework;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -53,7 +55,7 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
 
     private void addHoldNote(double start, double end)
     {
-        DrawableRuleset.Playfield.Add(new HoldNote
+        add(new HoldNote
         {
             StartTime = currentTime + start + delay,
             EndTime = currentTime + end + delay
@@ -62,7 +64,7 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
 
     private void addNote(double start)
     {
-        DrawableRuleset.Playfield.Add(new Note
+        add(new Note
         {
             StartTime = currentTime + start + delay,
         });
@@ -70,13 +72,30 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
 
     private void addTraceLine(double start, double end, SliderPath sliderPath, double velocity = 0.2)
     {
-        DrawableRuleset.Playfield.Add(new TraceLine
+        add(new TraceLine
         {
             StartTime = currentTime + start + delay,
             EndTime = currentTime + end + delay,
             Velocity = velocity,
             Path = sliderPath
         });
+    }
+
+    private void add(GitarooHitObject hitObject, bool kiai = false)
+    {
+        var cpi = createControlPointInfo(kiai);
+        var difficulty = new BeatmapDifficulty();
+
+        hitObject.ApplyDefaults(cpi, difficulty);
+
+        DrawableRuleset.Playfield.Add(hitObject);
+    }
+
+    private ControlPointInfo createControlPointInfo(bool kiai)
+    {
+        var cpi = new ControlPointInfo();
+        cpi.Add(-10000, new EffectControlPoint { KiaiMode = kiai });
+        return cpi;
     }
 
     private double currentTime => DrawableRuleset.Playfield.Time.Current;
