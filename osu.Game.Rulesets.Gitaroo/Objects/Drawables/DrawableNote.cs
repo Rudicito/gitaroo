@@ -1,14 +1,17 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Gitaroo.Skinning.Default;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
 /// <summary>
 /// Visualises a <see cref="Note"/> hit object.
 /// </summary>
-public partial class DrawableNote : DrawableTraceLineHitObject<Note>
+public partial class DrawableNote : DrawableTraceLineHitObject<Note>, IKeyBindingHandler<GitarooAction>
 {
     public DrawableNote()
         : this(null)
@@ -45,5 +48,38 @@ public partial class DrawableNote : DrawableTraceLineHitObject<Note>
         var positionInBoundingBox = TraceLine.SliderBody.GetPositionInBoundingBox(pathPosition);
 
         Position = TraceLine.Position + positionInBoundingBox;
+    }
+
+    protected override void CheckForResult(bool userTriggered, double timeOffset)
+    {
+        if (!userTriggered)
+        {
+            if (!HitObject!.HitWindows.CanBeHit(timeOffset))
+                ApplyMinResult();
+
+            return;
+        }
+
+        var result = HitObject!.HitWindows.ResultFor(timeOffset);
+
+        if (result == HitResult.None)
+            return;
+
+        ApplyResult(result);
+    }
+
+    public virtual bool OnPressed(KeyBindingPressEvent<GitarooAction> e)
+    {
+        if (e.Action != GitarooAction.LeftButton || e.Action != GitarooAction.RightButton)
+            return false;
+
+        if (CheckHittable?.Invoke(this, Time.Current) == false)
+            return false;
+
+        return UpdateResult(true);
+    }
+
+    public void OnReleased(KeyBindingReleaseEvent<GitarooAction> e)
+    {
     }
 }
