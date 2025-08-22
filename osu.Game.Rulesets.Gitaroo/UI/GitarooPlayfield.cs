@@ -41,7 +41,10 @@ public partial class GitarooPlayfield : Playfield
             centerCircle
         });
         RegisterPool<Note, DrawableNote>(10, 50);
+
         RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
+        RegisterPool<HeadNote, DrawableHeadNote>(10, 50);
+
         RegisterPool<TraceLine, DrawableTraceLine>(2, 5);
     }
 

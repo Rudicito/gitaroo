@@ -2,8 +2,10 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Gitaroo.Skinning.Default;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
@@ -47,7 +49,8 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     {
         AddRangeInternal(new Drawable[]
         {
-            SliderBody = new DefaultHoldNoteBody()
+            SliderBody = new DefaultHoldNoteBody(),
+            headContainer = new Container<DrawableHeadNote>()
         });
     }
 
@@ -109,5 +112,36 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     {
         base.OnKilled();
         SliderBody.RecyclePath();
+    }
+
+    private Container<DrawableHeadNote> headContainer;
+
+    protected override void AddNestedHitObject(DrawableHitObject hitObject)
+    {
+        base.AddNestedHitObject(hitObject);
+
+        switch (hitObject)
+        {
+            case DrawableHeadNote head:
+                headContainer.Child = head;
+                break;
+        }
+    }
+
+    protected override void ClearNestedHitObjects()
+    {
+        base.ClearNestedHitObjects();
+        headContainer.Clear(false);
+    }
+
+    protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+    {
+        switch (hitObject)
+        {
+            case HeadNote head:
+                return new DrawableHeadNote(head);
+        }
+
+        return base.CreateNestedHitObject(hitObject);
     }
 }
