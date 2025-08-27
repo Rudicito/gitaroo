@@ -8,15 +8,18 @@ namespace osu.Game.Rulesets.Gitaroo.Skinning.Default;
 
 public partial class NotePiece : CircularContainer
 {
-    private static Color4 borderColour = new Color4(251, 151, 75, byte.MaxValue);
-    private static Color4 colour = borderColour.Opacity(0.5f);
+    private static readonly Color4 default_border_colour = new Color4(251, 151, 75, byte.MaxValue);
+    private static readonly Color4 default_colour = default_border_colour.Opacity(0.5f);
+
+    private Color4 borderColour = default_border_colour;
+    private Color4 colour = default_colour;
 
     public Color4 AccentColor
     {
         set
         {
-            colour = value;
-            borderColour = value.Opacity(0.5f);
+            borderColour = value;
+            colour = value.Opacity(0.5f);
         }
     }
 

@@ -1,5 +1,7 @@
 using System.Threading;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects;
 
@@ -32,4 +34,7 @@ public class HoldNote : GitarooHitObject, IHasDuration
             StartTime = StartTime,
         });
     }
+
+    public override Judgement CreateJudgement() => new IgnoreJudgement();
+    protected override HitWindows? CreateHitWindows() => null;
 }

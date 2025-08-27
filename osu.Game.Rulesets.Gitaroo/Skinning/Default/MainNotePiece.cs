@@ -48,19 +48,19 @@ public partial class MainNotePiece : CompositeDrawable
         };
     }
 
-    private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
+    private readonly IBindable<Color4> accentColourBindable = new Bindable<Color4>();
 
     [BackgroundDependencyLoader]
     private void load()
     {
-        accentColour.BindTo(drawableObject.AccentColour);
+        accentColourBindable.BindTo(drawableObject.AccentColour);
     }
 
     protected override void LoadComplete()
     {
         base.LoadComplete();
 
-        accentColour.BindValueChanged(colour =>
+        accentColourBindable.BindValueChanged(colour =>
         {
             notePiece.AccentColor = colour.NewValue;
             kiaiContainer.Colour = colour.NewValue;

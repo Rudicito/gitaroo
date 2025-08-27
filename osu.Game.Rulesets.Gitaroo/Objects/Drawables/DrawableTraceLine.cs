@@ -31,7 +31,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     public double? PathStart { get; set; } = 0;
     public double? PathEnd { get; set; } = 1;
 
-    public TraceLineBody SliderBody = null!;
+    public PlayTraceLineBody SliderBody = null!;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -40,10 +40,6 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         {
             SliderBody = new DefaultTraceLineBody()
         });
-    }
-
-    private partial class DefaultTraceLineBody : TraceLineBody
-    {
     }
 
     protected override void UpdateAfterChildren()

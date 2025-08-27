@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osu.Game.Rulesets.Gitaroo.Skinning.Default;
 using osuTK;
 using osuTK.Graphics;
 

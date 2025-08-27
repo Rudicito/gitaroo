@@ -2,7 +2,7 @@ using osu.Game.Rulesets.Gitaroo.MathUtils;
 
 namespace osu.Game.Rulesets.Gitaroo.Skinning.Default;
 
-public partial class TraceLineBody : PlaySliderBody
+public partial class PlayTraceLineBody : PlaySliderBody
 {
     public float? AngleStart;
     public float? AngleEnd;

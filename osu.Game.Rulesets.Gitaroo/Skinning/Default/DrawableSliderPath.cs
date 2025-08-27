@@ -1,7 +1,7 @@
 using osu.Framework.Graphics.Lines;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Gitaroo.Skinning;
+namespace osu.Game.Rulesets.Gitaroo.Skinning.Default;
 
 public abstract partial class DrawableSliderPath : SmoothPath
 {

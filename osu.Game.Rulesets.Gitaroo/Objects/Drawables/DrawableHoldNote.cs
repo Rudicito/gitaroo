@@ -54,10 +54,6 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         });
     }
 
-    private partial class DefaultHoldNoteBody : PlaySliderBody
-    {
-    }
-
     protected override void UpdateAfterChildren()
     {
         base.UpdateAfterChildren();
