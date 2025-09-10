@@ -8,12 +8,14 @@ using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
 /// <remarks>
-/// Lot of thing taken from osu!mania playfield
+/// Lot of thing taken from osu!mania and osu! playfield
 /// </remarks>
 [Cached]
 public partial class GitarooPlayfield : Playfield
@@ -23,23 +25,38 @@ public partial class GitarooPlayfield : Playfield
     private readonly FanShaped fanShaped;
     private readonly CenterCircle centerCircle;
     private readonly OrderedHitPolicy hitPolicy;
+    private readonly JudgementContainer<DrawableGitarooJudgement> judgementLayer;
+
+    private readonly JudgementPooler<DrawableGitarooJudgement> judgementPooler;
 
     public GitarooPlayfield()
     {
-        fanShaped = new FanShaped();
-        centerCircle = new CenterCircle();
+        InternalChildren = new Drawable[]
+        {
+            HitObjectContainer,
+            fanShaped = new FanShaped(),
+            centerCircle = new CenterCircle(),
+            judgementLayer = new JudgementContainer<DrawableGitarooJudgement>
+            {
+                RelativeSizeAxes = Axes.Both,
+                Position = new Vector2(0, -150)
+            },
+        };
+
         hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+
+        AddInternal(judgementPooler = new JudgementPooler<DrawableGitarooJudgement>(new[]
+        {
+            HitResult.Great,
+            HitResult.Good,
+            HitResult.Meh,
+            HitResult.Miss,
+        }));
     }
 
     [BackgroundDependencyLoader]
     private void load()
     {
-        AddRangeInternal(new Drawable[]
-        {
-            HitObjectContainer,
-            fanShaped,
-            centerCircle
-        });
         RegisterPool<Note, DrawableNote>(10, 50);
 
         RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
@@ -75,8 +92,14 @@ public partial class GitarooPlayfield : Playfield
 
     internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
     {
+        if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
+            return;
+
         if (result.IsHit)
             hitPolicy.HandleHit(judgedObject);
+
+        judgementLayer.Clear(false);
+        judgementLayer.Add(judgementPooler.Get(result.Type, j => j.Apply(result, judgedObject))!);
     }
 
     public DrawableTraceLine? GetCurrentDrawableTraceLine(double time)
