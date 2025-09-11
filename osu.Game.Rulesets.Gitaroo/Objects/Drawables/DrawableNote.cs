@@ -70,7 +70,7 @@ public partial class DrawableNote : DrawableTraceLineHitObject<Note>, IKeyBindin
 
     public virtual bool OnPressed(KeyBindingPressEvent<GitarooAction> e)
     {
-        if (e.Action != GitarooAction.LeftButton || e.Action != GitarooAction.RightButton)
+        if (e.Action != GitarooAction.LeftButton && e.Action != GitarooAction.RightButton)
             return false;
 
         if (CheckHittable?.Invoke(this, Time.Current) == false)
