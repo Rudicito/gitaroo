@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
@@ -24,8 +25,11 @@ public partial class GitarooPlayfield : Playfield
 
     private readonly FanShaped fanShaped;
     private readonly CenterCircle centerCircle;
-    private readonly OrderedHitPolicy hitPolicy;
+
     private readonly JudgementContainer<DrawableGitarooJudgement> judgementLayer;
+    private readonly ProxyContainer traceLines;
+
+    private readonly OrderedHitPolicy hitPolicy;
 
     private readonly JudgementPooler<DrawableGitarooJudgement> judgementPooler;
 
@@ -33,6 +37,7 @@ public partial class GitarooPlayfield : Playfield
     {
         InternalChildren = new Drawable[]
         {
+            traceLines = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             HitObjectContainer,
             fanShaped = new FanShaped(),
             centerCircle = new CenterCircle(),
@@ -88,6 +93,18 @@ public partial class GitarooPlayfield : Playfield
             dho.GetTraceLine = GetCurrentDrawableTraceLine;
             dho.CheckHittable = hitPolicy.IsHittable;
         }
+
+        drawableHitObject.OnLoadComplete += onDrawableHitObjectLoaded;
+    }
+
+    private void onDrawableHitObjectLoaded(Drawable drawable)
+    {
+        switch (drawable)
+        {
+            case DrawableTraceLine:
+                traceLines.Add(drawable.CreateProxy());
+                break;
+        }
     }
 
     internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
@@ -105,5 +122,10 @@ public partial class GitarooPlayfield : Playfield
     public DrawableTraceLine? GetCurrentDrawableTraceLine(double time)
     {
         return HitObjectContainer.AliveObjects.OfType<DrawableTraceLine>().FirstOrDefault(x => x.IsActiveAtTime(time));
+    }
+
+    private partial class ProxyContainer : LifetimeManagementContainer
+    {
+        public void Add(Drawable proxy) => AddInternal(proxy);
     }
 }
