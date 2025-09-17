@@ -3,7 +3,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Gitaroo.Skinning.Default;
 
-public partial class DefaultTraceLineBody : PlayTraceLineBody
+public partial class DefaultTraceLineBody : PlaySliderBody
 {
     private const float path_radius = GitarooHitObject.OBJECT_RADIUS / 5;
 

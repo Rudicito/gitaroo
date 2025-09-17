@@ -23,7 +23,7 @@ public partial class GitarooPlayfield : Playfield
 {
     protected override GameplayCursorContainer CreateCursor() => new();
 
-    private readonly FanShaped fanShaped;
+    private readonly FanShapedManager fanShaped;
     private readonly CenterCircle centerCircle;
 
     private readonly JudgementContainer<DrawableGitarooJudgement> judgementLayer;
@@ -39,7 +39,7 @@ public partial class GitarooPlayfield : Playfield
         {
             traceLines = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             HitObjectContainer,
-            fanShaped = new FanShaped(),
+            fanShaped = new FanShapedManager { RelativeSizeAxes = Axes.Both },
             centerCircle = new CenterCircle(),
             judgementLayer = new JudgementContainer<DrawableGitarooJudgement>
             {
@@ -90,8 +90,13 @@ public partial class GitarooPlayfield : Playfield
 
         if (drawableHitObject is DrawableTraceLineHitObject dho)
         {
-            dho.GetTraceLine = GetCurrentDrawableTraceLine;
+            dho.GetTraceLine = GetTraceLine;
             dho.CheckHittable = hitPolicy.IsHittable;
+        }
+
+        else if (drawableHitObject is DrawableTraceLine dtl)
+        {
+            dtl.SetCurrentTraceLine = SetCurrentDrawableTraceLine;
         }
 
         drawableHitObject.OnLoadComplete += onDrawableHitObjectLoaded;
@@ -119,9 +124,16 @@ public partial class GitarooPlayfield : Playfield
         judgementLayer.Add(judgementPooler.Get(result.Type, j => j.Apply(result, judgedObject))!);
     }
 
-    public DrawableTraceLine? GetCurrentDrawableTraceLine(double time)
+    public DrawableTraceLine? CurrentDrawableTraceLine;
+
+    public DrawableTraceLine? GetTraceLine(double time)
     {
         return HitObjectContainer.AliveObjects.OfType<DrawableTraceLine>().FirstOrDefault(x => x.IsActiveAtTime(time));
+    }
+
+    public void SetCurrentDrawableTraceLine(DrawableTraceLine traceLine)
+    {
+        CurrentDrawableTraceLine = traceLine;
     }
 
     private partial class ProxyContainer : LifetimeManagementContainer
