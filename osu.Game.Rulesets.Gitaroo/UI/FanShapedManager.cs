@@ -27,14 +27,15 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
     }
 
     /// <summary>
-    /// Is the FanShaped tracking a TraceLine?
+    /// Whether the FanShaped is currently tracking a TraceLine.
     /// </summary>
     public bool Tracking { get; set; }
 
     private float direction;
 
     /// <summary>
-    /// The current direction of the FanShaped, use for all the logics.
+    /// The current direction of the FanShaped in degrees.
+    /// Used for all the tracking calculations.
     /// </summary>
     public float Direction
     {
@@ -50,8 +51,8 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
     private float halfAngleArea = 35;
 
     /// <summary>
-    /// The angle portion considered correct.
-    /// Exceeding it means missing the TraceLine.
+    /// The angle range (in degrees) in which tracking is considered valid.
+    /// A larger value makes tracking more forgiving; a smaller value makes it stricter.
     /// </summary>
     public float AngleArea
     {
@@ -65,7 +66,7 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
     }
 
     /// <summary>
-    /// The angle the user must target to be allowed to play the HitObjects
+    /// The current TraceLine angle the user must target to track the TraceLine.
     /// </summary>
     public float? AngleTarget;
 
@@ -101,7 +102,7 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
     // }
 
     /// <summary>
-    /// Check if the given angle is considered in the FanShaped area
+    /// Checks whether the given angle (in degrees) is considered valid based on the <see cref="AngleArea"/>.
     /// </summary>
     /// <param name="angle"></param>
     /// <returns></returns>
@@ -113,6 +114,11 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
         return AngleUtils.IsAngleBetween(angle, start, end);
     }
 
+    /// <summary>
+    /// Normalized closeness to the target angle:
+    /// 1 = exact match, decreasing towards 0 as the difference approaches <see cref="halfAngleArea"/>.
+    /// Null if no target is available.
+    /// </summary>
     public float? DeltaAngle;
 
     protected override void Update()
@@ -135,7 +141,5 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
             Tracking = false;
             DeltaAngle = null;
         }
-
-        // Logger.Log($"DeltaAngle : {DeltaAngle}\n Tracking : {Tracking}");
     }
 }
