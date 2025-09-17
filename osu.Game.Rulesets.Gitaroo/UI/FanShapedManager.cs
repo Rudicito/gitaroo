@@ -119,7 +119,6 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
     /// <summary>
     /// Normalized closeness to the target angle:
     /// 1 = exact match, decreasing towards 0 as the difference approaches <see cref="halfAngleArea"/>.
-    /// Null if no target is available.
     /// </summary>
     public float DeltaAngle;
 
