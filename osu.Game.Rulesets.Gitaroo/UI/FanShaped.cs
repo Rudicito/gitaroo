@@ -2,6 +2,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -11,9 +12,23 @@ public partial class FanShaped : Container
 {
     private readonly FanShapedSprite fanShapedSprite;
     private readonly Triangle leftArrow, rightArrow;
+
     private const float left_arrow_max_x = -86;
     private const float right_arrow_max_x = 86;
     private const float fan_shaped_max_y = 155;
+
+    private static readonly Color4 tracked_colour = Color4.Orange;
+    private static readonly Color4 not_tracked_colour = Color4.Cyan;
+
+    private static readonly Color4 left_right_arrow_colour = Color4.Cyan;
+    private static readonly Color4 middle_arrow_colour = Color4.White;
+
+    private static readonly (float, Color4)[] fan_shaped_colour_spectrum =
+    {
+        (0.0f, not_tracked_colour),
+        (0.8f, tracked_colour),
+        (1.0f, tracked_colour),
+    };
 
     private float angleArea = 70;
 
@@ -41,7 +56,7 @@ public partial class FanShaped : Container
                 Angle = AngleArea,
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Colour = Color4.Cyan,
+                Colour = not_tracked_colour,
                 Rotation = 0,
             },
 
@@ -51,7 +66,7 @@ public partial class FanShaped : Container
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.Centre,
                 Size = new Vector2(17, 50),
-                Colour = Color4.White,
+                Colour = middle_arrow_colour,
                 Alpha = 0.5f,
                 Rotation = 0,
             },
@@ -63,7 +78,7 @@ public partial class FanShaped : Container
                 Anchor = Anchor.Centre,
                 Size = new Vector2(11, 13),
                 Position = new Vector2(left_arrow_max_x, 5),
-                Colour = Color4.Cyan,
+                Colour = left_right_arrow_colour,
                 Alpha = 0.5f,
                 Rotation = 0,
             },
@@ -75,7 +90,7 @@ public partial class FanShaped : Container
                 Anchor = Anchor.Centre,
                 Size = new Vector2(11, 13),
                 Position = new Vector2(right_arrow_max_x, 5),
-                Colour = Color4.Cyan,
+                Colour = left_right_arrow_colour,
                 Alpha = 0.5f,
                 Rotation = 0,
             }
@@ -113,5 +128,10 @@ public partial class FanShaped : Container
 
         rightArrow.Animate(t => t.MoveToX(Math.Min(t.X + reset_value * right_arrow_max_x, right_arrow_max_x), down_time, Easing.OutQuint)
         ).Then(t => t.MoveToX(0, up_time, Easing.OutQuint));
+    }
+
+    public void SetColour(float range)
+    {
+        fanShapedSprite.Colour = ColourUtils.SampleFromLinearGradient(fan_shaped_colour_spectrum, range);
     }
 }

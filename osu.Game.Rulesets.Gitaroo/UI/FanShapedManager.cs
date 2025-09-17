@@ -44,6 +44,8 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
         {
             direction = value;
             FanShaped.Rotation = Tracking ? AngleTarget!.Value : value;
+
+            FanShaped.SetColour(DeltaAngle);
         }
     }
 
@@ -119,7 +121,7 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
     /// 1 = exact match, decreasing towards 0 as the difference approaches <see cref="halfAngleArea"/>.
     /// Null if no target is available.
     /// </summary>
-    public float? DeltaAngle;
+    public float DeltaAngle;
 
     protected override void Update()
     {
@@ -139,7 +141,7 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
         else
         {
             Tracking = false;
-            DeltaAngle = null;
+            DeltaAngle = 0;
         }
     }
 }
