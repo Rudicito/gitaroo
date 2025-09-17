@@ -23,6 +23,16 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
     }
 
+    public Action<DrawableTraceLine>? SetCurrentTraceLine { get; set; }
+
+    public float? AngleStart;
+    public float? AngleEnd;
+
+    /// <summary>
+    /// The current Direction of the TraceLine
+    /// </summary>
+    public float? Direction { get; private set; }
+
     public SliderPath? Path => HitObject?.Path;
 
     public IBindable<int> PathVersion => pathVersion;
@@ -31,7 +41,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     public double? PathStart { get; set; } = 0;
     public double? PathEnd { get; set; } = 1;
 
-    public PlayTraceLineBody SliderBody = null!;
+    public DefaultTraceLineBody SliderBody = null!;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -52,23 +62,37 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
-        if (Time.Current >= HitObject.StartTime)
+        // Move the TraceLine current progression to the center
+        if (Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime)
         {
-            // Move the TraceLine current progression to the center
+            SetCurrentTraceLine!(this);
+
             double completionProgress = (Time.Current - HitObject.StartTime) / HitObject.Duration;
-            SliderBody.UpdateProgress(Math.Clamp(completionProgress, 0, 1));
+
+            Direction = Path!.AngleAtProgress((float)completionProgress);
+
+            SliderBody.UpdateProgress(completionProgress);
             Position = -SliderBody.PathOffset;
         }
 
-        else
+        // Move the TraceLine towards the center
+        else if (Time.Current < HitObject.StartTime)
         {
-            // Move the TraceLine towards the center
-            if (SliderBody.AngleStart != null)
+            Direction = null;
+
+            if (AngleStart != null)
             {
                 SliderBody.UpdateProgress(0);
 
-                Position = Angle.MovePoint(-SliderBody.PathStartOffset, SliderBody.AngleStart.Value, (float)(HitObject.Velocity * (HitObject.StartTime - Time.Current)));
+                Position = AngleUtils.MovePoint(-SliderBody.PathStartOffset, AngleStart.Value, (float)(HitObject.Velocity * (HitObject.StartTime - Time.Current)));
             }
+        }
+
+        else if (Time.Current > HitObject.EndTime)
+        {
+            Direction = null;
+
+            SliderBody.UpdateProgress(1);
         }
     }
 
@@ -83,6 +107,9 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
         base.OnApply();
 
+        AngleStart = Path!.AngleAtProgress(0);
+        AngleEnd = Path!.AngleAtProgress(1);
+
         // Ensure that the version will change after the upcoming BindTo().
         pathVersion.Value = int.MaxValue;
         PathVersion.BindTo(HitObject!.Path.Version);
@@ -91,6 +118,11 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     protected override void OnFree()
     {
         base.OnFree();
+
+        AngleStart = null;
+        AngleEnd = null;
+        Direction = null;
+
         SliderBody.RecyclePath();
 
         PathVersion.UnbindFrom(Path!.Version);
