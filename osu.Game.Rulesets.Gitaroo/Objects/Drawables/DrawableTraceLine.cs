@@ -28,6 +28,9 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     public float? AngleStart;
     public float? AngleEnd;
 
+    /// <summary>
+    /// The current Direction of the TraceLine
+    /// </summary>
     public float? Direction { get; private set; }
 
     public SliderPath? Path => HitObject?.Path;
@@ -59,25 +62,24 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
+        // Move the TraceLine current progression to the center
         if (Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime)
         {
             SetCurrentTraceLine!(this);
 
-            // Move the TraceLine current progression to the center
             double completionProgress = (Time.Current - HitObject.StartTime) / HitObject.Duration;
-            double clampCompletionProgress = Math.Clamp(completionProgress, 0, 1);
 
             Direction = Path!.AngleAtProgress((float)completionProgress);
 
-            SliderBody.UpdateProgress(clampCompletionProgress);
+            SliderBody.UpdateProgress(completionProgress);
             Position = -SliderBody.PathOffset;
         }
 
+        // Move the TraceLine towards the center
         else if (Time.Current < HitObject.StartTime)
         {
             Direction = null;
 
-            // Move the TraceLine towards the center
             if (AngleStart != null)
             {
                 SliderBody.UpdateProgress(0);
@@ -89,6 +91,8 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         else if (Time.Current > HitObject.EndTime)
         {
             Direction = null;
+
+            SliderBody.UpdateProgress(1);
         }
     }
 
