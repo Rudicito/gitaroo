@@ -49,6 +49,10 @@ public class GitarooRuleset : Ruleset
     {
         new KeyBinding(InputKey.Z, GitarooAction.LeftButton),
         new KeyBinding(InputKey.X, GitarooAction.RightButton),
+        new KeyBinding(InputKey.Joystick2, GitarooAction.LeftButton),
+        new KeyBinding(InputKey.Joystick3, GitarooAction.RightButton),
+        new KeyBinding(InputKey.JoystickAxis2Positive, GitarooAction.JoystickDown),
+        new KeyBinding(InputKey.JoystickAxis1Positive, GitarooAction.JoystickRight),
     };
 
     public override Drawable CreateIcon() => new GitarooIcon();
