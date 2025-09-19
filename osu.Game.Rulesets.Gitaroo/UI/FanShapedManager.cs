@@ -10,6 +10,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
+/// <remarks>
+/// The code looks so unorganized sorry...
+/// </remarks>
 public partial class FanShapedManager : Container
 {
     [Resolved]
@@ -26,8 +29,8 @@ public partial class FanShapedManager : Container
 
     private FanShaped fanShaped = null!;
 
-    private JoyAxis joyX => inputManager.JoyX;
-    private JoyAxis joyY => inputManager.JoyY;
+    private JoyAxis? joyX => inputManager.JoyX;
+    private JoyAxis? joyY => inputManager.JoyY;
 
     private bool joystickPriority;
 
@@ -127,21 +130,24 @@ public partial class FanShapedManager : Container
 
     protected override bool OnJoystickAxisMove(JoystickAxisMoveEvent e)
     {
-        if (!(e.Axis.Source == joyX.Source || e.Axis.Source == joyY.Source))
+        if (joyX == null || joyY == null)
+            return base.OnJoystickAxisMove(e);
+
+        if (!(e.Axis.Source == joyX.Value.Source || e.Axis.Source == joyY.Value.Source))
             return base.OnJoystickAxisMove(e);
 
         joystick ??= Vector2.Zero;
 
         Vector2 currentJoystick = joystick.Value;
 
-        if (e.Axis.Source == joyX.Source)
+        if (e.Axis.Source == joyX.Value.Source)
         {
-            currentJoystick.X = joyX.IsNegative ? -e.Axis.Value : e.Axis.Value;
+            currentJoystick.X = joyX.Value.IsNegative ? -e.Axis.Value : e.Axis.Value;
         }
 
-        else if (e.Axis.Source == joyY.Source)
+        else if (e.Axis.Source == joyY.Value.Source)
         {
-            currentJoystick.Y = joyY.IsNegative ? -e.Axis.Value : e.Axis.Value;
+            currentJoystick.Y = joyY.Value.IsNegative ? -e.Axis.Value : e.Axis.Value;
         }
 
         joystick = currentJoystick;
@@ -150,7 +156,9 @@ public partial class FanShapedManager : Container
         if (joystick.Value.Length < deadZoneJoystick.Value || joystick == Vector2.Zero)
         {
             joystick = null;
-            FanShaped.FadeOut();
+
+            // Don't FadeOut if the mouse is being used
+            if (joystickPriority) FanShaped.FadeOut();
         }
 
         else
