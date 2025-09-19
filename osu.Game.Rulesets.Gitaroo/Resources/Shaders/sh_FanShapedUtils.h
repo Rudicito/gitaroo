@@ -3,14 +3,8 @@
 #ifndef FAN_SHAPED_UTILS_H
 #define FAN_SHAPED_UTILS_H
 
-#undef PI
-#define PI 3.1415926536
-
 #undef HALF_PI
 #define HALF_PI 1.57079632679
-
-#undef TWO_PI
-#define TWO_PI 6.28318530718
 
 highp float dstToLine(highp vec2 start, highp vec2 end, highp vec2 pixelPos)
 {
