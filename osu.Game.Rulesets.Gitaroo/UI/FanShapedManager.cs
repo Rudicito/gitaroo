@@ -1,8 +1,9 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
+using osu.Game.Rulesets.Gitaroo.Configuration;
 using osu.Game.Rulesets.Gitaroo.MathUtils;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osuTK;
@@ -12,7 +13,10 @@ namespace osu.Game.Rulesets.Gitaroo.UI;
 public partial class FanShapedManager : Container
 {
     [Resolved]
-    private GitarooPlayfield playfield { get; set; }
+    private GitarooPlayfield playfield { get; set; } = null!;
+
+    [Resolved(CanBeNull = true)]
+    private GitarooRulesetConfigManager? rulesetConfig { get; set; }
 
     private DrawableTraceLine? currentTraceLine => playfield.CurrentDrawableTraceLine;
 
@@ -25,9 +29,17 @@ public partial class FanShapedManager : Container
     private JoyAxis joyX => inputManager.JoyX;
     private JoyAxis joyY => inputManager.JoyY;
 
-    private bool joystickPriority = false;
+    private bool joystickPriority;
 
-    private GitarooInputManager inputManager;
+    private GitarooInputManager inputManager = null!;
+
+    private IBindable<float> deadZoneJoystick { get; set; } = null!;
+
+    [BackgroundDependencyLoader]
+    private void load()
+    {
+        deadZoneJoystick = rulesetConfig?.GetBindable<float>(GitarooRulesetSettings.DeadZoneJoystick) ?? new Bindable<float>(0.6f);
+    }
 
     protected override void LoadComplete()
     {
@@ -125,7 +137,6 @@ public partial class FanShapedManager : Container
         if (e.Axis.Source == joyX.Source)
         {
             currentJoystick.X = joyX.IsNegative ? -e.Axis.Value : e.Axis.Value;
-            Logger.Log("joyX moved");
         }
 
         else if (e.Axis.Source == joyY.Source)
@@ -136,7 +147,7 @@ public partial class FanShapedManager : Container
         joystick = currentJoystick;
 
         // Apply dead zone
-        if (joystick.Value.Length < 0.6 || joystick == Vector2.Zero)
+        if (joystick.Value.Length < deadZoneJoystick.Value || joystick == Vector2.Zero)
         {
             joystick = null;
             FanShaped.FadeOut();
