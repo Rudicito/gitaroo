@@ -8,9 +8,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Gitaroo.Beatmaps;
+using osu.Game.Rulesets.Gitaroo.Configuration;
 using osu.Game.Rulesets.Gitaroo.Mods;
 using osu.Game.Rulesets.Gitaroo.UI;
 using osu.Game.Rulesets.Scoring;
@@ -45,10 +49,18 @@ public class GitarooRuleset : Ruleset
 
     // public override string PlayingVerb => base.PlayingVerb;
 
+    public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new GitarooRulesetConfigManager(settings, RulesetInfo);
+
+    public override RulesetSettingsSubsection CreateSettings() => new GitarooSettingsSubsection(this);
+
     public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
     {
         new KeyBinding(InputKey.Z, GitarooAction.LeftButton),
         new KeyBinding(InputKey.X, GitarooAction.RightButton),
+        new KeyBinding(InputKey.Joystick2, GitarooAction.LeftButton),
+        new KeyBinding(InputKey.Joystick3, GitarooAction.RightButton),
+        new KeyBinding(InputKey.JoystickAxis2Positive, GitarooAction.JoystickDown),
+        new KeyBinding(InputKey.JoystickAxis1Positive, GitarooAction.JoystickRight),
     };
 
     public override Drawable CreateIcon() => new GitarooIcon();

@@ -1,24 +1,54 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Gitaroo.Configuration;
 using osu.Game.Rulesets.Gitaroo.MathUtils;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
-public partial class FanShapedManager : Container, IRequireHighFrequencyMousePosition
+/// <remarks>
+/// The code looks so unorganized sorry...
+/// </remarks>
+public partial class FanShapedManager : Container
 {
     [Resolved]
-    private GitarooPlayfield playfield { get; set; }
+    private GitarooPlayfield playfield { get; set; } = null!;
+
+    [Resolved(CanBeNull = true)]
+    private GitarooRulesetConfigManager? rulesetConfig { get; set; }
 
     private DrawableTraceLine? currentTraceLine => playfield.CurrentDrawableTraceLine;
 
     private Vector2? mousePosition;
 
+    private Vector2? joystick;
+
     private FanShaped fanShaped = null!;
+
+    private JoyAxis? joyX => inputManager.JoyX;
+    private JoyAxis? joyY => inputManager.JoyY;
+
+    private bool joystickPriority;
+
+    private GitarooInputManager inputManager = null!;
+
+    private IBindable<float> deadZoneJoystick { get; set; } = null!;
+
+    [BackgroundDependencyLoader]
+    private void load()
+    {
+        deadZoneJoystick = rulesetConfig?.GetBindable<float>(GitarooRulesetSettings.DeadZoneJoystick) ?? new Bindable<float>(0.6f);
+    }
+
+    protected override void LoadComplete()
+    {
+        base.LoadComplete();
+        inputManager = (GitarooInputManager)GetContainingInputManager()!;
+    }
 
     public FanShaped FanShaped
     {
@@ -81,6 +111,8 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
 
     protected override bool OnMouseMove(MouseMoveEvent e)
     {
+        joystickPriority = false;
+        FanShaped.FadeIn();
         mousePosition = e.MousePosition;
         return base.OnMouseMove(e);
     }
@@ -96,12 +128,46 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
         FanShaped.FadeOut();
     }
 
-    // todo: implement joystick support
-    //
-    // protected override bool OnJoystickAxisMove(JoystickAxisMoveEvent e)
-    // {
-    //     return base.OnJoystickAxisMove(e);
-    // }
+    protected override bool OnJoystickAxisMove(JoystickAxisMoveEvent e)
+    {
+        if (joyX == null || joyY == null)
+            return base.OnJoystickAxisMove(e);
+
+        if (!(e.Axis.Source == joyX.Value.Source || e.Axis.Source == joyY.Value.Source))
+            return base.OnJoystickAxisMove(e);
+
+        joystick ??= Vector2.Zero;
+
+        Vector2 currentJoystick = joystick.Value;
+
+        if (e.Axis.Source == joyX.Value.Source)
+        {
+            currentJoystick.X = joyX.Value.IsNegative ? -e.Axis.Value : e.Axis.Value;
+        }
+
+        else if (e.Axis.Source == joyY.Value.Source)
+        {
+            currentJoystick.Y = joyY.Value.IsNegative ? -e.Axis.Value : e.Axis.Value;
+        }
+
+        joystick = currentJoystick;
+
+        // Apply dead zone
+        if (joystick.Value.Length < deadZoneJoystick.Value || joystick == Vector2.Zero)
+        {
+            joystick = null;
+
+            // Don't FadeOut if the mouse is being used
+            if (joystickPriority) FanShaped.FadeOut();
+        }
+
+        else
+        {
+            FanShaped.FadeIn();
+        }
+
+        return base.OnJoystickAxisMove(e);
+    }
 
     /// <summary>
     /// Checks whether the given angle (in degrees) is considered valid based on the <see cref="AngleArea"/>.
@@ -126,7 +192,13 @@ public partial class FanShapedManager : Container, IRequireHighFrequencyMousePos
     {
         base.Update();
 
-        if (mousePosition != null)
+        if (joystick != null)
+        {
+            Direction = AngleUtils.GetDegreesFromPosition(Vector2.Zero, joystick.Value);
+            joystickPriority = true;
+        }
+
+        if (mousePosition != null && !joystickPriority)
             Direction = AngleUtils.GetDegreesFromPosition(AnchorPosition, mousePosition.Value);
 
         if (currentTraceLine?.Direction != null) AngleTarget = currentTraceLine.Direction.Value;

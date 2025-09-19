@@ -30,6 +30,14 @@ public partial class FanShaped : Container
         (1.0f, tracked_colour),
     };
 
+    private enum Fade
+    {
+        In,
+        Out,
+    }
+
+    private Fade fade;
+
     private float angleArea = 70;
 
     public float AngleArea
@@ -99,6 +107,10 @@ public partial class FanShaped : Container
 
     public void FadeIn()
     {
+        if (fade == Fade.In) return;
+
+        fade = Fade.In;
+
         const float reset_value = 0.5f;
         const float down_time = 40;
         const float up_time = 750;
@@ -115,6 +127,10 @@ public partial class FanShaped : Container
 
     public void FadeOut()
     {
+        if (fade == Fade.Out) return;
+
+        fade = Fade.Out;
+
         const float reset_value = 0.5f;
 
         const float down_time = 40;
