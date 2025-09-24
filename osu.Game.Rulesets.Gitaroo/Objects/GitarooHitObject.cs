@@ -26,5 +26,5 @@ public class GitarooHitObject : HitObject
 
     public override Judgement CreateJudgement() => new GitarooJudgement();
 
-    protected override HitWindows? CreateHitWindows() => new GitarooHitWindows();
+    protected override HitWindows CreateHitWindows() => new GitarooHitWindows();
 }

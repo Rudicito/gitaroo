@@ -140,4 +140,10 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
         return base.CreateNestedHitObject(hitObject);
     }
+
+    protected override void UpdateHitStateTransforms(ArmedState state)
+    {
+        using (BeginAbsoluteSequence(HitObject!.EndTime))
+            Expire();
+    }
 }

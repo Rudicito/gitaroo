@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.MathUtils;
 using osu.Game.Rulesets.Gitaroo.Skinning.Default;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
@@ -132,5 +133,11 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
         base.OnKilled();
         SliderBody.RecyclePath();
+    }
+
+    protected override void UpdateHitStateTransforms(ArmedState state)
+    {
+        using (BeginAbsoluteSequence(HitObject!.EndTime))
+            Expire();
     }
 }
