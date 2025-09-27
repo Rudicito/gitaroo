@@ -2,6 +2,7 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Gitaroo.Objects;
+using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -37,6 +38,13 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
         new Vector2(-max_line_trace_length)
     });
 
+    private readonly SliderPath circle = new SliderPath(PathType.PERFECT_CURVE, new[]
+    {
+        Vector2.Zero,
+        new Vector2(max_line_trace_length, 0),
+        new Vector2(max_line_trace_length, max_line_trace_length)
+    });
+
     [Test]
     public void TestHitObjects()
     {
@@ -48,7 +56,7 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
 
         AddStep("1 TraceLine, 1 Note", () =>
         {
-            addTraceLine(0, 2000, bezier);
+            addTraceLine(0, 2000, circle, 1);
             addNote(1000);
         });
     }
@@ -72,13 +80,17 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
 
     private void addTraceLine(double start, double end, SliderPath sliderPath, double velocity = 0.2)
     {
-        add(new TraceLine
+        var traceLine = new TraceLine
         {
             StartTime = currentTime + start + delay,
             EndTime = currentTime + end + delay,
             Velocity = velocity,
             Path = sliderPath
-        });
+        };
+
+        traceLine.ScaleToExpectedDistance();
+
+        add(traceLine);
     }
 
     private void add(GitarooHitObject hitObject, bool kiai = false)

@@ -2,7 +2,7 @@ using System;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
-namespace osu.Game.Rulesets.Gitaroo.MathUtils;
+namespace osu.Game.Rulesets.Gitaroo.Utils;
 
 public static class AngleUtils
 {

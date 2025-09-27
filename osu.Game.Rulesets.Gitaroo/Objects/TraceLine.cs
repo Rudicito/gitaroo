@@ -10,10 +10,6 @@ namespace osu.Game.Rulesets.Gitaroo.Objects;
 /// </summary>
 public class TraceLine : GitarooHitObject, IHasPath
 {
-    public TraceLine()
-    {
-    }
-
     public override Judgement CreateJudgement() => new IgnoreJudgement();
 
     public double EndTime
@@ -25,20 +21,18 @@ public class TraceLine : GitarooHitObject, IHasPath
     public double Duration { get; set; }
     public double Distance => Path.Distance;
 
-    private SliderPath path = null!;
+    public required SliderPath Path { get; set; } = null!;
 
-    public required SliderPath Path
+    private double velocity;
+
+    public required double Velocity
     {
-        get => path;
+        get => velocity;
         set
         {
-            path = value;
+            if (value == 0) throw new InvalidOperationException("TraceLine Velocity cannot be 0");
 
-            if (Velocity == 0) throw new InvalidOperationException("TraceLine Velocity cannot be 0");
-
-            path.ExpectedDistance.Value = Velocity * Duration;
+            velocity = value;
         }
     }
-
-    public required double Velocity { get; set; }
 }

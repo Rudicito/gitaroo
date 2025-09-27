@@ -4,8 +4,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Gitaroo.Configuration;
-using osu.Game.Rulesets.Gitaroo.MathUtils;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
+using osu.Game.Rulesets.Gitaroo.Utils;
 using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
