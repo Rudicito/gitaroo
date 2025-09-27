@@ -117,7 +117,12 @@ public partial class GitarooPlayfield : Playfield
     /// </summary>
     /// <param name="hitObject">The <see cref="DrawableTraceLineHitObject"/> to check.</param>
     /// <param name="time">The time to check.</param>
-    /// <returns></returns>
+    /// <returns>Whether hitObject can be hit at the given time.</returns>
+    /// <remarks>
+    /// Combines two validation checks:
+    /// - <see cref="FanShapedManager.Tracking"/> ensures the player is tracking the <see cref="DrawableTraceLine"/>
+    /// - <see cref="OrderedHitPolicy.IsHittable"/> ensures only the most recent hit object can be hit (note lock)
+    /// </remarks>
     public bool IsHittable(DrawableHitObject hitObject, double time) => fanShaped.Tracking && hitPolicy.IsHittable(hitObject, time);
 
     internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
