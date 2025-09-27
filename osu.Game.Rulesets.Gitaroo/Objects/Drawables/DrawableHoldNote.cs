@@ -110,7 +110,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         SliderBody.RecyclePath();
     }
 
-    private Container<DrawableHeadNote> headContainer;
+    private Container<DrawableHeadNote> headContainer = null!;
 
     protected override void AddNestedHitObject(DrawableHitObject hitObject)
     {
