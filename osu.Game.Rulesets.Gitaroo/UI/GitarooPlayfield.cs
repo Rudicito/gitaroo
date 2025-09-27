@@ -91,7 +91,7 @@ public partial class GitarooPlayfield : Playfield
         if (drawableHitObject is DrawableTraceLineHitObject dho)
         {
             dho.GetTraceLine = GetTraceLine;
-            dho.CheckHittable = hitPolicy.IsHittable;
+            dho.CheckHittable = IsHittable;
         }
 
         else if (drawableHitObject is DrawableTraceLine dtl)
@@ -111,6 +111,14 @@ public partial class GitarooPlayfield : Playfield
                 break;
         }
     }
+
+    /// <summary>
+    /// Whether the <see cref="DrawableTraceLineHitObject"/> can be hit, considering the FanShaped tracking status and the HitPolicy
+    /// </summary>
+    /// <param name="hitObject">The <see cref="DrawableTraceLineHitObject"/> to check.</param>
+    /// <param name="time">The time to check.</param>
+    /// <returns></returns>
+    public bool IsHittable(DrawableHitObject hitObject, double time) => fanShaped.Tracking && hitPolicy.IsHittable(hitObject, time);
 
     internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
     {
