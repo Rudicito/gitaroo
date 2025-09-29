@@ -1,20 +1,10 @@
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Utils;
-using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Utils;
 
 public static class TraceLineUtils
 {
-    public static void Scale(this SliderPath path, float scale)
-    {
-        for (int i = 0; i < path.ControlPoints.Count; i++)
-        {
-            path.ControlPoints[i].Position = GeometryUtils.GetScaledPosition(new Vector2(scale), Vector2.Zero, path.ControlPoints[i].Position);
-        }
-    }
-
     /// <summary>
     /// Scales the <see cref="TraceLine"/>'s path proportionally to match the expected distance,
     /// calculated from <see cref="TraceLine.Velocity"/> and <see cref="TraceLine.Duration"/>.
