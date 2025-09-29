@@ -7,7 +7,9 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects;
+using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects.Types;
+using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Beatmaps;
 
@@ -102,18 +104,36 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
     private List<TraceLine> generateTraceLine(GitarooBeatmap beatmap)
     {
-        double velocity = beatmap.Difficulty.SliderMultiplier;
-        // todo: Add TraceLine generator algorithm
+        double velocity = beatmap.Difficulty.SliderMultiplier / 5;
+        // todo: Do a much better TraceLine generator algorithm
+
+        const float max_line_trace_length = 1000;
+
+        SliderPath sliderPath = new SliderPath(PathType.PERFECT_CURVE, new[]
+        {
+            Vector2.Zero,
+            new Vector2(max_line_trace_length, 0),
+            new Vector2(max_line_trace_length, max_line_trace_length)
+        });
+
+        (double start, double end) = beatmap.CalculatePlayableBounds();
+
         List<TraceLine> traceLines =
         [
             new TraceLine
             {
+                StartTime = start - 1000,
+                EndTime = end + 10000,
                 Velocity = velocity,
-                StartTime = 1000,
-                EndTime = 10000,
-                Path = new SliderPath(),
+                Path = sliderPath,
             }
         ];
+
+        foreach (var traceLine in traceLines)
+        {
+            traceLine.ScaleToExpectedDistance();
+        }
+
         return traceLines;
     }
 }

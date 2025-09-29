@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using osu.Game.Rulesets.Gitaroo.MathUtils;
+using osu.Game.Rulesets.Gitaroo.Utils;
 
 namespace osu.Game.Rulesets.Gitaroo.Tests;
 
