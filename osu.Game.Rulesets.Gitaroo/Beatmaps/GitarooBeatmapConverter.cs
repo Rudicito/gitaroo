@@ -66,6 +66,8 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
         else
         {
+            var comboData = original as IHasCombo;
+
             switch (original)
             {
                 case GitarooHitObject gitarooObj:
@@ -80,6 +82,8 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
                         Samples = original.Samples,
                         StartTime = original.StartTime,
                         Duration = slider.Duration,
+                        NewCombo = comboData?.NewCombo ?? false,
+                        ComboOffset = comboData?.ComboOffset ?? 0,
                     }.Yield();
 
                 // If a osu Spinner
@@ -89,6 +93,9 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
                         Samples = original.Samples,
                         StartTime = original.StartTime,
                         Duration = spinner.Duration,
+                        NewCombo = comboData?.NewCombo ?? false,
+                        ComboOffset = comboData?.ComboOffset ?? 0,
+                        WasSpinner = true,
                     }.Yield();
 
                 // If a osu HitCircle
@@ -97,6 +104,8 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
                     {
                         Samples = original.Samples,
                         StartTime = original.StartTime,
+                        NewCombo = comboData?.NewCombo ?? false,
+                        ComboOffset = comboData?.ComboOffset ?? 0,
                     }.Yield();
             }
         }
