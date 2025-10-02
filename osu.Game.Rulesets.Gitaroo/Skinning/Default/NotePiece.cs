@@ -6,20 +6,31 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Gitaroo.Skinning.Default;
 
+/// <remarks>
+/// Uses <see cref="CircularContainer"/> with an internal <see cref="Box"/> instead of <see cref="Circle"/>
+/// to enable independent control of border and fill colors. With <see cref="Circle"/>, opacity changes
+/// affect both border and fill simultaneously. This approach allows separate control via the container's
+/// BorderColour and the inner box's Colour property.
+/// </remarks>
 public partial class NotePiece : CircularContainer
 {
     private static readonly Color4 default_border_colour = new Color4(251, 151, 75, byte.MaxValue);
     private static readonly Color4 default_colour = default_border_colour.Opacity(0.5f);
 
-    private Color4 borderColour = default_border_colour;
-    private Color4 colour = default_colour;
+    /// <summary>
+    /// The inner box that gives the fill color of the note.
+    /// </summary>
+    private readonly Box innerBox;
 
+    /// <summary>
+    /// Sets the border and fill color of the note.
+    /// </summary>
     public Color4 AccentColor
     {
         set
         {
-            borderColour = value;
-            colour = value.Opacity(0.5f);
+            BorderColour = value;
+            innerBox.Colour = value.Opacity(0.5f);
         }
     }
 
@@ -27,13 +38,13 @@ public partial class NotePiece : CircularContainer
     {
         Anchor = Anchor.Centre;
         Origin = Anchor.Centre;
-        BorderColour = borderColour;
+        BorderColour = default_border_colour;
         BorderThickness = 2.5f;
         Masking = true;
-        AddInternal(new Box
+        AddInternal(innerBox = new Box
         {
             RelativeSizeAxes = Axes.Both,
-            Colour = colour,
+            Colour = default_colour,
         });
     }
 }
