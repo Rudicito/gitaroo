@@ -39,8 +39,39 @@ public class GitarooRuleset : Ruleset
     {
         switch (type)
         {
+            case ModType.DifficultyReduction:
+                return new Mod[]
+                {
+                    new GitarooModNoFail(),
+                    new MultiMod(new GitarooModHalfTime(), new GitarooModDaycore())
+                };
+
+            case ModType.DifficultyIncrease:
+                return new Mod[]
+                {
+                    new MultiMod(new GitarooModSuddenDeath(), new GitarooModPerfect()),
+                    new MultiMod(new GitarooModDoubleTime(), new GitarooModNightcore()),
+                    new ModAccuracyChallenge(),
+                };
+
+            // case ModType.Conversion:
+            //     return new Mod[]
+            //     {
+            //     };
+
             case ModType.Automation:
-                return new[] { new GitarooModAutoplay() };
+                return new Mod[]
+                {
+                    new MultiMod(new GitarooModAutoplay(), new GitarooModCinema()),
+                };
+
+            case ModType.Fun:
+                return new Mod[]
+                {
+                    new MultiMod(new ModWindUp(), new ModWindDown()),
+                    new GitarooModMuted(),
+                    new ModAdaptiveSpeed(),
+                };
 
             default:
                 return Array.Empty<Mod>();
