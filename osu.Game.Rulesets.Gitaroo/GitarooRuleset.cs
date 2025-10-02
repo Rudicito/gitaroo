@@ -31,7 +31,7 @@ public class GitarooRuleset : Ruleset
 
     public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new GitarooBeatmapConverter(beatmap, this);
 
-    public override IBeatmapProcessor? CreateBeatmapProcessor(IBeatmap beatmap) => new BeatmapProcessor(beatmap);
+    public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new BeatmapProcessor(beatmap);
 
     public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new GitarooDifficultyCalculator(RulesetInfo, beatmap);
 
