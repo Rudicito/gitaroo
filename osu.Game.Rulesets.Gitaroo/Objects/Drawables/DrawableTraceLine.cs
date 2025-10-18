@@ -49,19 +49,26 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
         AddRangeInternal(new Drawable[]
         {
-            SliderBody = new DefaultTraceLineBody()
+            SliderBody = new DefaultTraceLineBody(),
         });
     }
 
-    protected override void UpdateAfterChildren()
+    protected override void Update()
     {
-        base.UpdateAfterChildren();
+        base.Update();
 
+        UpdatePosition();
+    }
+
+    protected void UpdatePosition()
+    {
         if (HitObject == null) return;
 
         Size = SliderBody.Size;
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
+
+        var offset = -SliderBody.PathOffset;
 
         // Move the TraceLine current progression to the center
         if (Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime)
@@ -73,7 +80,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
             Direction = Path!.AngleAtProgress((float)completionProgress);
 
             SliderBody.UpdateProgress(completionProgress);
-            Position = -SliderBody.PathOffset;
+            Position = offset;
         }
 
         // Move the TraceLine towards the center
@@ -85,7 +92,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
             {
                 SliderBody.UpdateProgress(0);
 
-                Position = AngleUtils.MovePoint(-SliderBody.PathStartOffset, AngleStart.Value, (float)(HitObject.Velocity * (HitObject.StartTime - Time.Current)));
+                Position = AngleUtils.MovePoint(offset, AngleStart.Value, (float)(HitObject.Velocity * (HitObject.StartTime - Time.Current)));
             }
         }
 
@@ -123,8 +130,6 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         AngleStart = null;
         AngleEnd = null;
         Direction = null;
-
-        SliderBody.RecyclePath();
 
         PathVersion.UnbindFrom(Path!.Version);
     }

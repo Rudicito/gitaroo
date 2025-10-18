@@ -22,7 +22,12 @@ public partial class PlaySliderBody : SnakingSliderBody
         if (drawableObject is IHasSnakingSlider drawableSlider)
         {
             pathVersion = drawableSlider.PathVersion.GetBoundCopy();
-            pathVersion.BindValueChanged(_ => Scheduler.AddOnce(Refresh));
+
+            // Could cause performance issue if there is an editor one day
+            // Refresh immediately on path changes to avoid visual lag from scheduler delay
+            // More info: https://github.com/ppy/osu/pull/26499
+            // Previously: pathVersion.BindValueChanged(_ => Scheduler.AddOnce(Refresh));
+            pathVersion.BindValueChanged(_ => Refresh());
         }
 
         BorderColour = GetBorderColour(skin);

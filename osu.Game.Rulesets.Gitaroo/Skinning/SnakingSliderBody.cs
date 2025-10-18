@@ -34,11 +34,13 @@ public abstract partial class SnakingSliderBody : SliderBody
     /// <summary>
     /// Path Offset of the current curve
     /// </summary>
-    public Vector2 PathOffset => Path.PositionInBoundingBox(Path.Vertices[0]);
+    public Vector2 PathOffset => Path.PositionInBoundingBox(Path.Vertices[0]) + snakedPosition - Path.PositionInBoundingBox(Vector2.Zero);
 
     public override Vector2 PathStartOffset => snakedPathOffset;
 
     public override Vector2 PathEndOffset => snakedPathEndOffset;
+
+    public override Vector2 GetPositionInBoundingBox(Vector2 position) => base.GetPositionInBoundingBox(position) + snakedPosition - Path.PositionInBoundingBox(Vector2.Zero);
 
     /// <summary>
     /// The top-left position of the path when fully snaked.
@@ -62,7 +64,7 @@ public abstract partial class SnakingSliderBody : SliderBody
     {
         drawableSlider = (IHasSnakingSlider)drawableObject;
 
-        // Refresh();
+        Refresh();
     }
 
     public void UpdateProgress(double start, double end = 1)
@@ -137,5 +139,12 @@ public abstract partial class SnakingSliderBody : SliderBody
         drawableSlider.Path!.GetPathToProgress(CurrentCurve, p0, p1);
 
         SetVertices(CurrentCurve);
+
+        // The bounding box of the path expands as it snakes, which in turn shifts the position of the path.
+        // Depending on the direction of expansion, it may appear as if the path is expanding towards the position of the slider
+        // rather than expanding out from the position of the slider.
+        // To remove this effect, the path's position is shifted towards its final snaked position
+
+        Path.Position = snakedPosition - Path.PositionInBoundingBox(Vector2.Zero);
     }
 }
