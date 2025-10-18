@@ -12,6 +12,11 @@ namespace osu.Game.Rulesets.Gitaroo.UI;
 
 public partial class FanShapedManager : Container
 {
+    /// <summary>
+    /// Automatically move the FanShaped to the <see cref="AngleTarget"/>.
+    /// </summary>
+    public bool Auto { get; set; }
+
     [Resolved]
     private GitarooPlayfield playfield { get; set; } = null!;
 
@@ -223,6 +228,12 @@ public partial class FanShapedManager : Container
 
     protected void UpdateInput()
     {
+        if (Auto)
+        {
+            Direction = AngleTarget;
+            return;
+        }
+
         if (joystickEnabled.Value)
         {
             if (joystick != null)

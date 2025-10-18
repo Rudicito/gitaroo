@@ -22,11 +22,13 @@ public class GitarooAutoGenerator : AutoGenerator<GitarooReplayFrame>
 
         foreach (GitarooHitObject hitObject in Beatmap.HitObjects)
         {
-            Frames.Add(new GitarooReplayFrame
-            {
-                Time = hitObject.StartTime
-                // todo: add required inputs and extra frames.
-            });
+            addFrame(hitObject.StartTime, GitarooAction.LeftButton);
         }
+    }
+
+    private void addFrame(double time, GitarooAction action)
+    {
+        Frames.Add(new GitarooReplayFrame(action) { Time = time });
+        Frames.Add(new GitarooReplayFrame { Time = time + KEY_UP_DELAY }); //Release the keys as well
     }
 }
