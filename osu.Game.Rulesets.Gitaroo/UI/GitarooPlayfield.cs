@@ -21,6 +21,10 @@ namespace osu.Game.Rulesets.Gitaroo.UI;
 [Cached]
 public partial class GitarooPlayfield : Playfield
 {
+    public new GitarooHitObjectContainer HitObjectContainer => (GitarooHitObjectContainer)base.HitObjectContainer;
+
+    protected override HitObjectContainer CreateHitObjectContainer() => new GitarooHitObjectContainer();
+
     protected override GameplayCursorContainer CreateCursor() => new();
 
     private readonly FanShapedManager fanShaped;

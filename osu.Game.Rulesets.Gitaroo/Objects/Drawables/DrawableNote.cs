@@ -36,10 +36,15 @@ public partial class DrawableNote : DrawableTraceLineHitObject<Note>, IKeyBindin
         });
     }
 
-    protected override void UpdateAfterChildren()
+    protected override void Update()
     {
-        base.UpdateAfterChildren();
+        base.Update();
 
+        UpdatePosition();
+    }
+
+    protected virtual void UpdatePosition()
+    {
         if (TraceLine?.HitObject == null) return;
 
         double traceLineProgress = Math.Clamp((HitObject!.StartTime - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration, 0, 1);

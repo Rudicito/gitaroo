@@ -54,10 +54,15 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         });
     }
 
-    protected override void UpdateAfterChildren()
+    protected override void Update()
     {
-        base.UpdateAfterChildren();
+        base.Update();
 
+        UpdatePosition();
+    }
+
+    protected virtual void UpdatePosition()
+    {
         if (TraceLine?.HitObject == null) return;
         if (Path == null) return;
 
@@ -100,8 +105,6 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
         PathStart = null;
         PathEnd = null;
-
-        SliderBody.RecyclePath();
     }
 
     public override void OnKilled()

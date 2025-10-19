@@ -14,13 +14,6 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
     {
     }
 
-    // protected override void CheckForResult(bool userTriggered, double timeOffset)
-    // {
-    //     if (timeOffset >= 0)
-    //         // todo: implement judgement logic
-    //         ApplyMaxResult();
-    // }
-
     protected override void UpdateHitStateTransforms(ArmedState state)
     {
         switch (state)
