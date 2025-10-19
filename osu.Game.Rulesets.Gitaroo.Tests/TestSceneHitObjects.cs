@@ -1,114 +1,104 @@
 using NUnit.Framework;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Gitaroo.Objects;
-using osu.Game.Rulesets.Gitaroo.Utils;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
-using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Tests;
 
 [TestFixture]
 public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
 {
-    private const double default_duration = 3000;
-    private const float max_line_trace_length = 200;
-    private const double delay = 1000;
-
-    private readonly SliderPath bezier = new SliderPath(PathType.BEZIER, new[]
+    protected override void LoadComplete()
     {
-        Vector2.Zero,
-        new Vector2(-max_line_trace_length * 0.375f, max_line_trace_length * 0.18f),
-        new Vector2(-max_line_trace_length / 2, 0),
-        new Vector2(-max_line_trace_length * 0.75f, -max_line_trace_length / 2),
-        new Vector2(-max_line_trace_length * 0.95f, 0),
-        new Vector2(-max_line_trace_length, 0)
-    });
+        base.LoadComplete();
 
-    private readonly SliderPath linearToBottomLeft = new SliderPath(PathType.LINEAR, new[]
-    {
-        Vector2.Zero,
-        new Vector2(max_line_trace_length)
-    });
-
-    private readonly SliderPath linearToTopRight = new SliderPath(PathType.LINEAR, new[]
-    {
-        Vector2.Zero,
-        new Vector2(-max_line_trace_length)
-    });
-
-    private readonly SliderPath circle = new SliderPath(PathType.PERFECT_CURVE, new[]
-    {
-        Vector2.Zero,
-        new Vector2(max_line_trace_length, 0),
-        new Vector2(max_line_trace_length, max_line_trace_length)
-    });
+        AddSliderStep("TraceLine Velocity", 0.1, 1, DEFAULT_TRACE_LINE_VELOCITY, v => TraceLineVelocity = v);
+        AddSliderStep("Spawn delay", 0, 5000, DEFAULT_DELAY, v => Delay = v);
+    }
 
     [Test]
-    public void TestHitObjects()
+    public void TestLinear()
     {
         AddStep("1 TraceLine, 1 HoLdNote", () =>
         {
-            addTraceLine(0, 2000, linearToBottomLeft);
-            addHoldNote(250, 1750);
+            KillAll();
+            AddTraceLine(0, 2000, LinearBottomRightPath);
+            AddHoldNote(250, 1750);
         });
 
         AddStep("1 TraceLine, 1 Note", () =>
         {
-            addTraceLine(0, 2000, circle, 1);
-            addNote(1000);
+            KillAll();
+            AddTraceLine(0, 2000, PerfectCurvePath);
+            AddNote(1000);
         });
     }
 
-    private void addHoldNote(double start, double end)
+    [Test]
+    public void TestBezier()
     {
-        add(new HoldNote
+        AddStep("1 TraceLine, 1 HoLdNote", () =>
         {
-            StartTime = currentTime + start + delay,
-            EndTime = currentTime + end + delay
+            KillAll();
+            AddTraceLine(0, 2000, BezierPath);
+            AddHoldNote(250, 1750);
+        });
+
+        AddStep("1 TraceLine, 1 Note", () =>
+        {
+            KillAll();
+            AddTraceLine(0, 2000, BezierPath);
+            AddNote(1000);
         });
     }
 
-    private void addNote(double start)
+    [Test]
+    public void TestPerfectCurve()
     {
-        add(new Note
+        AddStep("1 TraceLine, 1 HoLdNote", () =>
         {
-            StartTime = currentTime + start + delay,
+            KillAll();
+            AddTraceLine(0, 2000, PerfectCurvePath);
+            AddHoldNote(250, 1750);
+        });
+
+        AddStep("1 TraceLine, 1 Note", () =>
+        {
+            KillAll();
+            AddTraceLine(0, 2000, PerfectCurvePath);
+            AddNote(1000);
         });
     }
 
-    private void addTraceLine(double start, double end, SliderPath sliderPath, double velocity = 0.2)
+    private double traceLineDuration;
+
+    [Test]
+    public void TestHitObjectsManual()
     {
-        var traceLine = new TraceLine
+        AddSliderStep("TraceLine Duration", 1000, 100000, 10000, v => traceLineDuration = v);
+
+        AddStep("Kill all HitObjects", KillAll);
+
+        AddStep("Add TraceLine Linear", () =>
         {
-            StartTime = currentTime + start + delay,
-            EndTime = currentTime + end + delay,
-            Velocity = velocity,
-            Path = sliderPath
-        };
+            AddTraceLine(0, traceLineDuration, LinearBottomRightPath);
+        });
 
-        traceLine.ScaleToExpectedDistance();
+        AddStep("Add TraceLine Bezier", () =>
+        {
+            AddTraceLine(0, traceLineDuration, BezierPath);
+        });
 
-        add(traceLine);
+        AddStep("Add TraceLine PerfectCurve", () =>
+        {
+            AddTraceLine(0, traceLineDuration, PerfectCurvePath);
+        });
+
+        AddStep("Add Note", () =>
+        {
+            AddNote(0);
+        });
+
+        AddStep("Add HoldNote", () =>
+        {
+            AddHoldNote(0, 500);
+        });
     }
-
-    private void add(GitarooHitObject hitObject, bool kiai = false)
-    {
-        var cpi = createControlPointInfo(kiai);
-        var difficulty = new BeatmapDifficulty();
-
-        hitObject.ApplyDefaults(cpi, difficulty);
-
-        DrawableRuleset.Playfield.Add(hitObject);
-    }
-
-    private ControlPointInfo createControlPointInfo(bool kiai)
-    {
-        var cpi = new ControlPointInfo();
-        cpi.Add(-10000, new EffectControlPoint { KiaiMode = kiai });
-        return cpi;
-    }
-
-    private double currentTime => DrawableRuleset.Playfield.Time.Current;
 }
