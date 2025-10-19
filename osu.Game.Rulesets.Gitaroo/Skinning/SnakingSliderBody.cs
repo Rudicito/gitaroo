@@ -34,13 +34,13 @@ public abstract partial class SnakingSliderBody : SliderBody
     /// <summary>
     /// Path Offset of the current curve
     /// </summary>
-    public Vector2 PathOffset => Path.PositionInBoundingBox(Path.Vertices[0]) + snakedPosition - Path.PositionInBoundingBox(Vector2.Zero);
+    public Vector2 PathOffset => Path.PositionInBoundingBox(Path.Vertices[0]) + Path.Position;
 
     public override Vector2 PathStartOffset => snakedPathOffset;
 
     public override Vector2 PathEndOffset => snakedPathEndOffset;
 
-    public override Vector2 GetPositionInBoundingBox(Vector2 position) => base.GetPositionInBoundingBox(position) + snakedPosition - Path.PositionInBoundingBox(Vector2.Zero);
+    public override Vector2 GetPositionInBoundingBox(Vector2 position) => base.GetPositionInBoundingBox(position) + Path.Position;
 
     /// <summary>
     /// The top-left position of the path when fully snaked.
