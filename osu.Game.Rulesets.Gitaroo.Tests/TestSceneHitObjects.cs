@@ -16,7 +16,7 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
     [Test]
     public void TestLinear()
     {
-        AddStep("1 TraceLine, 1 HoLdNote", () =>
+        AddStep("1 TraceLine, 1 HoldNote", () =>
         {
             KillAll();
             AddTraceLine(0, 2000, LinearBottomRightPath);
@@ -26,7 +26,7 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
         AddStep("1 TraceLine, 1 Note", () =>
         {
             KillAll();
-            AddTraceLine(0, 2000, PerfectCurvePath);
+            AddTraceLine(0, 2000, LinearBottomRightPath);
             AddNote(1000);
         });
     }
@@ -34,7 +34,7 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
     [Test]
     public void TestBezier()
     {
-        AddStep("1 TraceLine, 1 HoLdNote", () =>
+        AddStep("1 TraceLine, 1 HoldNote", () =>
         {
             KillAll();
             AddTraceLine(0, 2000, BezierPath);
@@ -52,7 +52,7 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
     [Test]
     public void TestPerfectCurve()
     {
-        AddStep("1 TraceLine, 1 HoLdNote", () =>
+        AddStep("1 TraceLine, 1 HoldNote", () =>
         {
             KillAll();
             AddTraceLine(0, 2000, PerfectCurvePath);
