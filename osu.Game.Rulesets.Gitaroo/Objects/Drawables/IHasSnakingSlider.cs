@@ -16,15 +16,15 @@ public interface IHasSnakingSlider
     /// <summary>
     /// The Version of the <see cref="Path"/>
     /// </summary>
-    public IBindable<int> PathVersion { get; }
+    IBindable<int> PathVersion { get; }
 
     /// <summary>
     /// The start of the <see cref="Path"/>
     /// </summary>
-    public double? PathStart { get; set; }
+    double? PathStart { get; set; }
 
     /// <summary>
     /// The end of the <see cref="Path"/>
     /// </summary>
-    public double? PathEnd { get; set; }
+    double? PathEnd { get; set; }
 }
