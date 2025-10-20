@@ -220,6 +220,6 @@ public partial class FanShapedManager : Container
         }
 
         if (mousePosition != null && !joystickPriority)
-            Direction = AngleUtils.GetDegreesFromPosition(AnchorPosition, mousePosition.Value);
+            Direction = AngleUtils.GetDegreesFromPosition(AnchorPosition, mousePosition.Value, 180);
     }
 }

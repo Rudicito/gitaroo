@@ -37,10 +37,10 @@ public static class AngleUtils
             return angle >= start || angle <= end;
     }
 
-    public static float GetDegreesFromPosition(Vector2 a, Vector2 b)
+    public static float GetDegreesFromPosition(Vector2 a, Vector2 b, float offset = 0)
     {
         var direction = b - a;
-        return NormalizeAngle(MathHelper.RadiansToDegrees(MathF.Atan2(direction.Y, direction.X)) + 90);
+        return NormalizeAngle(MathHelper.RadiansToDegrees(MathF.Atan2(direction.Y, direction.X)) + 90 + offset);
     }
 
     /// <summary>
