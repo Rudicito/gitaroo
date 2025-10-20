@@ -22,6 +22,10 @@ public partial class FanShapedManager : Container
 
     private Vector2? mousePosition;
 
+    /// <summary>
+    /// The Vector2 of the joystick that playing.
+    /// Can be <c>null</c> when the joystick is disabled/ignored.
+    /// </summary>
     private Vector2? joystick;
 
     private FanShaped fanShaped = null!;
@@ -33,12 +37,14 @@ public partial class FanShapedManager : Container
 
     private GitarooInputManager inputManager = null!;
 
-    private IBindable<float> deadZoneJoystick { get; set; } = null!;
+    private IBindable<bool> joystickEnabled { get; set; } = null!;
+    private IBindable<float> joystickDeadZone { get; set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load()
     {
-        deadZoneJoystick = rulesetConfig?.GetBindable<float>(GitarooRulesetSettings.DeadZoneJoystick) ?? new Bindable<float>(0.6f);
+        joystickEnabled = rulesetConfig?.GetBindable<bool>(GitarooRulesetSettings.JoystickEnabled) ?? new Bindable<bool>(true);
+        joystickDeadZone = rulesetConfig?.GetBindable<float>(GitarooRulesetSettings.JoystickDeadZone) ?? new Bindable<float>(0.6f);
     }
 
     protected override void LoadComplete()
@@ -63,6 +69,7 @@ public partial class FanShapedManager : Container
     /// <summary>
     /// The current direction of the FanShaped in degrees.
     /// Used for all the tracking calculations.
+    /// Can be <c>null</c> when there is no direction.
     /// </summary>
     public float? Direction
     {
@@ -106,6 +113,7 @@ public partial class FanShapedManager : Container
 
     /// <summary>
     /// The current TraceLine angle the user must target to track the TraceLine.
+    /// Can be <c>null</c> when there is no TraceLine angle to target.
     /// </summary>
     public float? AngleTarget;
 
@@ -131,6 +139,9 @@ public partial class FanShapedManager : Container
 
     protected override bool OnJoystickAxisMove(JoystickAxisMoveEvent e)
     {
+        if (!joystickEnabled.Value)
+            return base.OnJoystickAxisMove(e);
+
         if (joyX == null || joyY == null)
             return base.OnJoystickAxisMove(e);
 
@@ -154,11 +165,10 @@ public partial class FanShapedManager : Container
         joystick = currentJoystick;
 
         // Apply dead zone
-        if (joystick.Value.Length < deadZoneJoystick.Value || joystick == Vector2.Zero)
+        if (joystick.Value.Length < joystickDeadZone.Value || joystick == Vector2.Zero)
         {
             joystick = null;
 
-            // Don't FadeOut if the mouse is being used
             if (joystickPriority) Direction = null;
         }
 
@@ -213,10 +223,19 @@ public partial class FanShapedManager : Container
 
     protected void UpdateInput()
     {
-        if (joystick != null)
+        if (joystickEnabled.Value)
         {
-            Direction = AngleUtils.GetDegreesFromPosition(Vector2.Zero, joystick.Value);
-            joystickPriority = true;
+            if (joystick != null)
+            {
+                Direction = AngleUtils.GetDegreesFromPosition(Vector2.Zero, joystick.Value);
+                joystickPriority = true;
+            }
+        }
+
+        else
+        {
+            joystick = null;
+            joystickPriority = false;
         }
 
         if (mousePosition != null && !joystickPriority)

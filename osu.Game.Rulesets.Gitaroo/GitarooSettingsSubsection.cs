@@ -27,12 +27,18 @@ public partial class GitarooSettingsSubsection : RulesetSettingsSubsection
 
         Children = new Drawable[]
         {
+            new SettingsCheckbox
+            {
+                LabelText = "Joystick Enabled",
+                Current = config.GetBindable<bool>(GitarooRulesetSettings.JoystickEnabled)
+            },
+
             joystickDeadZone = new SettingsSlider<float>
             {
                 LabelText = "Joystick Deadzone",
                 KeyboardStep = 0.01f,
                 DisplayAsPercentage = true,
-                Current = config.GetBindable<float>(GitarooRulesetSettings.DeadZoneJoystick),
+                Current = config.GetBindable<float>(GitarooRulesetSettings.JoystickDeadZone),
             },
         };
 
