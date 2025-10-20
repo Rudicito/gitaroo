@@ -14,11 +14,13 @@ public class GitarooRulesetConfigManager : RulesetConfigManager<GitarooRulesetSe
     {
         base.InitialiseDefaults();
 
-        SetDefault(GitarooRulesetSettings.DeadZoneJoystick, 0.6f, 0f, 1f, 0.005f);
+        SetDefault(GitarooRulesetSettings.JoystickEnabled, true);
+        SetDefault(GitarooRulesetSettings.JoystickDeadZone, 0.6f, 0f, 1f, 0.005f);
     }
 }
 
 public enum GitarooRulesetSettings
 {
-    DeadZoneJoystick
+    JoystickEnabled,
+    JoystickDeadZone
 }

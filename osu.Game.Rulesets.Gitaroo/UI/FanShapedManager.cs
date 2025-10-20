@@ -10,9 +10,6 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
-/// <remarks>
-/// The code looks so unorganized sorry...
-/// </remarks>
 public partial class FanShapedManager : Container
 {
     [Resolved]
@@ -25,6 +22,10 @@ public partial class FanShapedManager : Container
 
     private Vector2? mousePosition;
 
+    /// <summary>
+    /// The Vector2 of the joystick that playing.
+    /// Can be <c>null</c> when the joystick is disabled/ignored.
+    /// </summary>
     private Vector2? joystick;
 
     private FanShaped fanShaped = null!;
@@ -36,12 +37,14 @@ public partial class FanShapedManager : Container
 
     private GitarooInputManager inputManager = null!;
 
-    private IBindable<float> deadZoneJoystick { get; set; } = null!;
+    private IBindable<bool> joystickEnabled { get; set; } = null!;
+    private IBindable<float> joystickDeadZone { get; set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load()
     {
-        deadZoneJoystick = rulesetConfig?.GetBindable<float>(GitarooRulesetSettings.DeadZoneJoystick) ?? new Bindable<float>(0.6f);
+        joystickEnabled = rulesetConfig?.GetBindable<bool>(GitarooRulesetSettings.JoystickEnabled) ?? new Bindable<bool>(true);
+        joystickDeadZone = rulesetConfig?.GetBindable<float>(GitarooRulesetSettings.JoystickDeadZone) ?? new Bindable<float>(0.6f);
     }
 
     protected override void LoadComplete()
@@ -61,19 +64,30 @@ public partial class FanShapedManager : Container
     /// </summary>
     public bool Tracking { get; set; }
 
-    private float direction;
+    private float? direction;
 
     /// <summary>
     /// The current direction of the FanShaped in degrees.
     /// Used for all the tracking calculations.
+    /// Can be <c>null</c> when there is no direction.
     /// </summary>
-    public float Direction
+    public float? Direction
     {
         get => direction;
         set
         {
-            direction = value;
-            FanShaped.Rotation = Tracking ? AngleTarget!.Value : value;
+            if (value != null)
+            {
+                direction = value.Value;
+                FanShaped.Rotation = Tracking && AngleTarget != null ? AngleTarget.Value : value.Value;
+                FanShaped.FadeIn();
+            }
+
+            else
+            {
+                direction = null;
+                FanShaped.FadeOut();
+            }
 
             FanShaped.SetColour(DeltaAngle);
         }
@@ -99,6 +113,7 @@ public partial class FanShapedManager : Container
 
     /// <summary>
     /// The current TraceLine angle the user must target to track the TraceLine.
+    /// Can be <c>null</c> when there is no TraceLine angle to target.
     /// </summary>
     public float? AngleTarget;
 
@@ -112,24 +127,21 @@ public partial class FanShapedManager : Container
     protected override bool OnMouseMove(MouseMoveEvent e)
     {
         joystickPriority = false;
-        FanShaped.FadeIn();
         mousePosition = e.MousePosition;
         return base.OnMouseMove(e);
     }
 
-    protected override bool OnHover(HoverEvent e)
-    {
-        FanShaped.FadeIn();
-        return base.OnHover(e);
-    }
-
     protected override void OnHoverLost(HoverLostEvent e)
     {
-        FanShaped.FadeOut();
+        mousePosition = null;
+        Direction = null;
     }
 
     protected override bool OnJoystickAxisMove(JoystickAxisMoveEvent e)
     {
+        if (!joystickEnabled.Value)
+            return base.OnJoystickAxisMove(e);
+
         if (joyX == null || joyY == null)
             return base.OnJoystickAxisMove(e);
 
@@ -153,17 +165,11 @@ public partial class FanShapedManager : Container
         joystick = currentJoystick;
 
         // Apply dead zone
-        if (joystick.Value.Length < deadZoneJoystick.Value || joystick == Vector2.Zero)
+        if (joystick.Value.Length < joystickDeadZone.Value || joystick == Vector2.Zero)
         {
             joystick = null;
 
-            // Don't FadeOut if the mouse is being used
-            if (joystickPriority) FanShaped.FadeOut();
-        }
-
-        else
-        {
-            FanShaped.FadeIn();
+            if (joystickPriority) Direction = null;
         }
 
         return base.OnJoystickAxisMove(e);
@@ -172,12 +178,14 @@ public partial class FanShapedManager : Container
     /// <summary>
     /// Checks whether the given angle (in degrees) is considered valid based on the <see cref="AngleArea"/>.
     /// </summary>
-    /// <param name="angle"></param>
-    /// <returns></returns>
+    /// <param name="angle">The angle to check, in degrees.</param>
+    /// <returns>True if the angle is within the valid range; otherwise, false.</returns>
     public bool CheckRotation(float angle)
     {
-        float start = Direction - halfAngleArea;
-        float end = Direction + halfAngleArea;
+        if (Direction == null) return false;
+
+        float start = Direction.Value - halfAngleArea;
+        float end = Direction.Value + halfAngleArea;
 
         return AngleUtils.IsAngleBetween(angle, start, end);
     }
@@ -192,27 +200,45 @@ public partial class FanShapedManager : Container
     {
         base.Update();
 
-        if (joystick != null)
-        {
-            Direction = AngleUtils.GetDegreesFromPosition(Vector2.Zero, joystick.Value);
-            joystickPriority = true;
-        }
+        AngleTarget = currentTraceLine?.Direction;
 
-        if (mousePosition != null && !joystickPriority)
-            Direction = AngleUtils.GetDegreesFromPosition(AnchorPosition, mousePosition.Value);
+        UpdateInput();
 
-        if (currentTraceLine?.Direction != null) AngleTarget = currentTraceLine.Direction.Value;
-        else AngleTarget = null;
-
+        // Update the Tracking and DeltaAngle
         if (AngleTarget != null)
         {
             Tracking = CheckRotation(AngleTarget.Value);
-            DeltaAngle = AngleUtils.GetAngleCloseness(Direction, AngleTarget.Value, halfAngleArea);
+
+            if (Direction == null)
+                DeltaAngle = 0;
+            else
+                DeltaAngle = AngleUtils.GetAngleCloseness(Direction.Value, AngleTarget.Value, halfAngleArea);
         }
         else
         {
             Tracking = false;
             DeltaAngle = 0;
         }
+    }
+
+    protected void UpdateInput()
+    {
+        if (joystickEnabled.Value)
+        {
+            if (joystick != null)
+            {
+                Direction = AngleUtils.GetDegreesFromPosition(Vector2.Zero, joystick.Value);
+                joystickPriority = true;
+            }
+        }
+
+        else
+        {
+            joystick = null;
+            joystickPriority = false;
+        }
+
+        if (mousePosition != null && !joystickPriority)
+            Direction = AngleUtils.GetDegreesFromPosition(AnchorPosition, mousePosition.Value, 180);
     }
 }
