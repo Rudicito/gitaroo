@@ -10,9 +10,6 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
-/// <remarks>
-/// The code looks so unorganized sorry...
-/// </remarks>
 public partial class FanShapedManager : Container
 {
     [Resolved]
@@ -61,19 +58,29 @@ public partial class FanShapedManager : Container
     /// </summary>
     public bool Tracking { get; set; }
 
-    private float direction;
+    private float? direction;
 
     /// <summary>
     /// The current direction of the FanShaped in degrees.
     /// Used for all the tracking calculations.
     /// </summary>
-    public float Direction
+    public float? Direction
     {
         get => direction;
         set
         {
-            direction = value;
-            FanShaped.Rotation = Tracking ? AngleTarget!.Value : value;
+            if (value != null)
+            {
+                direction = value.Value;
+                FanShaped.Rotation = Tracking && AngleTarget != null ? AngleTarget.Value : value.Value;
+                FanShaped.FadeIn();
+            }
+
+            else
+            {
+                direction = null;
+                FanShaped.FadeOut();
+            }
 
             FanShaped.SetColour(DeltaAngle);
         }
@@ -112,20 +119,14 @@ public partial class FanShapedManager : Container
     protected override bool OnMouseMove(MouseMoveEvent e)
     {
         joystickPriority = false;
-        FanShaped.FadeIn();
         mousePosition = e.MousePosition;
         return base.OnMouseMove(e);
     }
 
-    protected override bool OnHover(HoverEvent e)
-    {
-        FanShaped.FadeIn();
-        return base.OnHover(e);
-    }
-
     protected override void OnHoverLost(HoverLostEvent e)
     {
-        FanShaped.FadeOut();
+        mousePosition = null;
+        Direction = null;
     }
 
     protected override bool OnJoystickAxisMove(JoystickAxisMoveEvent e)
@@ -158,12 +159,7 @@ public partial class FanShapedManager : Container
             joystick = null;
 
             // Don't FadeOut if the mouse is being used
-            if (joystickPriority) FanShaped.FadeOut();
-        }
-
-        else
-        {
-            FanShaped.FadeIn();
+            if (joystickPriority) Direction = null;
         }
 
         return base.OnJoystickAxisMove(e);
@@ -172,12 +168,14 @@ public partial class FanShapedManager : Container
     /// <summary>
     /// Checks whether the given angle (in degrees) is considered valid based on the <see cref="AngleArea"/>.
     /// </summary>
-    /// <param name="angle"></param>
-    /// <returns></returns>
+    /// <param name="angle">The angle to check, in degrees.</param>
+    /// <returns>True if the angle is within the valid range; otherwise, false.</returns>
     public bool CheckRotation(float angle)
     {
-        float start = Direction - halfAngleArea;
-        float end = Direction + halfAngleArea;
+        if (Direction == null) return false;
+
+        float start = Direction.Value - halfAngleArea;
+        float end = Direction.Value + halfAngleArea;
 
         return AngleUtils.IsAngleBetween(angle, start, end);
     }
@@ -192,6 +190,29 @@ public partial class FanShapedManager : Container
     {
         base.Update();
 
+        AngleTarget = currentTraceLine?.Direction;
+
+        UpdateInput();
+
+        // Update the Tracking and DeltaAngle
+        if (AngleTarget != null)
+        {
+            Tracking = CheckRotation(AngleTarget.Value);
+
+            if (Direction == null)
+                DeltaAngle = 0;
+            else
+                DeltaAngle = AngleUtils.GetAngleCloseness(Direction.Value, AngleTarget.Value, halfAngleArea);
+        }
+        else
+        {
+            Tracking = false;
+            DeltaAngle = 0;
+        }
+    }
+
+    protected void UpdateInput()
+    {
         if (joystick != null)
         {
             Direction = AngleUtils.GetDegreesFromPosition(Vector2.Zero, joystick.Value);
@@ -200,19 +221,5 @@ public partial class FanShapedManager : Container
 
         if (mousePosition != null && !joystickPriority)
             Direction = AngleUtils.GetDegreesFromPosition(AnchorPosition, mousePosition.Value);
-
-        if (currentTraceLine?.Direction != null) AngleTarget = currentTraceLine.Direction.Value;
-        else AngleTarget = null;
-
-        if (AngleTarget != null)
-        {
-            Tracking = CheckRotation(AngleTarget.Value);
-            DeltaAngle = AngleUtils.GetAngleCloseness(Direction, AngleTarget.Value, halfAngleArea);
-        }
-        else
-        {
-            Tracking = false;
-            DeltaAngle = 0;
-        }
     }
 }
