@@ -27,7 +27,7 @@ public partial class GitarooPlayfield : Playfield
 
     protected override GameplayCursorContainer CreateCursor() => new();
 
-    private readonly FanShapedManager fanShaped;
+    public readonly FanShapedManager FanShaped;
     private readonly CenterCircle centerCircle;
 
     private readonly JudgementContainer<DrawableGitarooJudgement> judgementLayer;
@@ -43,7 +43,7 @@ public partial class GitarooPlayfield : Playfield
         {
             traceLines = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             HitObjectContainer,
-            fanShaped = new FanShapedManager { RelativeSizeAxes = Axes.Both },
+            FanShaped = new FanShapedManager { RelativeSizeAxes = Axes.Both },
             centerCircle = new CenterCircle(),
             judgementLayer = new JudgementContainer<DrawableGitarooJudgement>
             {
@@ -127,7 +127,7 @@ public partial class GitarooPlayfield : Playfield
     /// - <see cref="FanShapedManager.Tracking"/> ensures the player is tracking the <see cref="DrawableTraceLine"/>
     /// - <see cref="OrderedHitPolicy.IsHittable"/> ensures only the most recent hit object can be hit (note lock)
     /// </remarks>
-    public bool IsHittable(DrawableHitObject hitObject, double time) => fanShaped.Tracking && hitPolicy.IsHittable(hitObject, time);
+    public bool IsHittable(DrawableHitObject hitObject, double time) => FanShaped.Tracking && hitPolicy.IsHittable(hitObject, time);
 
     internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
     {
@@ -141,7 +141,13 @@ public partial class GitarooPlayfield : Playfield
         judgementLayer.Add(judgementPooler.Get(result.Type, j => j.Apply(result, judgedObject))!);
     }
 
-    public DrawableTraceLine? CurrentDrawableTraceLine;
+    private DrawableTraceLine? currentDrawableTraceLine;
+
+    public DrawableTraceLine? CurrentDrawableTraceLine
+    {
+        get => currentDrawableTraceLine?.IsActive == true ? currentDrawableTraceLine : null;
+        set => currentDrawableTraceLine = value;
+    }
 
     public DrawableTraceLine? GetTraceLine(double time)
     {

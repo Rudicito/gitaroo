@@ -18,15 +18,32 @@ public class GitarooAutoGenerator : AutoGenerator<GitarooReplayFrame>
 
     protected override void GenerateFrames()
     {
+        // Use to alternate
+        bool hitButton = true;
+
         Frames.Add(new GitarooReplayFrame());
 
         foreach (GitarooHitObject hitObject in Beatmap.HitObjects)
         {
-            Frames.Add(new GitarooReplayFrame
+            switch (hitObject)
             {
-                Time = hitObject.StartTime
-                // todo: add required inputs and extra frames.
-            });
+                case Note:
+                    addClickFrame(hitObject.StartTime, hitButton ? GitarooAction.LeftButton : GitarooAction.RightButton);
+                    break;
+
+                case HoldNote:
+                    // TODO: Update when HoldNote gameplay going to change
+                    addClickFrame(hitObject.StartTime, hitButton ? GitarooAction.LeftButton : GitarooAction.RightButton);
+                    break;
+            }
+
+            hitButton = !hitButton;
         }
+    }
+
+    private void addClickFrame(double time, GitarooAction action)
+    {
+        Frames.Add(new GitarooReplayFrame(action) { Time = time });
+        Frames.Add(new GitarooReplayFrame { Time = time + KEY_UP_DELAY }); // Release the keys as well
     }
 }

@@ -1,7 +1,9 @@
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Screens.Play;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -10,6 +12,9 @@ namespace osu.Game.Rulesets.Gitaroo.UI;
 
 public partial class FanShaped : Container
 {
+    [Resolved]
+    private IGameplayClock? gameplayClock { get; set; }
+
     private readonly FanShapedSprite fanShapedSprite;
     private readonly Triangle leftArrow, rightArrow;
 
@@ -36,7 +41,7 @@ public partial class FanShaped : Container
         Out,
     }
 
-    private Fade fade;
+    private Fade fade = Fade.In;
 
     private float angleArea = 70;
 
@@ -105,8 +110,20 @@ public partial class FanShaped : Container
         ];
     }
 
-    public void FadeIn()
+    public void FadeIn(bool now = false)
     {
+        if (gameplayClock?.IsRewinding == true)
+            now = true;
+
+        if (now)
+        {
+            Alpha = 1;
+            leftArrow.X = left_arrow_max_x;
+            rightArrow.X = right_arrow_max_x;
+            fade = Fade.In;
+            return;
+        }
+
         if (fade == Fade.In) return;
 
         fade = Fade.In;
@@ -125,8 +142,20 @@ public partial class FanShaped : Container
         ).Then(t => t.MoveToX(right_arrow_max_x, up_time, Easing.OutQuint));
     }
 
-    public void FadeOut()
+    public void FadeOut(bool now = false)
     {
+        if (gameplayClock?.IsRewinding == true)
+            now = true;
+
+        if (now)
+        {
+            Alpha = 0;
+            leftArrow.X = 0;
+            rightArrow.X = 0;
+            fade = Fade.Out;
+            return;
+        }
+
         if (fade == Fade.Out) return;
 
         fade = Fade.Out;

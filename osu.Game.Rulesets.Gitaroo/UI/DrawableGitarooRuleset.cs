@@ -7,6 +7,7 @@ using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Gitaroo.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.Objects;
@@ -20,6 +21,12 @@ namespace osu.Game.Rulesets.Gitaroo.UI;
 [Cached]
 public partial class DrawableGitarooRuleset : DrawableRuleset<GitarooHitObject>
 {
+    public new GitarooInputManager KeyBindingInputManager => (GitarooInputManager)base.KeyBindingInputManager;
+
+    public new GitarooPlayfield Playfield => (GitarooPlayfield)base.Playfield;
+
+    protected new GitarooRulesetConfigManager Config => (GitarooRulesetConfigManager)base.Config;
+
     public DrawableGitarooRuleset(GitarooRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
         : base(ruleset, beatmap, mods)
     {
