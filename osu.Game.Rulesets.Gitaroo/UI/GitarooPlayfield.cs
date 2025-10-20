@@ -141,7 +141,13 @@ public partial class GitarooPlayfield : Playfield
         judgementLayer.Add(judgementPooler.Get(result.Type, j => j.Apply(result, judgedObject))!);
     }
 
-    public DrawableTraceLine? CurrentDrawableTraceLine;
+    private DrawableTraceLine? currentDrawableTraceLine;
+
+    public DrawableTraceLine? CurrentDrawableTraceLine
+    {
+        get => currentDrawableTraceLine?.IsActive == true ? currentDrawableTraceLine : null;
+        set => currentDrawableTraceLine = value;
+    }
 
     public DrawableTraceLine? GetTraceLine(double time)
     {

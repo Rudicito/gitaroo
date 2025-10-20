@@ -127,6 +127,7 @@ public partial class FanShapedManager : Container
         Anchor = Anchor.Centre;
         Origin = Anchor.Centre;
         FanShaped = new FanShaped();
+        FanShaped.FadeOut(true);
     }
 
     protected override bool OnMouseMove(MouseMoveEvent e)
