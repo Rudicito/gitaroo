@@ -177,6 +177,7 @@ public partial class FanShaped : Container
 
     public void SetColour(float range)
     {
-        fanShapedSprite.Colour = ColourUtils.SampleFromLinearGradient(fan_shaped_colour_spectrum, range);
+        var colour = ColourUtils.SampleFromLinearGradient(fan_shaped_colour_spectrum, range);
+        fanShapedSprite.Colour = leftArrow.Colour = rightArrow.Colour = colour;
     }
 }
