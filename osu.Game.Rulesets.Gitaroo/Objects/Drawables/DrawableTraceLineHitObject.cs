@@ -29,7 +29,7 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
     }
 
     /// <summary>
-    /// Causes this <see cref="DrawableGitarooHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
+    /// Causes this <see cref="DrawableGitarooHitObject"/> to get missed, disregarding all conditions in implementations of DrawableHitObject.CheckForResult.
     /// </summary>
     public virtual void MissForcefully() => ApplyMinResult();
 

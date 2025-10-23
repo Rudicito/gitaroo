@@ -28,7 +28,6 @@ public partial class GitarooPlayfield : Playfield
     protected override GameplayCursorContainer CreateCursor() => new();
 
     public readonly FanShapedManager FanShaped;
-    private readonly CenterCircle centerCircle;
 
     private readonly JudgementContainer<DrawableGitarooJudgement> judgementLayer;
     private readonly ProxyContainer traceLines;
@@ -44,7 +43,7 @@ public partial class GitarooPlayfield : Playfield
             traceLines = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             HitObjectContainer,
             FanShaped = new FanShapedManager { RelativeSizeAxes = Axes.Both },
-            centerCircle = new CenterCircle(),
+            new CenterCircle(),
             judgementLayer = new JudgementContainer<DrawableGitarooJudgement>
             {
                 RelativeSizeAxes = Axes.Both,

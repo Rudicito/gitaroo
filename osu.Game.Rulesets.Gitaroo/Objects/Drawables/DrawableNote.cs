@@ -25,14 +25,12 @@ public partial class DrawableNote : DrawableTraceLineHitObject<Note>, IKeyBindin
         Origin = Anchor.TopLeft;
     }
 
-    private MainNotePiece mainNotePiece = null!;
-
     [BackgroundDependencyLoader]
     private void load()
     {
         AddRangeInternal(new Drawable[]
         {
-            mainNotePiece = new MainNotePiece()
+            new MainNotePiece()
         });
     }
 

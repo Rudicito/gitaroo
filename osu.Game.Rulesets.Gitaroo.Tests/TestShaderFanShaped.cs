@@ -16,7 +16,7 @@ using osuTK.Graphics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace osu.Game.Rulesets.Gitaroo.Tests.Objects.Drawables
+namespace osu.Game.Rulesets.Gitaroo.Tests
 {
     /// <remarks>
     /// Heavily based of TestSceneCircularProgress from osu!framework
