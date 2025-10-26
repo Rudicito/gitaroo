@@ -69,6 +69,8 @@ public partial class GitarooPlayfield : Playfield
 
         RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
         RegisterPool<HeadNote, DrawableHeadNote>(10, 50);
+        RegisterPool<HoldNoteBody, DrawableHoldNoteBody>(10, 50);
+        RegisterPool<TailNote, DrawableTailNote>(10, 50);
 
         RegisterPool<TraceLine, DrawableTraceLine>(2, 5);
     }
@@ -95,6 +97,7 @@ public partial class GitarooPlayfield : Playfield
         {
             dho.GetTraceLine = GetTraceLine;
             dho.CheckHittable = IsHittable;
+            dho.CheckFanShaped = CheckFanShaped;
         }
 
         else if (drawableHitObject is DrawableTraceLine dtl)
@@ -127,6 +130,8 @@ public partial class GitarooPlayfield : Playfield
     /// - <see cref="OrderedHitPolicy.IsHittable"/> ensures only the most recent hit object can be hit (note lock)
     /// </remarks>
     public bool IsHittable(DrawableHitObject hitObject, double time) => FanShaped.Tracking && hitPolicy.IsHittable(hitObject, time);
+
+    public bool CheckFanShaped() => FanShaped.Tracking;
 
     internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
     {

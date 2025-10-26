@@ -82,7 +82,7 @@ public partial class DrawableNote : DrawableTraceLineHitObject<Note>, IKeyBindin
         return UpdateResult(true);
     }
 
-    public void OnReleased(KeyBindingReleaseEvent<GitarooAction> e)
+    public virtual void OnReleased(KeyBindingReleaseEvent<GitarooAction> e)
     {
     }
 }
