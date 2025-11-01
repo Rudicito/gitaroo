@@ -58,9 +58,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     /// <summary>
     /// The key that's playing the slider. Use for ignoring other input.
     /// </summary>
-    public IBindable<GitarooAction?> MainKey => mainKey;
-
-    private readonly Bindable<GitarooAction?> mainKey = new Bindable<GitarooAction?>();
+    private GitarooAction? mainKey;
 
     public DrawableHoldNoteHead Head => headContainer.Child;
     public DrawableHoldNoteTail Tail => tailContainer.Child;
@@ -83,7 +81,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         base.Update();
 
         isHolding.Value = Result.IsHolding(Time.Current);
-        mainKey.Value = Result.MainKey(Time.Current);
+        mainKey = Result.MainKey(Time.Current);
 
         // If user failed to track the FanShaped, stop hold state
         if (isHolding.Value && CheckFanShaped?.Invoke() == false)
@@ -157,7 +155,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
     public void OnReleased(KeyBindingReleaseEvent<GitarooAction> e)
     {
-        if (mainKey.Value != e.Action)
+        if (mainKey != e.Action)
             return;
 
         if (AllJudged)
