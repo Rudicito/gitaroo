@@ -27,13 +27,12 @@ public class GitarooAutoGenerator : AutoGenerator<GitarooReplayFrame>
         {
             switch (hitObject)
             {
-                case Note:
-                    addClickFrame(hitObject.StartTime, hitButton ? GitarooAction.LeftButton : GitarooAction.RightButton);
+                case Note note:
+                    addClickFrame(note.StartTime, hitButton ? GitarooAction.LeftButton : GitarooAction.RightButton);
                     break;
 
-                case HoldNote:
-                    // TODO: Update when HoldNote gameplay going to change
-                    addClickFrame(hitObject.StartTime, hitButton ? GitarooAction.LeftButton : GitarooAction.RightButton);
+                case HoldNote holdNote:
+                    addHoldFrame(holdNote.StartTime, holdNote.EndTime, hitButton ? GitarooAction.LeftButton : GitarooAction.RightButton);
                     break;
             }
 
@@ -44,6 +43,12 @@ public class GitarooAutoGenerator : AutoGenerator<GitarooReplayFrame>
     private void addClickFrame(double time, GitarooAction action)
     {
         Frames.Add(new GitarooReplayFrame(action) { Time = time });
-        Frames.Add(new GitarooReplayFrame { Time = time + KEY_UP_DELAY }); // Release the keys as well
+        Frames.Add(new GitarooReplayFrame { Time = time + KEY_UP_DELAY }); // Release the keys
+    }
+
+    private void addHoldFrame(double start, double end, GitarooAction action)
+    {
+        Frames.Add(new GitarooReplayFrame(action) { Time = start });
+        Frames.Add(new GitarooReplayFrame { Time = end }); // Release the keys
     }
 }

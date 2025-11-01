@@ -79,7 +79,7 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
                 case IHasPathWithRepeats slider:
                     return new HoldNote
                     {
-                        Samples = original.Samples,
+                        NodeSamples = slider.NodeSamples,
                         StartTime = original.StartTime,
                         Duration = slider.Duration,
                         NewCombo = comboData?.NewCombo ?? false,

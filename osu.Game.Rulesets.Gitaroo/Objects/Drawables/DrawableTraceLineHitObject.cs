@@ -39,6 +39,11 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
     /// </summary>
     public Func<DrawableHitObject, double, bool>? CheckHittable;
 
+    /// <summary>
+    /// Whether the FanShaped is being tracked.
+    /// </summary>
+    public Func<bool>? CheckFanShaped;
+
     public Func<double, DrawableTraceLine?>? GetTraceLine { get; set; }
 
     public DrawableTraceLine? TraceLine { get; set; }
