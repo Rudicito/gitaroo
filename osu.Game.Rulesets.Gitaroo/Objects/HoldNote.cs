@@ -22,23 +22,23 @@ public class HoldNote : GitarooHitObject, IHasDuration
 
     public double VelocityMultiplier { get; set; } = 1;
 
-    public IList<IList<HitSampleInfo>> NodeSamples { get; set; }
+    public IList<IList<HitSampleInfo>>? NodeSamples { get; set; }
 
     /// <summary>
     /// The head note of the hold.
     /// </summary>
-    public HeadNote Head { get; protected set; }
+    public HeadNote Head { get; protected set; } = null!;
 
     /// <summary>
     /// The tail note of the hold.
     /// </summary>
-    public TailNote Tail { get; protected set; }
+    public TailNote Tail { get; protected set; } = null!;
 
     /// <summary>
     /// The body of the hold.
     /// This is an invisible and silent object that tracks the holding state of the <see cref="HoldNote"/>.
     /// </summary>
-    public HoldNoteBody Body { get; protected set; }
+    public HoldNoteBody Body { get; protected set; } = null!;
 
     protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
     {
@@ -70,9 +70,6 @@ public class HoldNote : GitarooHitObject, IHasDuration
     /// <summary>
     /// Create the default note samples for a hold note, based off their main sample.
     /// </summary>
-    /// <remarks>
-    /// By default, osu!mania beatmaps in only play samples at the start of the hold note.
-    /// </remarks>
     /// <param name="obj">The object to use as a basis for the head sample.</param>
     /// <returns>Defaults for assigning to <see cref="HoldNote.NodeSamples"/>.</returns>
     public static List<IList<HitSampleInfo>> CreateDefaultNodeSamples(HitObject obj) => new List<IList<HitSampleInfo>>

@@ -9,15 +9,15 @@ namespace osu.Game.Rulesets.Gitaroo.Judgements;
 /// </remarks>
 public class HoldNoteJudgementResult : JudgementResult
 {
-    private Stack<(double time, bool holding)> holdingState { get; } = new Stack<(double, bool)>();
+    private Stack<(double time, bool holding, GitarooAction? action)> holdingState { get; } = new Stack<(double, bool, GitarooAction?)>();
 
     public HoldNoteJudgementResult(HoldNote hitObject, Judgement judgement)
         : base(hitObject, judgement)
     {
-        holdingState.Push((double.NegativeInfinity, false));
+        holdingState.Push((double.NegativeInfinity, false, null));
     }
 
-    private (double time, bool holding) getLastReport(double currentTime)
+    private (double time, bool holding, GitarooAction? action) getLastReport(double currentTime)
     {
         while (holdingState.Peek().time > currentTime)
             holdingState.Pop();
@@ -26,6 +26,7 @@ public class HoldNoteJudgementResult : JudgementResult
     }
 
     public bool IsHolding(double currentTime) => getLastReport(currentTime).holding;
+    public GitarooAction? MainKey(double currentTime) => getLastReport(currentTime).action;
 
     public bool DroppedHoldAfter(double time)
     {
@@ -38,10 +39,10 @@ public class HoldNoteJudgementResult : JudgementResult
         return false;
     }
 
-    public void ReportHoldState(double currentTime, bool holding)
+    public void ReportHoldState(double currentTime, bool holding, GitarooAction? action = null)
     {
         var lastReport = getLastReport(currentTime);
         if (holding != lastReport.holding)
-            holdingState.Push((currentTime, holding));
+            holdingState.Push((currentTime, holding, action));
     }
 }

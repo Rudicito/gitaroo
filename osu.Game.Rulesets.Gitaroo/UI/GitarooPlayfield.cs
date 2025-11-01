@@ -68,9 +68,9 @@ public partial class GitarooPlayfield : Playfield
         RegisterPool<Note, DrawableNote>(10, 50);
 
         RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
-        RegisterPool<HeadNote, DrawableHeadNote>(10, 50);
+        RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
         RegisterPool<HoldNoteBody, DrawableHoldNoteBody>(10, 50);
-        RegisterPool<TailNote, DrawableTailNote>(10, 50);
+        RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
 
         RegisterPool<TraceLine, DrawableTraceLine>(2, 5);
     }

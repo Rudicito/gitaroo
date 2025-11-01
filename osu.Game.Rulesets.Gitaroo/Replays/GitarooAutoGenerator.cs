@@ -43,7 +43,7 @@ public class GitarooAutoGenerator : AutoGenerator<GitarooReplayFrame>
     private void addClickFrame(double time, GitarooAction action)
     {
         Frames.Add(new GitarooReplayFrame(action) { Time = time });
-        Frames.Add(new GitarooReplayFrame { Time = time + KEY_UP_DELAY }); // Release the keys as well
+        Frames.Add(new GitarooReplayFrame { Time = time + KEY_UP_DELAY }); // Release the keys
     }
 
     private void addHoldFrame(double start, double end, GitarooAction action)

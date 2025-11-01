@@ -55,8 +55,15 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     public IBindable<bool> IsHolding => isHolding;
     private readonly Bindable<bool> isHolding = new Bindable<bool>();
 
-    public DrawableHeadNote Head => headContainer.Child;
-    public DrawableTailNote Tail => tailContainer.Child;
+    /// <summary>
+    /// The key that's playing the slider. Use for ignoring other input.
+    /// </summary>
+    public IBindable<GitarooAction?> MainKey => mainKey;
+
+    private readonly Bindable<GitarooAction?> mainKey = new Bindable<GitarooAction?>();
+
+    public DrawableHoldNoteHead Head => headContainer.Child;
+    public DrawableHoldNoteTail Tail => tailContainer.Child;
     public DrawableHoldNoteBody Body => bodyContainer.Child;
 
     [BackgroundDependencyLoader]
@@ -65,8 +72,8 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         AddRangeInternal(new Drawable[]
         {
             SliderBody = new DefaultHoldNoteBody(),
-            headContainer = new Container<DrawableHeadNote>(),
-            tailContainer = new Container<DrawableTailNote>(),
+            headContainer = new Container<DrawableHoldNoteHead>(),
+            tailContainer = new Container<DrawableHoldNoteTail>(),
             bodyContainer = new Container<DrawableHoldNoteBody>(),
         });
     }
@@ -76,11 +83,12 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         base.Update();
 
         isHolding.Value = Result.IsHolding(Time.Current);
+        mainKey.Value = Result.MainKey(Time.Current);
 
         // If user failed to track the FanShaped, stop hold state
-        if (CheckFanShaped?.Invoke() == false)
+        if (isHolding.Value && CheckFanShaped?.Invoke() == false)
         {
-            Result.ReportHoldState(Time.Current, false);
+            breakHold();
         }
 
         UpdatePosition();
@@ -118,6 +126,12 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
     public bool OnPressed(KeyBindingPressEvent<GitarooAction> e)
     {
+        if (isHolding.Value)
+            return false;
+
+        if (e.Action != GitarooAction.LeftButton && e.Action != GitarooAction.RightButton)
+            return false;
+
         if (AllJudged)
             return false;
 
@@ -128,21 +142,24 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         if (CheckHittable?.Invoke(this, Time.Current) == false)
             return false;
 
-        beginHoldAt(Time.Current - Head.HitObject!.StartTime);
+        beginHoldAt(Time.Current - Head.HitObject!.StartTime, e.Action);
 
         return Head.UpdateResult();
     }
 
-    private void beginHoldAt(double timeOffset)
+    private void beginHoldAt(double timeOffset, GitarooAction? action)
     {
         if (timeOffset < -Head.HitObject!.HitWindows.WindowFor(HitResult.Miss))
             return;
 
-        Result.ReportHoldState(Time.Current, true);
+        Result.ReportHoldState(Time.Current, true, action);
     }
 
     public void OnReleased(KeyBindingReleaseEvent<GitarooAction> e)
     {
+        if (mainKey.Value != e.Action)
+            return;
+
         if (AllJudged)
             return;
 
@@ -150,17 +167,18 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         if ((Clock as IGameplayClock)?.IsRewinding == true)
             return;
 
-        // When our action is released and we are in the middle of a hold, there's a chance that
-        // the user has released too early (before the tail).
-        //
-        // In such a case, we want to record this against the DrawableHoldNoteBody.
         if (isHolding.Value)
         {
-            Tail.UpdateResult();
-            Body.TriggerResult(Tail.IsHit);
-
-            Result.ReportHoldState(Time.Current, false);
+            breakHold();
         }
+    }
+
+    private void breakHold()
+    {
+        Tail.UpdateResult();
+        Body.TriggerResult(Tail.IsHit);
+
+        Result.ReportHoldState(Time.Current, false);
     }
 
     protected virtual void UpdatePosition()
@@ -215,8 +233,8 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         SliderBody.RecyclePath();
     }
 
-    private Container<DrawableHeadNote> headContainer = null!;
-    private Container<DrawableTailNote> tailContainer = null!;
+    private Container<DrawableHoldNoteHead> headContainer = null!;
+    private Container<DrawableHoldNoteTail> tailContainer = null!;
     private Container<DrawableHoldNoteBody> bodyContainer = null!;
 
     protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -225,11 +243,11 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
         switch (hitObject)
         {
-            case DrawableHeadNote head:
+            case DrawableHoldNoteHead head:
                 headContainer.Child = head;
                 break;
 
-            case DrawableTailNote tail:
+            case DrawableHoldNoteTail tail:
                 tailContainer.Child = tail;
                 break;
 
@@ -252,10 +270,10 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         switch (hitObject)
         {
             case HeadNote head:
-                return new DrawableHeadNote(head);
+                return new DrawableHoldNoteHead(head);
 
             case TailNote tail:
-                return new DrawableTailNote(tail);
+                return new DrawableHoldNoteTail(tail);
 
             case HoldNoteBody body:
                 return new DrawableHoldNoteBody(body);
@@ -271,7 +289,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
     protected override void UpdateHitStateTransforms(ArmedState state)
     {
-        using (BeginAbsoluteSequence(HitObject!.EndTime))
+        if (AllJudged)
             Expire();
     }
 }

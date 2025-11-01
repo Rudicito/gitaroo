@@ -3,16 +3,16 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
-public partial class DrawableHeadNote : DrawableNote
+public partial class DrawableHoldNoteTail : DrawableNote
 {
-    public DrawableHoldNote DrawableHoldNote => (DrawableHoldNote)ParentHitObject;
+    protected internal DrawableHoldNote DrawableHoldNote => (DrawableHoldNote)ParentHitObject;
 
-    public DrawableHeadNote()
+    public DrawableHoldNoteTail()
         : this(null)
     {
     }
 
-    public DrawableHeadNote(Note? hitObject)
+    public DrawableHoldNoteTail(TailNote? hitObject)
         : base(hitObject)
     {
         Anchor = Anchor.Centre;
@@ -23,10 +23,10 @@ public partial class DrawableHeadNote : DrawableNote
     {
         if (TraceLine?.HitObject == null) return;
 
-        Position = DrawableHoldNote.SliderBody.PathOffset;
+        Position = DrawableHoldNote.SliderBody.PathEndOffset;
     }
 
-    public bool UpdateResult() => base.UpdateResult(true);
+    public void UpdateResult() => base.UpdateResult(true);
 
     public override bool OnPressed(KeyBindingPressEvent<GitarooAction> e) => false; // Handled by the hold note
 
