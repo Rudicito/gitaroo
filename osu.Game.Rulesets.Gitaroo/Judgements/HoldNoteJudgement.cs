@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Judgements;
@@ -5,7 +6,7 @@ using osu.Game.Rulesets.Judgements;
 namespace osu.Game.Rulesets.Gitaroo.Judgements;
 
 /// <remarks>
-/// An exact copy of "osu.Game.Rulesets.Mania/Judgements/HoldNoteJudgementResult.cs"
+/// Based of "osu.Game.Rulesets.Mania/Judgements/HoldNoteJudgementResult.cs"
 /// </remarks>
 public class HoldNoteJudgementResult : JudgementResult
 {
@@ -26,7 +27,7 @@ public class HoldNoteJudgementResult : JudgementResult
     }
 
     public bool IsHolding(double currentTime) => getLastReport(currentTime).holding;
-    public GitarooAction? MainKey(double currentTime) => getLastReport(currentTime).action;
+    public GitarooAction? HoldKey(double currentTime) => getLastReport(currentTime).action;
 
     public bool DroppedHoldAfter(double time)
     {
@@ -41,8 +42,12 @@ public class HoldNoteJudgementResult : JudgementResult
 
     public void ReportHoldState(double currentTime, bool holding, GitarooAction? action = null)
     {
+        if (holding && action == null)
+            throw new ArgumentException("Action must be provided when holding is true.");
+
         var lastReport = getLastReport(currentTime);
-        if (holding != lastReport.holding)
+
+        if (holding != lastReport.holding || action != lastReport.action)
             holdingState.Push((currentTime, holding, action));
     }
 }

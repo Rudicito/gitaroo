@@ -56,9 +56,14 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     private readonly Bindable<bool> isHolding = new Bindable<bool>();
 
     /// <summary>
-    /// The key that's playing the slider. Use for ignoring other input.
+    /// The key that's holding the HoldNote. Use for example to ignore other input.
     /// </summary>
-    private GitarooAction? mainKey;
+    private GitarooAction? holdKey;
+
+    /// <summary>
+    /// Indicates that the FanShaped is currently failing tracking, that HoldNote was previously in hold state, and the hold key is still held.
+    /// </summary>
+    private bool fanShapedFailingButStillHeld;
 
     public DrawableHoldNoteHead Head => headContainer.Child;
     public DrawableHoldNoteTail Tail => tailContainer.Child;
@@ -81,12 +86,20 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         base.Update();
 
         isHolding.Value = Result.IsHolding(Time.Current);
-        mainKey = Result.MainKey(Time.Current);
+        holdKey = Result.HoldKey(Time.Current);
 
-        // If user failed to track the FanShaped, stop hold state
+        fanShapedFailingButStillHeld = !isHolding.Value && holdKey != null;
+
+        // If user failed to track the FanShaped, stop hold state, but still save the holdKey he's still holding
         if (isHolding.Value && CheckFanShaped?.Invoke() == false)
         {
-            breakHold();
+            breakHoldState(true);
+        }
+
+        // If user was failing to track the FanShaped, but correct it, and was still holding the holdKey, restart hold state
+        else if (fanShapedFailingButStillHeld && CheckFanShaped?.Invoke() == true)
+        {
+            startHoldState(holdKey!.Value);
         }
 
         UpdatePosition();
@@ -145,17 +158,17 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         return Head.UpdateResult();
     }
 
-    private void beginHoldAt(double timeOffset, GitarooAction? action)
+    private void beginHoldAt(double timeOffset, GitarooAction action)
     {
         if (timeOffset < -Head.HitObject!.HitWindows.WindowFor(HitResult.Miss))
             return;
 
-        Result.ReportHoldState(Time.Current, true, action);
+        startHoldState(action);
     }
 
     public void OnReleased(KeyBindingReleaseEvent<GitarooAction> e)
     {
-        if (mainKey != e.Action)
+        if (holdKey == null || holdKey != e.Action)
             return;
 
         if (AllJudged)
@@ -167,16 +180,31 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
         if (isHolding.Value)
         {
-            breakHold();
+            breakHoldState();
+        }
+
+        if (fanShapedFailingButStillHeld)
+        {
+            // Clear the stored holdKey
+            Result.ReportHoldState(Time.Current, false);
         }
     }
 
-    private void breakHold()
+    private void startHoldState(GitarooAction action)
+    {
+        Result.ReportHoldState(Time.Current, true, action);
+    }
+
+    /// <param name="storeKey">If true, the key used to hold is stored, else no.</param>
+    private void breakHoldState(bool storeKey = false)
     {
         Tail.UpdateResult();
         Body.TriggerResult(Tail.IsHit);
 
-        Result.ReportHoldState(Time.Current, false);
+        if (storeKey)
+            Result.ReportHoldState(Time.Current, false, holdKey);
+        else
+            Result.ReportHoldState(Time.Current, false);
     }
 
     protected virtual void UpdatePosition()
