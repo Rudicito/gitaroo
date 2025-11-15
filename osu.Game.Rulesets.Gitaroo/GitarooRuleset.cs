@@ -63,6 +63,8 @@ public class GitarooRuleset : Ruleset
                 return new Mod[]
                 {
                     new MultiMod(new GitarooModAutoplay(), new GitarooModCinema()),
+                    new GitarooModRelax(),
+                    new GitarooModAutopilot(),
                 };
 
             case ModType.Fun:

@@ -12,6 +12,19 @@ namespace osu.Game.Rulesets.Gitaroo;
 
 public partial class GitarooInputManager : RulesetInputManager<GitarooAction>
 {
+    /// <summary>
+    /// Whether gameplay input buttons should be allowed.
+    /// Defaults to <c>true</c>, generally used for mods like Relax which turn off main inputs.
+    /// </summary>
+    /// <remarks>
+    /// Of note, auxiliary inputs like the "smoke" key are left usable.
+    /// </remarks>
+    public bool AllowGameplayInputs
+    {
+        get => ((GitarooKeyBindingContainer)KeyBindingContainer).AllowGameplayInputs;
+        set => ((GitarooKeyBindingContainer)KeyBindingContainer).AllowGameplayInputs = value;
+    }
+
     public JoyAxis? JoyX => ((GitarooKeyBindingContainer)KeyBindingContainer).JoyX;
     public JoyAxis? JoyY => ((GitarooKeyBindingContainer)KeyBindingContainer).JoyY;
 
@@ -25,6 +38,25 @@ public partial class GitarooInputManager : RulesetInputManager<GitarooAction>
 
     private partial class GitarooKeyBindingContainer : RulesetKeyBindingContainer
     {
+        private bool allowGameplayInputs = true;
+
+        /// <summary>
+        /// Whether gameplay input buttons should be allowed.
+        /// Defaults to <c>true</c>, generally used for mods like Relax which turn off main inputs.
+        /// </summary>
+        /// <remarks>
+        /// Of note, auxiliary inputs like the "smoke" key are left usable.
+        /// </remarks>
+        public bool AllowGameplayInputs
+        {
+            get => allowGameplayInputs;
+            set
+            {
+                allowGameplayInputs = value;
+                ReloadMappings();
+            }
+        }
+
         public JoyAxis? JoyX { get; private set; }
         public JoyAxis? JoyY { get; private set; }
 
@@ -45,6 +77,9 @@ public partial class GitarooInputManager : RulesetInputManager<GitarooAction>
 
             JoyX = getAxes(joyRight);
             JoyY = getAxes(joyUp);
+
+            if (!AllowGameplayInputs)
+                KeyBindings = [];
         }
 
         private JoyAxis? getAxes(InputKey inputKey)

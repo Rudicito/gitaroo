@@ -318,4 +318,6 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         if (AllJudged)
             Expire();
     }
+
+    public bool IsActive => HitObject != null && Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime;
 }
