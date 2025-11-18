@@ -6,6 +6,42 @@
 #undef HALF_PI
 #define HALF_PI 1.57079632679
 
+highp float deltaToLine(highp vec2 start, highp vec2 end, highp vec2 pixelPos, highp float transitionLength)
+{
+    highp vec2 line = end - start;
+    highp float len = length(line);
+    highp vec2 n = vec2(-line.y, line.x); // perpendicular
+
+    // signed distance to the infinite line
+    highp float d = dot(pixelPos - start, n) / len;
+
+    // remap to a 0–1 gradient using smoothstep
+    // left = 0, right = 1, 0 is the line, gradientLength is the softness
+    return smoothstep(-transitionLength, transitionLength, d);
+}
+
+lowp vec3 getColour(highp vec2 pixelPos, highp vec3 trackedColour, highp vec3 notTrackedColour, highp float halfAngle, highp float delta, highp float gradientLenght)
+{
+    highp vec2 origin = vec2(0.5);
+    highp vec2 cs = vec2(cos(halfAngle - HALF_PI), sin(halfAngle - HALF_PI)) * (1 - abs(delta));
+
+    highp float gradientFactor;
+
+    if (delta < 0)
+    {
+        cs.x = -cs.x;
+
+        gradientFactor = deltaToLine(origin, cs, pixelPos, gradientLenght);
+        return mix(notTrackedColour, trackedColour, gradientFactor);
+    }
+
+    else
+    {
+        gradientFactor = deltaToLine(origin, cs, pixelPos, gradientLenght);
+        return mix(trackedColour, notTrackedColour, gradientFactor);
+    }
+}
+
 highp float dstToLine(highp vec2 start, highp vec2 end, highp vec2 pixelPos)
 {
     highp float lineLength = distance(end, start);
@@ -49,13 +85,12 @@ lowp float alphaAtFar(highp float dist, highp float texelSize, lowp float min_al
     }
 }
 
-lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float angle, highp float texelSize, highp float linesWidth, mediump float linesAlpha, mediump float fanShapedMinAlpha, mediump float fanShapedMaxAlpha)
+lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float halfAngle, highp float texelSize, highp float linesWidth, mediump float linesAlpha, mediump float fanShapedMinAlpha, mediump float fanShapedMaxAlpha)
 {
     highp vec2 origin = vec2(0.5);
     highp float radius = 0.5;
 
     mediump float pixelAngle = atan(0.5 - pixelPos.y, 0.5 - pixelPos.x) - HALF_PI;
-    mediump float halfAngle = radians(angle / 2);
     highp float halfLinesWidth = linesWidth * 0.5;
 
     highp float dist = distance(pixelPos, origin);

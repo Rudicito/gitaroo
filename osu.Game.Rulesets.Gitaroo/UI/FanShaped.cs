@@ -1,6 +1,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Screens.Play;
@@ -175,9 +176,41 @@ public partial class FanShaped : Container
         ).Then(t => t.MoveToX(0, up_time, Easing.OutQuint));
     }
 
-    public void SetColour(float range)
+    public void SetColour(float? range)
     {
-        var colour = ColourUtils.SampleFromLinearGradient(fan_shaped_colour_spectrum, range);
+        ColourInfo colour;
+
+        if (range == null)
+        {
+            colour = not_tracked_colour;
+        }
+        else
+        {
+            Color4 left;
+            Color4 right;
+
+            switch (range)
+            {
+                // Too much to the right
+                case > 0:
+                    left = tracked_colour;
+                    right = ColourUtils.SampleFromLinearGradient(fan_shaped_colour_spectrum, range.Value);
+                    break;
+
+                // Too much to the left
+                case < 0:
+                    left = ColourUtils.SampleFromLinearGradient(fan_shaped_colour_spectrum, range.Value);
+                    right = tracked_colour;
+                    break;
+
+                default:
+                    left = right = tracked_colour;
+                    break;
+            }
+
+            colour = ColourInfo.GradientHorizontal(left, right);
+        }
+
         fanShapedSprite.Colour = leftArrow.Colour = rightArrow.Colour = colour;
     }
 }

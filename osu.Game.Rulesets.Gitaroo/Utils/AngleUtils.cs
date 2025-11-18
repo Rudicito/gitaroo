@@ -59,26 +59,27 @@ public static class AngleUtils
 
     /// <summary>
     /// Calculate the similarity of two angles.
-    /// Returns 1 if they're exact, decreasing linearly towards 0 until maxError.
+    /// Returns 0 if they're exact, -1 if value is maxError to the left, 1 if maxError to the right.
     /// </summary>
     /// <param name="value">The approximate angle</param>
     /// <param name="angle">The angle goal</param>
     /// <param name="maxError">The max error allowed</param>
-    /// <returns>A value between 0 and 1</returns>
+    /// <returns>A value between -1 and 1</returns>
     public static float GetAngleCloseness(float value, float angle, float maxError)
     {
         value = NormalizeAngle(value);
         angle = NormalizeAngle(angle);
 
-        float diff = Math.Abs(value - angle);
+        float diff = value - angle;
 
-        // Handle wrap-around: take the smaller of the two possible angular diff
+        // Handle wrap-around: take the smaller of the two possible angular differences
         if (diff > 180f)
-            diff = 360f - diff;
+            diff -= 360f;
+        else if (diff < -180f)
+            diff += 360f;
 
-        if (diff > maxError) return 0;
-
-        return 1f - (diff / maxError);
+        // Clamp to maxError and normalize to [-1, 1]
+        return Math.Clamp(diff / maxError, -1f, 1f);
     }
 
     /// <summary>
