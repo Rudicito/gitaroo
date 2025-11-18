@@ -36,10 +36,11 @@ lowp float alphaAtLines(highp float dist, highp float texelSize, lowp float max_
 lowp float alphaAtFar(highp float dist, highp float texelSize, lowp float min_alpha, lowp float max_alpha)
 {
     //  Inside the shape
-    if (dist <= 0.5 - texelSize) {
+    if (dist <= 0.5 - texelSize)
+    {
         return mix(min_alpha, max_alpha, (0.5 - dist) / 0.5);
     }
-            
+
     // Outside, too far
     else
     {
@@ -52,7 +53,7 @@ lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float angle, highp floa
 {
     highp vec2 origin = vec2(0.5);
     highp float radius = 0.5;
-    
+
     mediump float pixelAngle = atan(0.5 - pixelPos.y, 0.5 - pixelPos.x) - HALF_PI;
     mediump float halfAngle = radians(angle / 2);
     highp float halfLinesWidth = linesWidth * 0.5;
@@ -61,7 +62,7 @@ lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float angle, highp floa
 
     highp vec2 csRight = vec2(cos(halfAngle - HALF_PI), sin(halfAngle - HALF_PI));
     highp vec2 csLeft = vec2(-csRight.x, csRight.y);
-    
+
     highp vec2 edgeRight = origin + csRight * vec2(radius - texelSize - halfLinesWidth);
     highp float dstToEdgeRight = dstToLine(origin, edgeRight, pixelPos);
 
@@ -70,12 +71,15 @@ lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float angle, highp floa
 
     highp float edgeDist = min(dstToEdgeLeft, dstToEdgeRight);
 
-    if (abs(pixelAngle) < halfAngle) {
+    if (abs(pixelAngle) < halfAngle)
+    {
         // Inside sector
         lowp float centerAlpha = alphaAtFar(dist, texelSize, fanShapedMinAlpha, fanShapedMaxAlpha);
         lowp float edgeAlpha = alphaAtLines(edgeDist, texelSize, linesAlpha, halfLinesWidth);
         return max(centerAlpha, edgeAlpha); // Choose stronger effect
-    } else {
+    }
+    else
+    {
         // Outside sector
         return alphaAtLines(edgeDist, texelSize, linesAlpha, halfLinesWidth);
     }
