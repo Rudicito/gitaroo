@@ -33,7 +33,6 @@ layout(std140, set = 0, binding = 0) uniform m_FanShapedParameters
     mediump float transitionLength;
 
     // between -1 and 1
-    // 0 = left, 1 = right
     mediump float delta;
 };
 

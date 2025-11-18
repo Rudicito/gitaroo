@@ -23,7 +23,10 @@ highp float deltaToLine(highp vec2 start, highp vec2 end, highp vec2 pixelPos, h
 lowp vec3 getColour(highp vec2 pixelPos, highp vec3 trackedColour, highp vec3 notTrackedColour, highp float halfAngle, highp float delta, highp float gradientLenght)
 {
     highp vec2 origin = vec2(0.5);
-    highp vec2 cs = vec2(cos(halfAngle - HALF_PI), sin(halfAngle - HALF_PI)) * (1 - abs(delta));
+
+    highp float angle = halfAngle - (halfAngle * delta);
+
+    highp vec2 cs = vec2(cos(angle - HALF_PI), sin(angle - HALF_PI));
 
     highp float gradientFactor;
 
