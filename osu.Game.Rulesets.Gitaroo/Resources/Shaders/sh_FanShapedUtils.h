@@ -19,6 +19,11 @@ highp vec2 pixelPos)
     return dot(pixelPos - start, n) / len;
 }
 
+highp float deltaToLineGradient(highp float delta, highp float gradientLength){
+    highp float halfGradientLength = gradientLength / 2;
+    return 1.0 - smoothstep(-halfGradientLength, halfGradientLength, delta);
+}
+
 lowp vec3 getColour(
 highp vec2 pixelPos,
 highp vec3 trackedColour,
@@ -27,29 +32,36 @@ highp float halfAngle,
 highp float delta,
 highp float gradientLength)
 {
-    // When delta = 0 → everything trackedColour
+    // Optimization: If delta is 0, return full color immediately
     if (abs(delta) < 0.0001)
     return trackedColour;
 
     highp vec2 origin = vec2(0.5);
 
-    highp float angle = halfAngle - (halfAngle * delta * 2);
+    highp float magnitude = abs(delta);
+
+    highp float angle = halfAngle * magnitude;
+
     highp vec2 dir = vec2(
     cos(angle - HALF_PI),
     sin(angle - HALF_PI)
     );
 
-    highp float d = deltaToLine(origin, origin + dir, pixelPos);
+    // NotTrackedColour coming from the left
+    if (delta < 0)
+    {
+        dir.x = - dir.x;
+        highp float g = deltaToLineGradient(deltaToLine(origin, origin + dir, pixelPos), gradientLength);
+        return mix(notTrackedColour, trackedColour, g);
+    }
 
-    highp float t = smoothstep(-gradientLength, gradientLength, d);
-
-    if (delta < 0.0) {
-        return mix(trackedColour, notTrackedColour, t);
-    } else {
-        return mix(trackedColour, notTrackedColour, t);
+    // NotTrackedColour coming from the right
+    else
+    {
+        highp float g = deltaToLineGradient(deltaToLine(origin, origin + dir, pixelPos), gradientLength);
+        return mix(trackedColour, notTrackedColour, g);
     }
 }
-
 
 highp float dstToLine(highp vec2 start, highp vec2 end, highp vec2 pixelPos)
 {
