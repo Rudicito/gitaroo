@@ -28,37 +28,31 @@ lowp vec3 getColour(
 highp vec2 pixelPos,
 highp vec3 trackedColour,
 highp vec3 notTrackedColour,
-highp float halfAngle,
+highp float Angle,
 highp float delta,
 highp float gradientLength)
 {
-    // Optimization: If delta is 0, return full color immediately
-    if (abs(delta) < 0.0001)
-    return trackedColour;
+    highp float halfAngle = Angle / 2;
 
     highp vec2 origin = vec2(0.5);
 
-    highp float magnitude = abs(delta);
+    highp float csAngle;
+    highp vec2 cs;
+    highp float g;
 
-    highp float angle = halfAngle * magnitude;
-
-    highp vec2 dir = vec2(
-    cos(angle - HALF_PI),
-    sin(angle - HALF_PI)
-    );
-
-    // NotTrackedColour coming from the left
-    if (delta < 0)
+    if (delta > 0)
     {
-        dir.x = - dir.x;
-        highp float g = deltaToLineGradient(deltaToLine(origin, origin + dir, pixelPos), gradientLength);
+        csAngle = -halfAngle + Angle * delta;
+        cs = vec2(cos(csAngle - HALF_PI), sin(csAngle - HALF_PI));
+        g = deltaToLineGradient(deltaToLine(origin, origin + cs, pixelPos), gradientLength);
         return mix(notTrackedColour, trackedColour, g);
     }
 
-    // NotTrackedColour coming from the right
     else
     {
-        highp float g = deltaToLineGradient(deltaToLine(origin, origin + dir, pixelPos), gradientLength);
+        csAngle = halfAngle + Angle * delta;
+        cs = vec2(cos(csAngle - HALF_PI), sin(csAngle - HALF_PI));
+        g = deltaToLineGradient(deltaToLine(origin, origin + cs, pixelPos), gradientLength);
         return mix(trackedColour, notTrackedColour, g);
     }
 }
