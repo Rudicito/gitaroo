@@ -45,7 +45,7 @@ highp float gradientLength)
         csAngle = -halfAngle + Angle * delta;
         cs = vec2(cos(csAngle - HALF_PI), sin(csAngle - HALF_PI));
         g = deltaToLineGradient(deltaToLine(origin, origin + cs, pixelPos), gradientLength);
-        return mix(notTrackedColour, trackedColour, g);
+        return mix(trackedColour, notTrackedColour, g);
     }
 
     else
@@ -53,7 +53,7 @@ highp float gradientLength)
         csAngle = halfAngle + Angle * delta;
         cs = vec2(cos(csAngle - HALF_PI), sin(csAngle - HALF_PI));
         g = deltaToLineGradient(deltaToLine(origin, origin + cs, pixelPos), gradientLength);
-        return mix(trackedColour, notTrackedColour, g);
+        return mix(notTrackedColour, trackedColour, g);
     }
 }
 
@@ -100,10 +100,12 @@ lowp float alphaAtFar(highp float dist, highp float texelSize, lowp float min_al
     }
 }
 
-lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float halfAngle, highp float texelSize, highp float linesWidth, mediump float linesAlpha, mediump float fanShapedMinAlpha, mediump float fanShapedMaxAlpha)
+lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float radAngle, highp float texelSize, highp float linesWidth, mediump float linesAlpha, mediump float fanShapedMinAlpha, mediump float fanShapedMaxAlpha)
 {
     highp vec2 origin = vec2(0.5);
     highp float radius = 0.5;
+
+    highp float halfAngle = radAngle / 2;
 
     mediump float pixelAngle = atan(0.5 - pixelPos.y, 0.5 - pixelPos.x) - HALF_PI;
     highp float halfLinesWidth = linesWidth * 0.5;

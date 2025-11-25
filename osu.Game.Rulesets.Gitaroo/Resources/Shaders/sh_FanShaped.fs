@@ -52,13 +52,13 @@ void main(void)
     mediump vec3 trackedColour = vec3(trackedColourR, trackedColourG, trackedColourB);
     mediump vec3 notTrackedColour = vec3(notTrackedColourR, notTrackedColourG, notTrackedColourB);
 
-    mediump float halfAngle = radians(angle / 2);
+    mediump float radAngle = radians(angle);
 
-    highp vec3 gradientColour = getColour(pixelPos, trackedColour, notTrackedColour, halfAngle, delta, transitionLength);
+    highp vec3 gradientColour = getColour(pixelPos, trackedColour, notTrackedColour, radAngle, delta, transitionLength);
 
     highp vec4 finalColour = vec4(textureColour.rgb * gradientColour, textureColour.a);
 
-    o_Colour = vec4(finalColour.rgb, finalColour.a * fanShapedAlphaAt(pixelPos, halfAngle, texelSize, linesWidth, linesAlpha, fanShapedMinAlpha, fanShapedMaxAlpha));
+    o_Colour = vec4(finalColour.rgb, finalColour.a * fanShapedAlphaAt(pixelPos, radAngle, texelSize, linesWidth, linesAlpha, fanShapedMinAlpha, fanShapedMaxAlpha));
 }
 
 #endif
