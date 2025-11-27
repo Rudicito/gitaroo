@@ -123,18 +123,17 @@ lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float radAngle, highp f
 
     highp float edgeDist = min(dstToEdgeLeft, dstToEdgeRight);
 
-    if (abs(pixelAngle) < halfAngle)
-    {
-        // Inside sector
-        lowp float centerAlpha = alphaAtFar(dist, texelSize, fanShapedMinAlpha, fanShapedMaxAlpha);
-        lowp float edgeAlpha = alphaAtLines(edgeDist, texelSize, linesAlpha, halfLinesWidth);
-        return max(centerAlpha, edgeAlpha); // Choose stronger effect
-    }
-    else
-    {
-        // Outside sector
-        return alphaAtLines(edgeDist, texelSize, linesAlpha, halfLinesWidth);
-    }
+    lowp float centerAlpha = alphaAtFar(dist, texelSize, fanShapedMinAlpha, fanShapedMaxAlpha);
+    lowp float outsideAlpha = alphaAtLines(edgeDist, texelSize, linesAlpha, halfLinesWidth);
+
+    // angular distance from the sector boundary
+    float ang = abs(pixelAngle) - halfAngle;
+
+    // signed distance blend factor
+    float t = smoothstep(-texelSize, +texelSize , ang);
+
+    // blend inside <-> outside
+    return mix(centerAlpha, outsideAlpha, t);
 }
 
 #endif

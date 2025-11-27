@@ -54,7 +54,7 @@ void main(void)
 
     mediump float radAngle = radians(angle);
 
-    highp vec3 gradientColour = getColour(pixelPos, trackedColour, notTrackedColour, radAngle, delta, transitionLength);
+    highp vec3 gradientColour = getColour(pixelPos, trackedColour, notTrackedColour, radAngle, delta, texelSize);
 
     highp vec4 finalColour = vec4(textureColour.rgb * gradientColour, textureColour.a);
 
