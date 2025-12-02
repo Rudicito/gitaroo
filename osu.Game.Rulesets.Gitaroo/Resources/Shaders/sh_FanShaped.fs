@@ -46,19 +46,26 @@ void main(void)
     highp vec2 resolution = v_TexRect.zw - v_TexRect.xy;
     highp vec2 pixelPos = (v_TexCoord - v_TexRect.xy) / resolution;
 
+    mediump float radAngle = radians(angle);
+
+    mediump float alpha = fanShapedAlphaAt(pixelPos, radAngle, texelSize, linesWidth, linesAlpha, fanShapedMinAlpha, fanShapedMaxAlpha);
+
+    // Skip colour calculation if alpha = 0
+    if (alpha <= 0.0)
+    {
+        o_Colour = vec4(0.0, 0.0, 0.0, 0.0);
+        return;
+    }
+
     highp vec2 wrappedCoord = wrap(v_TexCoord, v_TexRect);
     lowp vec4 textureColour = getRoundedColor(wrappedSampler(wrappedCoord, v_TexRect, m_Texture, m_Sampler, -0.9), wrappedCoord);
 
     mediump vec3 trackedColour = vec3(trackedColourR, trackedColourG, trackedColourB);
     mediump vec3 notTrackedColour = vec3(notTrackedColourR, notTrackedColourG, notTrackedColourB);
 
-    mediump float radAngle = radians(angle);
+    mediump vec3 gradientColour = getColour(pixelPos, trackedColour, notTrackedColour, radAngle, delta, texelSize, linesWidth);
 
-    highp vec3 gradientColour = getColour(pixelPos, trackedColour, notTrackedColour, radAngle, delta, texelSize);
-
-    highp vec4 finalColour = vec4(textureColour.rgb * gradientColour, textureColour.a);
-
-    o_Colour = vec4(finalColour.rgb, finalColour.a * fanShapedAlphaAt(pixelPos, radAngle, texelSize, linesWidth, linesAlpha, fanShapedMinAlpha, fanShapedMaxAlpha));
+    o_Colour = vec4(textureColour.rgb * gradientColour, textureColour.a * alpha);
 }
 
 #endif
