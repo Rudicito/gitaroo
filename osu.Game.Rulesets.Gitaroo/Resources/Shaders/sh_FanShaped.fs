@@ -26,11 +26,7 @@ layout(std140, set = 0, binding = 0) uniform m_FanShapedParameters
     mediump float trackedColourG;
     mediump float trackedColourB;
 
-    mediump float notTrackedColourR;
-    mediump float notTrackedColourG;
-    mediump float notTrackedColourB;
-
-    mediump float transitionLength;
+    bool tracked;
 
     // between -1 and 1
     mediump float delta;
@@ -61,11 +57,10 @@ void main(void)
     lowp vec4 textureColour = getRoundedColor(wrappedSampler(wrappedCoord, v_TexRect, m_Texture, m_Sampler, -0.9), wrappedCoord);
 
     mediump vec3 trackedColour = vec3(trackedColourR, trackedColourG, trackedColourB);
-    mediump vec3 notTrackedColour = vec3(notTrackedColourR, notTrackedColourG, notTrackedColourB);
 
-    mediump vec3 gradientColour = getColour(pixelPos, trackedColour, notTrackedColour, radAngle, delta, texelSize, linesWidth);
+    mediump vec3 gradientColour = getColour(pixelPos, trackedColour, textureColour.rgb, radAngle, delta, texelSize, linesWidth);
 
-    o_Colour = vec4(textureColour.rgb * gradientColour, textureColour.a * alpha);
+    o_Colour = vec4(gradientColour, textureColour.a * alpha);
 }
 
 #endif

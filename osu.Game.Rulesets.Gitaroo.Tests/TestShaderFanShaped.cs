@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Gitaroo.Tests
             AddSliderStep("FanShaped Min Alpha", 0f, 1f, fanShapedSprite.FanShapedMinAlpha, s => fanShapedSprite.FanShapedMinAlpha = s);
             AddSliderStep("FanShaped Max Alpha", 0f, 1f, fanShapedSprite.FanShapedMaxAlpha, s => fanShapedSprite.FanShapedMaxAlpha = s);
             AddSliderStep("Scale", 0f, 2f, 1f, s => fanShapedSprite.Scale = new Vector2(s));
-            AddSliderStep("TransitionLenght", 0f, 1f, 0.2f, s => fanShapedSprite.TransitionLenght = s);
+            AddToggleStep("Tracked", b => fanShapedSprite.Tracked = b);
             AddSliderStep("Delta", -1f, 1f, 0f, s => fanShapedSprite.Delta = s);
         }
 

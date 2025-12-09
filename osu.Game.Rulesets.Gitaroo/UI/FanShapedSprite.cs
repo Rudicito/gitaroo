@@ -49,39 +49,7 @@ public partial class FanShapedSprite : Sprite
         }
     }
 
-    private Color4 notTrackedColour = Color4.Cyan;
-
-    public Color4 NotTrackedColour
-    {
-        get => notTrackedColour;
-        set
-        {
-            if (notTrackedColour == value)
-                return;
-
-            notTrackedColour = value;
-
-            if (IsLoaded)
-                Invalidate(Invalidation.DrawNode);
-        }
-    }
-
-    private float transitionLength;
-
-    public float TransitionLenght
-    {
-        get => transitionLength;
-        set
-        {
-            if (transitionLength == value)
-                return;
-
-            transitionLength = value;
-
-            if (IsLoaded)
-                Invalidate(Invalidation.DrawNode);
-        }
-    }
+    public bool Tracked { get; set; }
 
     private float delta;
 
@@ -184,10 +152,7 @@ public partial class FanShapedSprite : Sprite
         protected float TrackedColourR { get; private set; }
         protected float TrackedColourG { get; private set; }
         protected float TrackedColourB { get; private set; }
-        protected float NotTrackedColourR { get; private set; }
-        protected float NotTrackedColourG { get; private set; }
-        protected float NotTrackedColourB { get; private set; }
-        protected float TransitionLength { get; private set; }
+        protected bool Tracked { get; private set; }
         protected float Delta { get; private set; }
 
         public override void ApplyState()
@@ -202,10 +167,7 @@ public partial class FanShapedSprite : Sprite
             TrackedColourR = Source.TrackedColour.R;
             TrackedColourG = Source.TrackedColour.G;
             TrackedColourB = Source.TrackedColour.B;
-            NotTrackedColourR = Source.NotTrackedColour.R;
-            NotTrackedColourG = Source.NotTrackedColour.G;
-            NotTrackedColourB = Source.NotTrackedColour.B;
-            TransitionLength = Math.Abs(Source.TransitionLenght);
+            Tracked = Source.Tracked;
             Delta = Source.Delta;
 
             // smoothstep looks too sharp with 1px, let's give it a bit more
@@ -230,10 +192,7 @@ public partial class FanShapedSprite : Sprite
                 TrackedColourR = TrackedColourR,
                 TrackedColourG = TrackedColourG,
                 TrackedColourB = TrackedColourB,
-                NotTrackedColourR = NotTrackedColourR,
-                NotTrackedColourG = NotTrackedColourG,
-                NotTrackedColourB = NotTrackedColourB,
-                TransitionLength = TransitionLength,
+                Tracked = Tracked,
                 Delta = Delta,
             };
 
@@ -260,13 +219,10 @@ public partial class FanShapedSprite : Sprite
             public required UniformFloat TrackedColourR;
             public required UniformFloat TrackedColourG;
             public required UniformFloat TrackedColourB;
-            public required UniformFloat NotTrackedColourR;
-            public required UniformFloat NotTrackedColourG;
-            public required UniformFloat NotTrackedColourB;
-            public required UniformFloat TransitionLength;
+            public required UniformBool Tracked;
             public required UniformFloat Delta;
 
-            private readonly UniformPadding8 Padding;
+            private readonly UniformPadding4 Padding;
         }
     }
 }

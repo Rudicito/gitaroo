@@ -27,34 +27,46 @@ highp float deltaToLineGradient(highp float delta, highp float gradientLength){
 lowp vec3 getColour(
 highp vec2 pixelPos,
 highp vec3 trackedColour,
-highp vec3 notTrackedColour,
-highp float Angle,
+highp vec3 textureColour,
+highp float angle,
 highp float delta,
 highp float texelSize,
 highp float linesWidth)
 {
-    highp float halfAngle = Angle / 2;
+    highp float halfAngle = angle / 2;
 
-    highp vec2 origin = vec2(0.5, 0.5 + linesWidth/2);
+//    mediump float pixelAngle = atan(0.5 - pixelPos.y, 0.5 - pixelPos.x) - HALF_PI;
+//
+//    bool isOutside = abs(pixelAngle) > halfAngle;
+//
+//    if (isOutside)
+//    {
+//        return textureColour;
+//    }
+
+    highp vec2 origin = vec2(0.5);
 
     highp float csAngle;
     highp vec2 cs;
     highp float g;
 
+    highp vec3 tinted = textureColour * trackedColour;
+
     if (delta > 0)
     {
-        csAngle = -halfAngle + Angle * delta;
+        csAngle = -halfAngle + angle * delta;
         cs = vec2(cos(csAngle - HALF_PI), sin(csAngle - HALF_PI));
         g = deltaToLineGradient(deltaToLine(origin, origin + cs, pixelPos), texelSize);
-        return mix(trackedColour, notTrackedColour, g);
+        g = 1.0 - g;
+        return mix(textureColour, tinted, g);
     }
 
     else
     {
-        csAngle = halfAngle + Angle * delta;
+        csAngle = halfAngle + angle * delta;
         cs = vec2(cos(csAngle - HALF_PI), sin(csAngle - HALF_PI));
         g = deltaToLineGradient(deltaToLine(origin, origin + cs, pixelPos), texelSize);
-        return mix(notTrackedColour, trackedColour, g);
+        return mix(textureColour, tinted, g);
     }
 }
 
