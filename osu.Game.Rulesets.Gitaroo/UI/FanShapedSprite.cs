@@ -49,7 +49,24 @@ public partial class FanShapedSprite : Sprite
         }
     }
 
-    public bool Tracked { get; set; }
+    private bool isActive;
+
+    public bool IsActive
+    {
+        get => isActive;
+        set
+        {
+            if (isActive == value)
+                return;
+
+            isActive = value;
+
+            if (IsLoaded)
+            {
+                Invalidate(Invalidation.DrawNode);
+            }
+        }
+    }
 
     private float delta;
 
@@ -68,7 +85,7 @@ public partial class FanShapedSprite : Sprite
         }
     }
 
-    private double linesWidth = 0.005;
+    private double linesWidth = 0.025;
 
     protected double LinesWidth
     {
@@ -152,7 +169,7 @@ public partial class FanShapedSprite : Sprite
         protected float TrackedColourR { get; private set; }
         protected float TrackedColourG { get; private set; }
         protected float TrackedColourB { get; private set; }
-        protected bool Tracked { get; private set; }
+        protected bool IsActive { get; private set; }
         protected float Delta { get; private set; }
 
         public override void ApplyState()
@@ -167,7 +184,7 @@ public partial class FanShapedSprite : Sprite
             TrackedColourR = Source.TrackedColour.R;
             TrackedColourG = Source.TrackedColour.G;
             TrackedColourB = Source.TrackedColour.B;
-            Tracked = Source.Tracked;
+            IsActive = Source.IsActive;
             Delta = Source.Delta;
 
             // smoothstep looks too sharp with 1px, let's give it a bit more
@@ -192,7 +209,7 @@ public partial class FanShapedSprite : Sprite
                 TrackedColourR = TrackedColourR,
                 TrackedColourG = TrackedColourG,
                 TrackedColourB = TrackedColourB,
-                Tracked = Tracked,
+                IsActive = IsActive,
                 Delta = Delta,
             };
 
@@ -219,7 +236,7 @@ public partial class FanShapedSprite : Sprite
             public required UniformFloat TrackedColourR;
             public required UniformFloat TrackedColourG;
             public required UniformFloat TrackedColourB;
-            public required UniformBool Tracked;
+            public required UniformBool IsActive;
             public required UniformFloat Delta;
 
             private readonly UniformPadding4 Padding;

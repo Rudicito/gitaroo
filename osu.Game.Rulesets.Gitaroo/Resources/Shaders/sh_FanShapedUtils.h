@@ -31,18 +31,15 @@ highp vec3 textureColour,
 highp float angle,
 highp float delta,
 highp float texelSize,
-highp float linesWidth)
+highp float linesWidth,
+bool isActive)
 {
-    highp float halfAngle = angle / 2;
+    if (!isActive)
+    {
+        return textureColour;
+    }
 
-//    mediump float pixelAngle = atan(0.5 - pixelPos.y, 0.5 - pixelPos.x) - HALF_PI;
-//
-//    bool isOutside = abs(pixelAngle) > halfAngle;
-//
-//    if (isOutside)
-//    {
-//        return textureColour;
-//    }
+    highp float halfAngle = angle / 2;
 
     highp vec2 origin = vec2(0.5);
 
@@ -51,23 +48,37 @@ highp float linesWidth)
     highp float g;
 
     highp vec3 tinted = textureColour * trackedColour;
+    highp vec3 innerColour;
 
-    if (delta > 0)
+    if (delta < 0)
     {
-        csAngle = -halfAngle + angle * delta;
+        csAngle = -halfAngle + angle * -delta;
         cs = vec2(cos(csAngle - HALF_PI), sin(csAngle - HALF_PI));
         g = deltaToLineGradient(deltaToLine(origin, origin + cs, pixelPos), texelSize);
         g = 1.0 - g;
-        return mix(textureColour, tinted, g);
+        innerColour = mix(textureColour, tinted, g);
     }
 
     else
     {
-        csAngle = halfAngle + angle * delta;
+        csAngle = halfAngle + angle * -delta;
         cs = vec2(cos(csAngle - HALF_PI), sin(csAngle - HALF_PI));
         g = deltaToLineGradient(deltaToLine(origin, origin + cs, pixelPos), texelSize);
-        return mix(textureColour, tinted, g);
+        innerColour = mix(textureColour, tinted, g);
     }
+
+    highp vec2 csRight = vec2(cos(halfAngle - HALF_PI), sin(halfAngle - HALF_PI));
+    highp vec2 csLeft = vec2(-csRight.x, csRight.y);
+
+    highp float signedDistRight = deltaToLine(origin, origin + csRight, pixelPos);
+    highp float signedDistLeft  = deltaToLine(origin, origin + csLeft, pixelPos);
+
+    highp float t_right = 1.0 - deltaToLineGradient(signedDistRight, texelSize);
+    highp float t_left  = deltaToLineGradient(signedDistLeft, texelSize);
+
+    highp float t = max(t_right, t_left);
+
+    return mix(innerColour, tinted, t);
 }
 
 highp float dstToLine(highp vec2 start, highp vec2 end, highp vec2 pixelPos)
@@ -139,11 +150,15 @@ lowp float fanShapedAlphaAt(highp vec2 pixelPos, mediump float radAngle, highp f
     lowp float centerAlpha = alphaAtFar(dist, texelSize, fanShapedMinAlpha, fanShapedMaxAlpha);
     lowp float outsideAlpha = alphaAtLines(edgeDist, texelSize, linesAlpha, halfLinesWidth);
 
-    // angular distance from the sector boundary
-    float ang = abs(pixelAngle) - halfAngle;
+    // ---
 
-    // signed distance blend factor
-    float t = smoothstep(-texelSize, +texelSize , ang);
+    highp float signedDistRight = deltaToLine(origin, origin + csRight, pixelPos);
+    highp float signedDistLeft  = deltaToLine(origin, origin + csLeft, pixelPos);
+
+    highp float t_right = 1.0 - deltaToLineGradient(signedDistRight, texelSize);
+    highp float t_left  = deltaToLineGradient(signedDistLeft, texelSize);
+
+    float t = max(t_right, t_left);
 
     // blend inside <-> outside
     return mix(centerAlpha, outsideAlpha, t);

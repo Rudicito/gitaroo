@@ -26,7 +26,7 @@ layout(std140, set = 0, binding = 0) uniform m_FanShapedParameters
     mediump float trackedColourG;
     mediump float trackedColourB;
 
-    bool tracked;
+    bool isActive;
 
     // between -1 and 1
     mediump float delta;
@@ -58,7 +58,7 @@ void main(void)
 
     mediump vec3 trackedColour = vec3(trackedColourR, trackedColourG, trackedColourB);
 
-    mediump vec3 gradientColour = getColour(pixelPos, trackedColour, textureColour.rgb, radAngle, delta, texelSize, linesWidth);
+    mediump vec3 gradientColour = getColour(pixelPos, trackedColour, textureColour.rgb, radAngle, delta, texelSize, linesWidth, isActive);
 
     o_Colour = vec4(gradientColour, textureColour.a * alpha);
 }

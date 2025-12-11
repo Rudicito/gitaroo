@@ -93,8 +93,6 @@ public partial class FanShapedManager : Container
                 direction = null;
                 FanShaped.FadeOut();
             }
-
-            FanShaped.SetColour(DeltaAngle);
         }
     }
 
@@ -218,12 +216,19 @@ public partial class FanShapedManager : Container
             if (Direction == null)
                 DeltaAngle = null;
             else
+            {
                 DeltaAngle = AngleUtils.GetAngleCloseness(Direction.Value, AngleTarget.Value, halfAngleArea);
+
+                FanShaped.UpdateActive(true);
+                FanShaped.UpdateDelta(DeltaAngle.Value);
+            }
         }
         else
         {
             Tracking = false;
             DeltaAngle = null;
+
+            FanShaped.UpdateActive(false);
         }
     }
 

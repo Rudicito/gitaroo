@@ -1,11 +1,9 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Screens.Play;
-using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -28,13 +26,6 @@ public partial class FanShaped : Container
 
     private static readonly Color4 left_right_arrow_colour = Color4.Cyan;
     private static readonly Color4 middle_arrow_colour = Color4.White;
-
-    private static readonly (float, Color4)[] fan_shaped_colour_spectrum =
-    {
-        (0.0f, not_tracked_colour),
-        (0.8f, tracked_colour),
-        (1.0f, tracked_colour),
-    };
 
     private enum Fade
     {
@@ -176,41 +167,17 @@ public partial class FanShaped : Container
         ).Then(t => t.MoveToX(0, up_time, Easing.OutQuint));
     }
 
-    public void SetColour(float? range)
-    {
-        ColourInfo colour;
+    /// <summary>
+    /// Update the delta variable of the <see cref="FanShapedSprite"/> (the main triangle)
+    /// </summary>
+    /// <param name="delta">The delta to send</param>
+    public void UpdateDelta(float delta) => fanShapedSprite.Delta = delta;
 
-        if (range == null)
-        {
-            colour = not_tracked_colour;
-        }
-        else
-        {
-            Color4 left;
-            Color4 right;
-
-            switch (range)
-            {
-                // Too much to the right
-                case > 0:
-                    left = tracked_colour;
-                    right = ColourUtils.SampleFromLinearGradient(fan_shaped_colour_spectrum, range.Value);
-                    break;
-
-                // Too much to the left
-                case < 0:
-                    left = ColourUtils.SampleFromLinearGradient(fan_shaped_colour_spectrum, range.Value);
-                    right = tracked_colour;
-                    break;
-
-                default:
-                    left = right = tracked_colour;
-                    break;
-            }
-
-            colour = ColourInfo.GradientHorizontal(left, right);
-        }
-
-        fanShapedSprite.Colour = leftArrow.Colour = rightArrow.Colour = colour;
-    }
+    /// <summary>
+    /// Update the IsActive variable of the <see cref="FanShapedSprite"/> (the main triangle).
+    /// When <c>true</c>, shows the direction of the tracking.
+    /// When <c>false</c>, just stay in normal color.
+    /// </summary>
+    /// <param name="value">The <c>bool</c> to send</param>
+    public void UpdateActive(bool value) => fanShapedSprite.IsActive = value;
 }
