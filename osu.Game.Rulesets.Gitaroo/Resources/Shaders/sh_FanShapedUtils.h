@@ -6,6 +6,15 @@
 #undef HALF_PI
 #define HALF_PI 1.57079632679
 
+highp vec3 colorize(vec3 originalColor, vec3 targetColor, float intensity) {
+    // RGB to grayscale magic formula
+    highp float gray = dot(originalColor, vec3(0.299, 0.587, 0.114));
+
+    highp vec3 tintedColor = vec3(gray) * targetColor;
+
+    return mix(originalColor, tintedColor, intensity);
+}
+
 highp float deltaToLine(
 highp vec2 start,
 highp vec2 end,
@@ -47,8 +56,13 @@ bool isActive)
     highp vec2 cs;
     highp float g;
 
-    highp vec3 tinted = textureColour * trackedColour;
+    highp vec3 tinted = colorize(textureColour, trackedColour, 1);
     highp vec3 innerColour;
+
+//    if (abs(delta) < 0.1)
+//    {
+//        innerColour = tinted;
+//    }
 
     if (delta < 0)
     {
