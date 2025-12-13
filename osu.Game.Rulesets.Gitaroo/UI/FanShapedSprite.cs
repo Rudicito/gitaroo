@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
@@ -31,7 +32,60 @@ public partial class FanShapedSprite : Sprite
         }
     }
 
-    private double linesWidth = 0.005;
+    private Color4 trackedColour = Color4.Orange;
+
+    public Color4 TrackedColour
+    {
+        get => trackedColour;
+        set
+        {
+            if (trackedColour == value)
+                return;
+
+            trackedColour = value;
+
+            if (IsLoaded)
+                Invalidate(Invalidation.DrawNode);
+        }
+    }
+
+    private bool isActive;
+
+    public bool IsActive
+    {
+        get => isActive;
+        set
+        {
+            if (isActive == value)
+                return;
+
+            isActive = value;
+
+            if (IsLoaded)
+            {
+                Invalidate(Invalidation.DrawNode);
+            }
+        }
+    }
+
+    private float delta;
+
+    public float Delta
+    {
+        get => delta;
+        set
+        {
+            if (delta == value)
+                return;
+
+            delta = value;
+
+            if (IsLoaded)
+                Invalidate(Invalidation.DrawNode);
+        }
+    }
+
+    private double linesWidth = 0.025;
 
     protected double LinesWidth
     {
@@ -112,6 +166,11 @@ public partial class FanShapedSprite : Sprite
         protected float LinesAlpha { get; private set; }
         protected float FanShapedMinAlpha { get; private set; }
         protected float FanShapedMaxAlpha { get; private set; }
+        protected float TrackedColourR { get; private set; }
+        protected float TrackedColourG { get; private set; }
+        protected float TrackedColourB { get; private set; }
+        protected bool IsActive { get; private set; }
+        protected float Delta { get; private set; }
 
         public override void ApplyState()
         {
@@ -122,6 +181,11 @@ public partial class FanShapedSprite : Sprite
             LinesAlpha = Math.Abs(Source.linesAlpha);
             FanShapedMinAlpha = Math.Abs(Source.fanShapedMinAlpha);
             FanShapedMaxAlpha = Math.Abs(Source.fanShapedMaxAlpha);
+            TrackedColourR = Source.TrackedColour.R;
+            TrackedColourG = Source.TrackedColour.G;
+            TrackedColourB = Source.TrackedColour.B;
+            IsActive = Source.IsActive;
+            Delta = Source.Delta;
 
             // smoothstep looks too sharp with 1px, let's give it a bit more
             TexelSize = 1.5f / ScreenSpaceDrawQuad.Size.X;
@@ -142,6 +206,11 @@ public partial class FanShapedSprite : Sprite
                 LinesAlpha = LinesAlpha,
                 FanShapedMinAlpha = FanShapedMinAlpha,
                 FanShapedMaxAlpha = FanShapedMaxAlpha,
+                TrackedColourR = TrackedColourR,
+                TrackedColourG = TrackedColourG,
+                TrackedColourB = TrackedColourB,
+                IsActive = IsActive,
+                Delta = Delta,
             };
 
             shader.BindUniformBlock("m_FanShapedParameters", parametersBuffer);
@@ -158,14 +227,19 @@ public partial class FanShapedSprite : Sprite
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private record struct FanShapedParameters
         {
-            public UniformFloat Angle;
-            public UniformFloat TexelSize;
-            public UniformFloat LinesWidth;
-            public UniformFloat LinesAlpha;
-            public UniformFloat FanShapedMinAlpha;
-            public UniformFloat FanShapedMaxAlpha;
+            public required UniformFloat Angle;
+            public required UniformFloat TexelSize;
+            public required UniformFloat LinesWidth;
+            public required UniformFloat LinesAlpha;
+            public required UniformFloat FanShapedMinAlpha;
+            public required UniformFloat FanShapedMaxAlpha;
+            public required UniformFloat TrackedColourR;
+            public required UniformFloat TrackedColourG;
+            public required UniformFloat TrackedColourB;
+            public required UniformBool IsActive;
+            public required UniformFloat Delta;
 
-            private readonly UniformPadding8 Padding;
+            private readonly UniformPadding4 Padding;
         }
     }
 }

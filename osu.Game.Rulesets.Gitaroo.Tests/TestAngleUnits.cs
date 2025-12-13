@@ -23,9 +23,9 @@ public partial class TestAngleUnits : TestSceneOsuGitaroo
     [Test]
     public void TestGetAngleCloseness()
     {
-        Assert.AreEqual(1, AngleUtils.GetAngleCloseness(50, 50, 20));
-        Assert.AreEqual(0, AngleUtils.GetAngleCloseness(110, 50, 20));
+        Assert.AreEqual(0f, AngleUtils.GetAngleCloseness(50, 50, 20));
+        Assert.AreEqual(1f, AngleUtils.GetAngleCloseness(110, 50, 20));
         Assert.AreEqual(0.5f, AngleUtils.GetAngleCloseness(0, -10, 20));
-        Assert.AreEqual(1f, AngleUtils.GetAngleCloseness(350, -10, 20));
+        Assert.AreEqual(0f, AngleUtils.GetAngleCloseness(350, -10, 20));
     }
 }

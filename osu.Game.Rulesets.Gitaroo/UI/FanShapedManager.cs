@@ -84,7 +84,7 @@ public partial class FanShapedManager : Container
             if (value != null)
             {
                 direction = value.Value;
-                FanShaped.Rotation = Tracking && AngleTarget != null ? AngleTarget.Value : value.Value;
+                FanShaped.Rotation = value.Value;
                 FanShaped.FadeIn();
             }
 
@@ -93,8 +93,6 @@ public partial class FanShapedManager : Container
                 direction = null;
                 FanShaped.FadeOut();
             }
-
-            FanShaped.SetColour(DeltaAngle);
         }
     }
 
@@ -197,10 +195,10 @@ public partial class FanShapedManager : Container
     }
 
     /// <summary>
-    /// Normalized closeness to the target angle:
-    /// 1 = exact match, decreasing towards 0 as the difference approaches <see cref="halfAngleArea"/>.
+    /// The normalized angular difference between the current direction and the target angle:
+    /// Returns 0 when perfectly aligned, -1 when at maximum error to the left, and 1 when at maximum error to the right.
     /// </summary>
-    public float DeltaAngle;
+    public float? DeltaAngle;
 
     protected override void Update()
     {
@@ -216,14 +214,21 @@ public partial class FanShapedManager : Container
             Tracking = CheckRotation(AngleTarget.Value);
 
             if (Direction == null)
-                DeltaAngle = 0;
+                DeltaAngle = null;
             else
+            {
                 DeltaAngle = AngleUtils.GetAngleCloseness(Direction.Value, AngleTarget.Value, halfAngleArea);
+
+                FanShaped.UpdateActive(true);
+                FanShaped.UpdateDelta(DeltaAngle.Value);
+            }
         }
         else
         {
             Tracking = false;
-            DeltaAngle = 0;
+            DeltaAngle = null;
+
+            FanShaped.UpdateActive(false);
         }
     }
 
