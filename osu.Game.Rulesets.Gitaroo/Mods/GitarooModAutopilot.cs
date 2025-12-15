@@ -1,3 +1,4 @@
+using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -16,6 +17,12 @@ public class GitarooModAutopilot : Mod, IApplicableToDrawableRuleset<GitarooHitO
     public override ModType Type => ModType.Automation;
     public override LocalisableString Description => @"TraceLines automatically tracked - just follow the rhythm.";
     public override double ScoreMultiplier => 0.1;
+
+    public override Type[] IncompatibleMods => new[]
+    {
+        typeof(ModRelax),
+        typeof(ModAutoplay)
+    };
 
     public void ApplyToDrawableRuleset(DrawableRuleset<GitarooHitObject> drawableRuleset)
     {
