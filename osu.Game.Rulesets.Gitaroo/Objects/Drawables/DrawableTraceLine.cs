@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Gitaroo.Skinning.Default;
 using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
@@ -68,7 +69,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
-        var offset = -SliderBody.PathOffset;
+        Vector2 offset;
 
         // Move the TraceLine current progression to the center
         if (Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime)
@@ -80,6 +81,9 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
             Direction = Path!.AngleAtProgress((float)completionProgress);
 
             SliderBody.UpdateProgress(completionProgress);
+
+            offset = -SliderBody.PathOffset;
+
             Position = offset;
         }
 
@@ -91,6 +95,8 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
             if (AngleStart != null)
             {
                 SliderBody.UpdateProgress(0);
+
+                offset = -SliderBody.PathOffset;
 
                 Position = AngleUtils.MovePoint(offset, AngleStart.Value, (float)(HitObject.Velocity * (HitObject.StartTime - Time.Current)));
             }
@@ -144,5 +150,50 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
         using (BeginAbsoluteSequence(HitObject!.EndTime))
             Expire();
+    }
+
+    /// <summary>
+    /// Get the position along the path of the <see cref="DrawableTraceLine"/> at a specific point in time.
+    /// </summary>
+    /// <param name="time">The time at which to calculate the position.</param>
+    /// <param name="minProgress">The minimum progress value to clamp to (default is 0).</param>
+    /// <param name="maxProgress">The maximum progress value to clamp to (default is 1).</param>
+    /// <returns>The position along the path of the <see cref="DrawableTraceLine"/>.</returns>
+    public Vector2 GetPositionWithTime(double time, double minProgress = 0, double maxProgress = 1)
+    {
+        if (HitObject == null) return Vector2.Zero;
+
+        double traceLineProgress = GetProgressWithTime(time, minProgress, maxProgress);
+
+        return GetPositionWithProgress(traceLineProgress);
+    }
+
+    /// <summary>
+    /// Get the progress of the <see cref="DrawableTraceLine"/> at a specific point in time.
+    /// </summary>
+    /// <param name="time">The time at which to calculate the progress.</param>
+    /// <param name="minProgress">The minimum progress value to clamp to (default is 0).</param>
+    /// <param name="maxProgress">The maximum progress value to clamp to (default is 1).</param>
+    /// <returns>The progress of the <see cref="DrawableTraceLine"/>, by default between 0 and 1.</returns>
+    public double GetProgressWithTime(double time, double minProgress = 0, double maxProgress = 1)
+    {
+        if (HitObject == null) return 0;
+
+        return Math.Clamp((time - HitObject.StartTime) / HitObject.Duration, minProgress, maxProgress);
+    }
+
+    /// <summary>
+    /// Get the position along the path of the <see cref="DrawableTraceLine"/> with the specific progress.
+    /// </summary>
+    /// <param name="progress">The progress value used to get the position</param>
+    /// <returns>The position along the path of the <see cref="DrawableTraceLine"/></returns>
+    public Vector2 GetPositionWithProgress(double progress)
+    {
+        if (HitObject == null) return Vector2.Zero;
+
+        var pathPosition = Path!.PositionAt(progress);
+        var positionInBoundingBox = SliderBody.GetPositionInBoundingBox(pathPosition);
+
+        return Position + positionInBoundingBox;
     }
 }

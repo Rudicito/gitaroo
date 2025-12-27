@@ -1,4 +1,3 @@
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
@@ -45,12 +44,7 @@ public partial class DrawableNote : DrawableTraceLineHitObject<Note>, IKeyBindin
     {
         if (TraceLine?.HitObject == null) return;
 
-        double traceLineProgress = Math.Clamp((HitObject!.StartTime - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration, 0, 1);
-
-        var pathPosition = TraceLine.Path!.PositionAt(traceLineProgress);
-        var positionInBoundingBox = TraceLine.SliderBody.GetPositionInBoundingBox(pathPosition);
-
-        Position = TraceLine.Position + positionInBoundingBox;
+        Position = TraceLine.GetPositionWithTime(HitObject!.StartTime);
     }
 
     protected override void CheckForResult(bool userTriggered, double timeOffset)

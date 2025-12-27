@@ -1,4 +1,3 @@
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -183,7 +182,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
             breakHoldState();
         }
 
-        if (fanShapedFailingButStillHeld)
+        else if (fanShapedFailingButStillHeld)
         {
             // Clear the stored holdKey
             Result.ReportHoldState(Time.Current, false);
@@ -216,13 +215,10 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
-        double start = Math.Clamp((Time.Current - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration, PathStart!.Value, PathEnd!.Value);
+        double start = TraceLine.GetProgressWithTime(Time.Current, PathStart!.Value, PathEnd!.Value);
         SliderBody.UpdateProgress(start, PathEnd!.Value);
 
-        var pathPosition = Path.PositionAt(start);
-        var positionInBoundingBox = TraceLine.SliderBody.GetPositionInBoundingBox(pathPosition);
-
-        Position = TraceLine.Position + positionInBoundingBox - SliderBody.PathOffset;
+        Position = TraceLine.GetPositionWithProgress(start) - SliderBody.PathOffset;
     }
 
     protected override void OnApply()
