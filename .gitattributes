@@ -5,7 +5,6 @@
 
 # Check out with crlf (Windows) line endings
 *.sln text eol=crlf
-*.csproj text eol=crlf
 *.cs text diff=csharp eol=crlf
 *.resx text eol=crlf
 *.vsixmanifest text eol=crlf
@@ -16,6 +15,9 @@ App.config text eol=crlf
 *.snippet text eol=crlf
 *.manifest text eol=crlf
 *.licenseheader text eol=crlf
+
+# Check out with lf (Unix) line endings for .csproj files because dependabot force lf: https://github.com/dependabot/dependabot-core/issues/10193
+*.csproj text eol=lf
 
 # Check out with lf (UNIX) line endings
 *.sh text eol=lf
