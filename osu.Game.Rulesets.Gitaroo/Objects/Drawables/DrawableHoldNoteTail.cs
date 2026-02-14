@@ -5,6 +5,8 @@ namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
 public partial class DrawableHoldNoteTail : DrawableNote
 {
+    protected override bool UseTraceLine => false;
+
     protected internal DrawableHoldNote DrawableHoldNote => (DrawableHoldNote)ParentHitObject;
 
     public DrawableHoldNoteTail()
@@ -19,11 +21,16 @@ public partial class DrawableHoldNoteTail : DrawableNote
         Origin = Anchor.TopLeft;
     }
 
-    protected override void UpdatePosition()
+    public override void UpdatePosition()
     {
-        if (TraceLine?.HitObject == null) return;
+        Position = OffsetPosition;
+    }
 
-        Position = DrawableHoldNote.SliderBody.PathEndOffset;
+    public override void UpdateOffsetPosition()
+    {
+        if (DrawableHoldNote.HitObject == null) return;
+
+        OffsetPosition = DrawableHoldNote.GetPositionWithProgress(DrawableHoldNote.PathEnd!.Value);
     }
 
     public void UpdateResult() => base.UpdateResult(true);

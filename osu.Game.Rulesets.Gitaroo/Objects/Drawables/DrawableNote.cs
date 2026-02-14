@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 /// <summary>
 /// Visualises a <see cref="Note"/> hit object.
 /// </summary>
-public partial class DrawableNote : DrawableTraceLineHitObject<Note>, IKeyBindingHandler<GitarooAction>
+public partial class DrawableNote : DrawableTraceLineHitObject, IKeyBindingHandler<GitarooAction>
 {
     public DrawableNote()
         : this(null)
@@ -33,18 +33,11 @@ public partial class DrawableNote : DrawableTraceLineHitObject<Note>, IKeyBindin
         });
     }
 
-    protected override void Update()
-    {
-        base.Update();
-
-        UpdatePosition();
-    }
-
-    protected virtual void UpdatePosition()
+    public override void UpdateOffsetPosition()
     {
         if (TraceLine?.HitObject == null) return;
 
-        Position = TraceLine.GetPositionWithTime(HitObject!.StartTime);
+        OffsetPosition = TraceLine.GetPositionWithTime(HitObject!.StartTime);
     }
 
     protected override void CheckForResult(bool userTriggered, double timeOffset)

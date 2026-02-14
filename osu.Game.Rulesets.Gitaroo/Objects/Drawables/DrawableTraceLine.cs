@@ -194,6 +194,6 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         var pathPosition = Path!.PositionAt(progress);
         var positionInBoundingBox = SliderBody.GetPositionInBoundingBox(pathPosition);
 
-        return Position + positionInBoundingBox;
+        return positionInBoundingBox;
     }
 }
