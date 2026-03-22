@@ -1,6 +1,8 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Gitaroo.Configuration;
 
@@ -10,7 +12,12 @@ public partial class GitarooSettingsSubsection : RulesetSettingsSubsection
 {
     private readonly Ruleset ruleset;
 
-    private SettingsSlider<float> joystickDeadZone = null!;
+    private readonly Bindable<SettingsNote.Data?> joystickNote = new Bindable<SettingsNote.Data?>(
+        new SettingsNote.Data(
+            "Make sure the other joystick deadzone setting in the Input category is set to a very low value to avoid constant snapping to up, right, left, or down, because of some limitation.",
+            SettingsNote.Type.Warning
+        )
+    );
 
     public GitarooSettingsSubsection(Ruleset ruleset)
         : base(ruleset)
@@ -27,23 +34,22 @@ public partial class GitarooSettingsSubsection : RulesetSettingsSubsection
 
         Children = new Drawable[]
         {
-            new SettingsCheckbox
+            new SettingsItemV2(new FormCheckBox
             {
-                LabelText = "Joystick Enabled",
+                Caption = "Joystick Enabled",
                 Current = config.GetBindable<bool>(GitarooRulesetSettings.JoystickEnabled)
-            },
+            }),
 
-            joystickDeadZone = new SettingsSlider<float>
+            new SettingsItemV2(new FormSliderBar<float>
             {
-                LabelText = "Joystick Deadzone",
+                Caption = "Joystick Deadzone",
                 KeyboardStep = 0.01f,
                 DisplayAsPercentage = true,
-                Current = config.GetBindable<float>(GitarooRulesetSettings.JoystickDeadZone),
-            },
+                Current = config.GetBindable<float>(GitarooRulesetSettings.JoystickDeadZone)
+            })
+            {
+                Note = { BindTarget = joystickNote }
+            }
         };
-
-        joystickDeadZone.SetNoticeText(
-            "Make sure the other joystick deadzone setting in the Input category is set to a very low value to avoid constant snapping to up, right, left, or down, because of some limitation.",
-            true);
     }
 }
