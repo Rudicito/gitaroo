@@ -100,11 +100,12 @@ public class GitarooRuleset : Ruleset
 
     public override Drawable CreateIcon() => new GitarooIcon();
 
-    protected override IEnumerable<HitResult> GetValidHitResults() => new[]
+    public override IEnumerable<HitResult> GetValidHitResults() => new[]
     {
         HitResult.Great,
         HitResult.Good,
-        HitResult.Meh
+        HitResult.Meh,
+        HitResult.Miss
     };
 
     // Leave this line intact. It will bake the correct version into the ruleset on each build/release.
