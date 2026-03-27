@@ -54,14 +54,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         });
     }
 
-    protected override void Update()
-    {
-        base.Update();
-
-        UpdatePosition();
-    }
-
-    protected void UpdatePosition()
+    public void UpdatePosition(double progress, float? length)
     {
         if (HitObject == null) return;
 
@@ -71,24 +64,8 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
 
         Vector2 offset;
 
-        // Move the TraceLine current progression to the center
-        if (Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime)
-        {
-            SetCurrentTraceLine!(this);
-
-            double completionProgress = (Time.Current - HitObject.StartTime) / HitObject.Duration;
-
-            Direction = Path!.AngleAtProgress((float)completionProgress);
-
-            SliderBody.UpdateProgress(completionProgress);
-
-            offset = -SliderBody.PathOffset;
-
-            Position = offset;
-        }
-
         // Move the TraceLine towards the center
-        else if (Time.Current < HitObject.StartTime)
+        if (length != null)
         {
             Direction = null;
 
@@ -98,11 +75,25 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
 
                 offset = -SliderBody.PathOffset;
 
-                Position = AngleUtils.MovePoint(offset, AngleStart.Value, (float)(HitObject.Velocity * (HitObject.StartTime - Time.Current)));
+                Position = AngleUtils.MovePoint(offset, AngleStart.Value, length.Value);
             }
         }
 
-        else if (Time.Current > HitObject.EndTime)
+        // Move the TraceLine current progression to the center
+        else if (progress < 1)
+        {
+            SetCurrentTraceLine!(this);
+
+            Direction = Path!.AngleAtProgress((float)progress);
+
+            SliderBody.UpdateProgress(progress);
+
+            offset = -SliderBody.PathOffset;
+
+            Position = offset;
+        }
+
+        else
         {
             Direction = null;
 

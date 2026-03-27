@@ -65,8 +65,6 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
         //todo: Should not be called at every frames for better performance
         // (should be called after Refresh() of SnakingSlider for example, or called with a bindable)
         UpdateOffsetPosition();
-
-        UpdatePosition();
     }
 
     /// <summary>
