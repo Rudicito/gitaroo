@@ -40,7 +40,7 @@ public abstract partial class SnakingSliderBody : SliderBody
     /// <summary>
     /// Path Offset of the current curve
     /// </summary>
-    public Vector2 PathOffset => Path.PositionInBoundingBox(Path.Vertices[0]) + Path.Position;
+    public Vector2 PathOffset => Path.Vertices.Count == 0 ? Vector2.Zero : Path.PositionInBoundingBox(Path.Vertices[0]) + Path.Position;
 
     public override Vector2 PathStartOffset => snakedPathOffset;
 
@@ -102,7 +102,7 @@ public abstract partial class SnakingSliderBody : SliderBody
         ScaleSliderPath.ControlPoints.Clear();
         ScaleSliderPath.ControlPoints.AddRange(controlPoints);
 
-        ScaleSliderPath.GetPathToProgress(CurrentCurve, SnakedStart.Value, SnakedEnd.Value);
+        ScaleSliderPath.GetPathToProgress(CurrentCurve, 0, 1);
         SetVertices(CurrentCurve);
 
         // todo: Path auto-sizing calculation "acts like" there is a vertex at (0,0), causing the bounding box to be larger than expected,

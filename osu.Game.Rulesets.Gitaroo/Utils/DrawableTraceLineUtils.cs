@@ -24,8 +24,8 @@ public static class DrawableTraceLineUtils
         var algorithm = scrollingInfo.Algorithm.Value;
         double timeRange = scrollingInfo.TimeRange.Value;
 
-        traceLine.Distance ??= algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1);
-        float traveledDistance = algorithm.GetLength(traceLineStartTime, time, timeRange, 1);
+        traceLine.Distance ??= algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1000);
+        float traveledDistance = algorithm.GetLength(traceLineStartTime, time, timeRange, 1000);
 
         if (traceLine.Distance == 0)
             return 0;
@@ -56,7 +56,7 @@ public static class DrawableTraceLineUtils
 
             double endTime = controlPoints.Count == 0 ? traceLineEndTime : controlPoints[0].Time;
 
-            segmentLengths.Add(new(0, algorithm.GetLength(traceLineStartTime, endTime, timeRange, 1)));
+            segmentLengths.Add(new(0, algorithm.GetLength(traceLineStartTime, endTime, timeRange, 1000)));
         }
 
         for (int i = startIndex; i < controlPoints.Count; i++)
@@ -69,11 +69,11 @@ public static class DrawableTraceLineUtils
                 ? traceLineEndTime
                 : controlPoints[i + 1].Time;
 
-            segmentLengths.Add(new(segmentLengths.Count == 0 ? 0 : traceLine.GetProgressFromTime(controlPoints[i].Time, scrollingInfo), algorithm.GetLength(startTime, endTime, timeRange, 1)));
+            segmentLengths.Add(new(segmentLengths.Count == 0 ? 0 : traceLine.GetProgressFromTime(controlPoints[i].Time, scrollingInfo), algorithm.GetLength(startTime, endTime, timeRange, 1000)));
         }
 
         if (segmentLengths.Count == 0)
-            segmentLengths.Add((0, algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1)));
+            segmentLengths.Add((0, algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1000)));
 
         traceLine.Segments = segmentLengths;
     }
@@ -85,6 +85,6 @@ public static class DrawableTraceLineUtils
         var algorithm = scrollingInfo.Algorithm.Value;
         double timeRange = scrollingInfo.TimeRange.Value;
 
-        traceLine.Distance = algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1);
+        traceLine.Distance = algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1000);
     }
 }

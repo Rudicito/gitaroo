@@ -222,6 +222,8 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         {
             traceLine.ComputeDistance(scrollingInfo);
             traceLine.ComputeSegments(scrollingInfo);
+
+            traceLine.SliderBody.Refresh();
         }
 
         foreach (var obj in hitObject.NestedHitObjects)
