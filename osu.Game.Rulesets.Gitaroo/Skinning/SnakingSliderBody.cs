@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Gitaroo.Skinning;
 /// </summary>
 public abstract partial class SnakingSliderBody : SliderBody
 {
-    protected SliderPath ScaleSliderPath = new SliderPath();
+    public SliderPath ScaleSliderPath = new SliderPath();
 
     public readonly List<Vector2> CurrentCurve = new List<Vector2>();
 

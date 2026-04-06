@@ -58,6 +58,10 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
     {
     }
 
+    public virtual void UpdateVisual(double progress)
+    {
+    }
+
     protected override void Update()
     {
         base.Update();

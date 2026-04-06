@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -212,15 +211,22 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     {
         if (TraceLine?.HitObject == null) return;
 
+        UpdateVisual(progress);
+        OffsetPosition = TraceLine.GetPositionWithProgress(progress) - SliderBody.PathOffset;
+
+        Head.UpdateOffsetPosition(progress);
+        Tail.UpdateOffsetPosition(progress);
+    }
+
+    public override void UpdateVisual(double progress)
+    {
+        if (TraceLine?.HitObject == null) return;
+
         Size = SliderBody.Size;
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
-        double start = Math.Clamp(progress, PathStart!.Value, PathEnd!.Value);
-
-        SliderBody.UpdateProgress(start, PathEnd!.Value);
-
-        OffsetPosition = TraceLine.GetPositionWithProgress(start) - SliderBody.PathOffset;
+        SliderBody.UpdateProgress(progress, PathEnd!.Value);
     }
 
     protected override void OnApply()

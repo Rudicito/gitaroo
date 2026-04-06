@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Layout;
 using osu.Framework.Lists;
-using osu.Framework.Logging;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
 using osu.Game.Rulesets.Gitaroo.Utils;
@@ -245,8 +244,11 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
                 if (traceLineHitObject.TraceLine != null)
                 {
                     double progress = traceLineHitObject.TraceLine.GetProgressFromTime(traceLineHitObject.HitObject.StartTime, scrollingInfo);
-                    Logger.Log(progress.ToString());
+
+                    //todo: Should not be called every frame
                     traceLineHitObject.UpdateOffsetPosition(progress);
+
+                    traceLineHitObject.UpdateVisual(progress);
                 }
 
                 traceLineHitObject.UpdatePosition();
