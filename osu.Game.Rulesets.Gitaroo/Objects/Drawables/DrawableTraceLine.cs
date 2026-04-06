@@ -45,7 +45,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
 
     public double? PathStart { get; set; } = 0;
     public double? PathEnd { get; set; } = 1;
-    public List<(double progress, float length)> Segments { get; set; }
+    public List<(double progress, float length)> Segments { get; set; } = [];
 
     public DefaultTraceLineBody SliderBody = null!;
 
@@ -145,36 +145,6 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
         using (BeginAbsoluteSequence(HitObject!.EndTime))
             Expire();
-    }
-
-    /// <summary>
-    /// Get the position along the path of the <see cref="DrawableTraceLine"/> at a specific point in time.
-    /// </summary>
-    /// <param name="time">The time at which to calculate the position.</param>
-    /// <param name="minProgress">The minimum progress value to clamp to (default is 0).</param>
-    /// <param name="maxProgress">The maximum progress value to clamp to (default is 1).</param>
-    /// <returns>The position along the path of the <see cref="DrawableTraceLine"/>.</returns>
-    public Vector2 GetPositionWithTime(double time, double minProgress = 0, double maxProgress = 1)
-    {
-        if (HitObject == null) return Vector2.Zero;
-
-        double traceLineProgress = GetProgressWithTime(time, minProgress, maxProgress);
-
-        return GetPositionWithProgress(traceLineProgress);
-    }
-
-    /// <summary>
-    /// Get the progress of the <see cref="DrawableTraceLine"/> at a specific point in time.
-    /// </summary>
-    /// <param name="time">The time at which to calculate the progress.</param>
-    /// <param name="minProgress">The minimum progress value to clamp to (default is 0).</param>
-    /// <param name="maxProgress">The maximum progress value to clamp to (default is 1).</param>
-    /// <returns>The progress of the <see cref="DrawableTraceLine"/>, by default between 0 and 1.</returns>
-    public double GetProgressWithTime(double time, double minProgress = 0, double maxProgress = 1)
-    {
-        if (HitObject == null) return 0;
-
-        return Math.Clamp((time - HitObject.StartTime) / HitObject.Duration, minProgress, maxProgress);
     }
 
     /// <summary>

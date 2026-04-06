@@ -26,11 +26,11 @@ public partial class DrawableHoldNoteHead : DrawableNote
         Position = OffsetPosition;
     }
 
-    public override void UpdateOffsetPosition()
+    public override void UpdateOffsetPosition(double progress)
     {
-        if (DrawableHoldNote.HitObject == null) return;
+        if (DrawableHoldNote.HitObject == null || DrawableHoldNote.TraceLine == null) return;
 
-        OffsetPosition = DrawableHoldNote.GetPositionWithProgress(DrawableHoldNote.PathStart!.Value);
+        OffsetPosition = DrawableHoldNote.TraceLine.GetPositionWithProgress(DrawableHoldNote.PathStart!.Value);
     }
 
     public bool UpdateResult() => base.UpdateResult(true);

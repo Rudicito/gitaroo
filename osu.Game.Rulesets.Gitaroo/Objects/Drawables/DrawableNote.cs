@@ -33,11 +33,11 @@ public partial class DrawableNote : DrawableTraceLineHitObject<Note>, IKeyBindin
         });
     }
 
-    public override void UpdateOffsetPosition()
+    public override void UpdateOffsetPosition(double progress)
     {
         if (TraceLine?.HitObject == null) return;
 
-        OffsetPosition = TraceLine.GetPositionWithTime(HitObject!.StartTime);
+        OffsetPosition = TraceLine.GetPositionWithProgress(progress);
     }
 
     protected override void CheckForResult(bool userTriggered, double timeOffset)
