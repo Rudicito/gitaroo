@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects;
 
@@ -21,10 +22,12 @@ public interface IHasSnakingSlider
     /// <summary>
     /// The start of the <see cref="Path"/>
     /// </summary>
-    double? PathStart { get; set; }
+    double? PathStart { get; }
 
     /// <summary>
     /// The end of the <see cref="Path"/>
     /// </summary>
-    double? PathEnd { get; set; }
+    double? PathEnd { get; }
+
+    List<(double progress, float length)>? Segments { get; }
 }

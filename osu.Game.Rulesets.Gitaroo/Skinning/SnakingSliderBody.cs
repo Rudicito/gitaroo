@@ -1,8 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
+using osu.Game.Rulesets.Gitaroo.Utils;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Skinning;
@@ -12,6 +16,8 @@ namespace osu.Game.Rulesets.Gitaroo.Skinning;
 /// </summary>
 public abstract partial class SnakingSliderBody : SliderBody
 {
+    protected SliderPath ScaleSliderPath = new SliderPath();
+
     public readonly List<Vector2> CurrentCurve = new List<Vector2>();
 
     public double? SnakedStart { get; private set; }
@@ -80,7 +86,7 @@ public abstract partial class SnakingSliderBody : SliderBody
         SnakedStart = drawableSlider.PathStart;
         SnakedEnd = drawableSlider.PathEnd;
 
-        if (drawableSlider.Path == null)
+        if (drawableSlider.Path == null || drawableSlider.Segments == null || drawableSlider.Segments.Count == 0)
             return;
 
         // Early return if we don't have valid path bounds
@@ -88,7 +94,15 @@ public abstract partial class SnakingSliderBody : SliderBody
             return;
 
         // Generate the curve
-        drawableSlider.Path.GetPathToProgress(CurrentCurve, SnakedStart.Value, SnakedEnd.Value);
+        List<Vector2> fullCurve = [];
+        drawableSlider.Path.GetScaledVertices(fullCurve, drawableSlider.Segments);
+
+        var controlPoints = fullCurve.Select(c => new PathControlPoint(c, PathType.LINEAR)).ToArray();
+
+        ScaleSliderPath.ControlPoints.Clear();
+        ScaleSliderPath.ControlPoints.AddRange(controlPoints);
+
+        ScaleSliderPath.GetPathToProgress(CurrentCurve, SnakedStart.Value, SnakedEnd.Value);
         SetVertices(CurrentCurve);
 
         // todo: Path auto-sizing calculation "acts like" there is a vertex at (0,0), causing the bounding box to be larger than expected,
@@ -136,7 +150,7 @@ public abstract partial class SnakingSliderBody : SliderBody
         SnakedStart = p0;
         SnakedEnd = p1;
 
-        drawableSlider.Path!.GetPathToProgress(CurrentCurve, p0, p1);
+        ScaleSliderPath.GetPathToProgress(CurrentCurve, p0, p1);
 
         SetVertices(CurrentCurve);
 

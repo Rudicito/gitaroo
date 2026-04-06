@@ -4,7 +4,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.Utils;
@@ -43,6 +45,27 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
         // Can be more optimized?
         beatmap.HitObjects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
+
+        foreach (HitObject hitObject in original.HitObjects)
+        {
+            // Post processing step to transform standard slider velocity changes into scroll speed changes
+            // Copied from TaikoBeatmapConverter
+            double lastScrollSpeed = 1;
+
+            if (hitObject is not IHasSliderVelocity hasSliderVelocity) continue;
+
+            double nextScrollSpeed = hasSliderVelocity.SliderVelocityMultiplier;
+            EffectControlPoint currentEffectPoint = beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime);
+
+            if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
+            {
+                beatmap.ControlPointInfo.Add(hitObject.StartTime, new EffectControlPoint
+                {
+                    KiaiMode = currentEffectPoint.KiaiMode,
+                    ScrollSpeed = lastScrollSpeed = nextScrollSpeed,
+                });
+            }
+        }
 
         return beatmap;
     }

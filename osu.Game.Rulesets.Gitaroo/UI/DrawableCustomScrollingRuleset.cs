@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Timing;
@@ -79,12 +80,12 @@ public abstract partial class DrawableCustomScrollingRuleset<TObject> : Drawable
     /// <summary>
     /// The <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s inside this <see cref="DrawableRuleset{TObject}"/>.
     /// </summary>
-    protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
+    protected readonly Bindable<SortedList<MultiplierControlPoint>> ControlPoints = new(new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default));
 
     public IScrollingInfo ScrollingInfo => scrollingInfo;
 
-    [Cached(Type = typeof(IScrollingInfo))]
-    private readonly LocalScrollingInfo scrollingInfo;
+    [Cached(Type = typeof(IGitarooScrollingInfo))]
+    private readonly GitarooScrollingInfo scrollingInfo;
 
     [Resolved]
     private Player? player { get; set; }
@@ -92,9 +93,10 @@ public abstract partial class DrawableCustomScrollingRuleset<TObject> : Drawable
     protected DrawableCustomScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
         : base(ruleset, beatmap, mods)
     {
-        scrollingInfo = new LocalScrollingInfo();
+        scrollingInfo = new GitarooScrollingInfo();
         scrollingInfo.Direction.BindTo(Direction);
         scrollingInfo.TimeRange.BindTo(TimeRange);
+        scrollingInfo.ControlPoints.BindTo(ControlPoints);
     }
 
     [BackgroundDependencyLoader]
@@ -152,10 +154,10 @@ public abstract partial class DrawableCustomScrollingRuleset<TObject> : Drawable
                         // Collapse sections with the same start time
                         .GroupBy(s => s.Time).Select(g => g.Last()).OrderBy(s => s.Time);
 
-        ControlPoints.AddRange(timingChanges);
+        ControlPoints.Value.AddRange(timingChanges);
 
-        if (ControlPoints.Count == 0)
-            ControlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.Difficulty.SliderMultiplier });
+        if (ControlPoints.Value.Count == 0)
+            ControlPoints.Value.Add(new MultiplierControlPoint { Velocity = Beatmap.Difficulty.SliderMultiplier });
     }
 
     private ScrollVisualisationMethod visualisationMethod = ScrollVisualisationMethod.Sequential;
@@ -175,11 +177,11 @@ public abstract partial class DrawableCustomScrollingRuleset<TObject> : Drawable
         switch (VisualisationMethod)
         {
             case ScrollVisualisationMethod.Sequential:
-                scrollingInfo.Algorithm.Value = new SequentialScrollAlgorithm(ControlPoints);
+                scrollingInfo.Algorithm.Value = new SequentialScrollAlgorithm(ControlPoints.Value);
                 break;
 
             case ScrollVisualisationMethod.Overlapping:
-                scrollingInfo.Algorithm.Value = new OverlappingScrollAlgorithm(ControlPoints);
+                scrollingInfo.Algorithm.Value = new OverlappingScrollAlgorithm(ControlPoints.Value);
                 break;
 
             case ScrollVisualisationMethod.Constant:
@@ -222,15 +224,17 @@ public abstract partial class DrawableCustomScrollingRuleset<TObject> : Drawable
         scheduledScrollSpeedAdjustment?.Cancel();
         scheduledScrollSpeedAdjustment = null;
     }
+}
 
-    private class LocalScrollingInfo : IScrollingInfo
-    {
-        public IBindable<ScrollingDirection> Direction { get; } = new Bindable<ScrollingDirection>();
+public class GitarooScrollingInfo : IGitarooScrollingInfo
+{
+    public IBindable<ScrollingDirection> Direction { get; } = new Bindable<ScrollingDirection>();
 
-        public IBindable<double> TimeRange { get; } = new BindableDouble();
+    public IBindable<double> TimeRange { get; } = new BindableDouble();
 
-        public readonly Bindable<IScrollAlgorithm> Algorithm = new Bindable<IScrollAlgorithm>(new ConstantScrollAlgorithm());
+    public readonly Bindable<IScrollAlgorithm> Algorithm = new Bindable<IScrollAlgorithm>(new ConstantScrollAlgorithm());
 
-        IBindable<IScrollAlgorithm> IScrollingInfo.Algorithm => Algorithm;
-    }
+    IBindable<IScrollAlgorithm> IScrollingInfo.Algorithm => Algorithm;
+
+    public IBindable<SortedList<MultiplierControlPoint>> ControlPoints { get; } = new Bindable<SortedList<MultiplierControlPoint>>(new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default));
 }

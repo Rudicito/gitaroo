@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -25,6 +26,8 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
     }
 
+    public float? Distance = null;
+
     public Action<DrawableTraceLine>? SetCurrentTraceLine { get; set; }
 
     public float? AngleStart;
@@ -42,6 +45,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
 
     public double? PathStart { get; set; } = 0;
     public double? PathEnd { get; set; } = 1;
+    public List<(double progress, float length)> Segments { get; set; }
 
     public DefaultTraceLineBody SliderBody = null!;
 

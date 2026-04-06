@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -42,6 +43,8 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     /// The progress end of the HoldNote in the TraceLine SliderBody
     /// </summary>
     public double? PathEnd { get; set; }
+
+    public List<(double progress, float length)> Segments => TraceLine!.Segments;
 
     public PlaySliderBody SliderBody = null!;
 

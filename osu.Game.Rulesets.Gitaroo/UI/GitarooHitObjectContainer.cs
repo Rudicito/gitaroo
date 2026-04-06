@@ -5,9 +5,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Layout;
+using osu.Framework.Lists;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
+using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
+using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
@@ -36,6 +40,7 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
     private readonly IBindable<double> timeRange = new BindableDouble();
     private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
     private readonly IBindable<IScrollAlgorithm> algorithm = new Bindable<IScrollAlgorithm>();
+    private readonly IBindable<SortedList<MultiplierControlPoint>> controlPoints = new Bindable<SortedList<MultiplierControlPoint>>();
 
     /// <summary>
     /// Whether the scrolling direction is horizontal or vertical.
@@ -57,7 +62,7 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
     private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
 
     [Resolved]
-    private IScrollingInfo scrollingInfo { get; set; } = null!;
+    private IGitarooScrollingInfo scrollingInfo { get; set; } = null!;
 
     // Responds to changes in the layout. When the layout changes, all hit object states must be recomputed.
     private readonly LayoutValue layoutCache = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
@@ -75,10 +80,12 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         direction.BindTo(scrollingInfo.Direction);
         timeRange.BindTo(scrollingInfo.TimeRange);
         algorithm.BindTo(scrollingInfo.Algorithm);
+        controlPoints.BindTo(scrollingInfo.ControlPoints);
 
         direction.ValueChanged += _ => layoutCache.Invalidate();
         timeRange.ValueChanged += _ => layoutCache.Invalidate();
         algorithm.ValueChanged += _ => layoutCache.Invalidate();
+        controlPoints.ValueChanged += _ => layoutCache.Invalidate();
     }
 
     private float scrollLength => scrollingAxis == Direction.Horizontal ? DrawWidth : DrawHeight;
@@ -211,14 +218,11 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
     {
         parentHitObjectStartTime ??= hitObject.HitObject.StartTime;
 
-        // if (hitObject.HitObject is IHasDuration e)
-        // {
-        //     float length = LengthAtTime(hitObject.HitObject.StartTime, e.EndTime);
-        //     if (scrollingAxis == Direction.Horizontal)
-        //         hitObject.Width = length;
-        //     else
-        //         hitObject.Height = length;
-        // }
+        if (hitObject is DrawableTraceLine traceLine)
+        {
+            traceLine.ComputeDistance(scrollingInfo);
+            traceLine.ComputeSegments(scrollingInfo);
+        }
 
         foreach (var obj in hitObject.NestedHitObjects)
         {
@@ -255,32 +259,7 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         }
         else
         {
-            traceLine.UpdatePosition(getTraceLineProgress(traceLine, time), null);
+            traceLine.UpdatePosition(traceLine.GetProgressFromTime(time, scrollingInfo), null);
         }
-    }
-
-    /// <summary>
-    /// Computes the progress of a <see cref="DrawableTraceLine"/> along its path using the current <see cref="IScrollAlgorithm"/>.
-    /// This progression value is used to calculate the position of hit objects along the trace line.
-    /// </summary>
-    /// <param name="traceLine">The <see cref="DrawableTraceLine"/> to calculate progression for.</param>
-    /// <param name="time">The time at which to calculate progression.</param>
-    /// <returns>A value between 0 and 1 representing how far along the trace line has progressed, where 0 is the start and 1 is the end.</returns>
-    private double getTraceLineProgress(DrawableTraceLine traceLine, double time)
-    {
-        if (traceLine.HitObject == null)
-            return 0;
-
-        float traveledDistance = algorithm.Value.GetLength(traceLine.HitObject.StartTime, time, timeRange.Value, 1);
-
-        //todo: Optimize this, always the same value for the TraceLine, so store it somewhere
-        float totalDistance = algorithm.Value.GetLength(traceLine.HitObject.StartTime, traceLine.HitObject.EndTime, timeRange.Value, 1);
-
-        if (totalDistance == 0)
-            return 0;
-
-        float progress = traveledDistance / totalDistance;
-
-        return Math.Clamp(progress, 0f, 1f);
     }
 }
