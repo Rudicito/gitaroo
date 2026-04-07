@@ -243,12 +243,13 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
             case DrawableTraceLineHitObject traceLineHitObject:
                 if (traceLineHitObject.TraceLine != null)
                 {
-                    double progress = traceLineHitObject.TraceLine.GetProgressFromTime(traceLineHitObject.HitObject.StartTime, scrollingInfo);
+                    double startTimeProgress = traceLineHitObject.TraceLine.GetProgressFromTime(traceLineHitObject.HitObject.StartTime, scrollingInfo);
 
                     //todo: Should not be called every frame
-                    traceLineHitObject.UpdateOffsetPosition(progress);
+                    traceLineHitObject.UpdateOffsetPosition(startTimeProgress);
 
-                    traceLineHitObject.UpdateVisual(progress);
+                    double currentProgress = traceLineHitObject.TraceLine.GetProgressFromTime(currentTime, scrollingInfo);
+                    traceLineHitObject.UpdateVisual(currentProgress);
                 }
 
                 traceLineHitObject.UpdatePosition();
