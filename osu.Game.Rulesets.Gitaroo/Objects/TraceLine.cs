@@ -1,4 +1,3 @@
-using System;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -22,17 +21,4 @@ public class TraceLine : GitarooHitObject, IHasPath
     public double Distance => Path.Distance;
 
     public required SliderPath Path { get; set; } = null!;
-
-    private double velocity;
-
-    public required double Velocity
-    {
-        get => velocity;
-        set
-        {
-            if (value == 0) throw new InvalidOperationException("TraceLine Velocity cannot be 0");
-
-            velocity = value;
-        }
-    }
 }

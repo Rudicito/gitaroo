@@ -4,6 +4,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.Skinning.Default;
+using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
 using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -48,6 +49,9 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     public List<(double progress, float length)> Segments { get; set; } = [];
 
     public DefaultTraceLineBody SliderBody = null!;
+
+    [Resolved]
+    private IGitarooScrollingInfo scrolling { get; set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -161,4 +165,6 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
 
         return positionInBoundingBox;
     }
+
+    public double GetProgressFromTime(double time) => this.GetProgressFromTime(time, scrolling);
 }

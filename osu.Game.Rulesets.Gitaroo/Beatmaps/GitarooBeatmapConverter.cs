@@ -9,7 +9,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects;
-using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -156,15 +155,9 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
             {
                 StartTime = start - 1000,
                 EndTime = end + 10000,
-                Velocity = velocity,
                 Path = sliderPath,
             }
         ];
-
-        foreach (var traceLine in traceLines)
-        {
-            traceLine.ScaleToExpectedDistance();
-        }
 
         return traceLines;
     }

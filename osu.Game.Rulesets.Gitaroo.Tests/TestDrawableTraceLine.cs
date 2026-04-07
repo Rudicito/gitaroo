@@ -60,7 +60,6 @@ public partial class TestDrawableTraceLine : TestSceneOsuGitaroo
             Path = new SliderPath(),
             StartTime = startTime,
             EndTime = endTime,
-            Velocity = 1
         };
 
         var drawableTraceLine = new DrawableTraceLine(traceLine);

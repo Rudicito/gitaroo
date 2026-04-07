@@ -246,8 +246,8 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
         Path = TraceLine.Path;
 
-        PathStart = (HitObject!.StartTime - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration;
-        PathEnd = (HitObject!.EndTime - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration;
+        PathStart = TraceLine.GetProgressFromTime(HitObject!.StartTime);
+        PathEnd = TraceLine.GetProgressFromTime(HitObject!.EndTime);
 
         // Ensure that the version will change after the upcoming BindTo().
         pathVersion.Value = int.MaxValue;

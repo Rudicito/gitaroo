@@ -7,7 +7,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.UI;
-using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -67,9 +66,6 @@ public abstract partial class DrawableGitarooRulesetTestScene : TestSceneOsuGita
     public const double DEFAULT_DELAY = 1000;
     public double Delay = DEFAULT_DELAY;
 
-    public const double DEFAULT_TRACE_LINE_VELOCITY = 0.2;
-    public double TraceLineVelocity = DEFAULT_TRACE_LINE_VELOCITY;
-
     public readonly SliderPath BezierPath = new SliderPath(PathType.BEZIER, new[]
     {
         Vector2.Zero,
@@ -110,19 +106,14 @@ public abstract partial class DrawableGitarooRulesetTestScene : TestSceneOsuGita
         });
     }
 
-    protected void AddTraceLine(double start, double end, SliderPath sliderPath, double? velocity = null)
+    protected void AddTraceLine(double start, double end, SliderPath sliderPath)
     {
-        velocity ??= TraceLineVelocity;
-
         var traceLine = new TraceLine
         {
             StartTime = CurrentTime + start + Delay,
             EndTime = CurrentTime + end + Delay,
-            Velocity = velocity.Value,
             Path = sliderPath
         };
-
-        traceLine.ScaleToExpectedDistance();
 
         Add(traceLine);
     }
