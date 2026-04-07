@@ -25,7 +25,7 @@ public partial class TestDrawableTraceLine : TestSceneOsuGitaroo
             )
         );
 
-        Assert.That(segments, Has.Count.EqualTo(2));
+        Assert.That(segments.Count, Is.EqualTo(2));
 
         Assert.That(segments[0].progress, Is.EqualTo(0).Within(0.001));
         Assert.That(segments[1].progress, Is.EqualTo(segments[0].length / (segments[0].length + segments[1].length)).Within(0.001));

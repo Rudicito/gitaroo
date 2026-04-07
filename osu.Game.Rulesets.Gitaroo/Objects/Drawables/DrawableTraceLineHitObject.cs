@@ -62,15 +62,6 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
     {
     }
 
-    protected override void Update()
-    {
-        base.Update();
-
-        //todo: Should not be called at every frames for better performance
-        // (should be called after Refresh() of SnakingSlider for example, or called with a bindable)
-        // UpdateOffsetPosition();
-    }
-
     /// <summary>
     /// A bool use to use or not the TraceLine.
     /// Set to false for example the <see cref="DrawableHoldNoteHead"/> and <see cref="DrawableHoldNoteTail"/>
