@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.Skinning.Default;
 using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
 using osu.Game.Rulesets.Gitaroo.Utils;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
@@ -39,7 +38,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     /// </summary>
     public float? Direction { get; private set; }
 
-    public SliderPath? Path => HitObject?.Path;
+    public GitarooSliderPath? Path => HitObject?.ConvertedPath;
 
     public IBindable<int> PathVersion => pathVersion;
     private readonly Bindable<int> pathVersion = new Bindable<int>();
@@ -160,7 +159,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
         if (HitObject == null) return Vector2.Zero;
 
-        var pathPosition = SliderBody.ScaleSliderPath.PositionAt(progress);
+        var pathPosition = Path!.PositionAt(progress);
         var positionInBoundingBox = SliderBody.GetPositionInBoundingBox(pathPosition);
 
         return positionInBoundingBox;

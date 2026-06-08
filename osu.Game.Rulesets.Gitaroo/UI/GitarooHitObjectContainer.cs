@@ -1,20 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Layout;
 using osu.Framework.Lists;
+using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
 using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
+using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
@@ -88,14 +92,20 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         controlPoints.ValueChanged += _ => layoutCache.Invalidate();
     }
 
-    private float scrollLength => scrollingAxis == Direction.Horizontal ? DrawWidth : DrawHeight;
+    //todo: should be a var of the circle radius
+    private float scrollLength => DrawWidth;
 
     public override void Add(HitObjectLifetimeEntry entry)
     {
         // Scroll info is not available until loaded.
         // The lifetime of all entries will be updated in the first Update.
         if (IsLoaded)
+        {
+            if (entry.HitObject is TraceLine traceLine)
+                computePath(traceLine);
+
             setComputedLifetime(entry);
+        }
 
         base.Add(entry);
     }
@@ -129,10 +139,15 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
 
         layoutComputed.Clear();
 
-        foreach (var entry in Entries)
-            setComputedLifetime(entry);
-
         algorithm.Value.Reset();
+
+        foreach (var entry in Entries)
+        {
+            if (entry.HitObject is TraceLine traceLine)
+                computePath(traceLine);
+
+            setComputedLifetime(entry);
+        }
 
         layoutCache.Validate();
     }
@@ -168,29 +183,35 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
 
     private double computeDisplayStartTime(HitObjectLifetimeEntry entry)
     {
-        RectangleF boundingBox = GetConservativeBoundingBox(entry);
-        float startOffset = 0;
+        double displayStartTime;
 
-        switch (direction.Value)
+        switch (entry.HitObject)
         {
-            case ScrollingDirection.Right:
-                startOffset = boundingBox.Right;
+            case TraceLine traceLine:
+                //todo: not perfect, it the traceLine do weird shapes, the TraceLine could appear too late
+                displayStartTime = algorithm.Value.GetDisplayStartTime(traceLine.StartTime, GitarooHitObject.OBJECT_RADIUS + 100, timeRange.Value, scrollLength);
                 break;
 
-            case ScrollingDirection.Down:
-                startOffset = boundingBox.Bottom;
+            case TraceLineHitObject traceLineHitObject:
+                double progress = traceLineHitObject.GetProgressFromTime(traceLineHitObject.StartTime, scrollingInfo);
+                double? lifetimeStartProgress = traceLineHitObject.TraceLine!.ConvertedPath.BackwardFirstCircleIntersection(progress, 100);
+
+                if (lifetimeStartProgress == null)
+                {
+                    //todo: same as TraceLine
+                    displayStartTime = algorithm.Value.GetDisplayStartTime(entry.HitObject.StartTime, GitarooHitObject.OBJECT_RADIUS + 100, timeRange.Value, scrollLength);
+                    break;
+                }
+
+                displayStartTime = traceLineHitObject.GetTimeFromProgress(lifetimeStartProgress.Value, scrollingInfo);
                 break;
 
-            case ScrollingDirection.Left:
-                startOffset = -boundingBox.Left;
-                break;
-
-            case ScrollingDirection.Up:
-                startOffset = -boundingBox.Top;
+            default:
+                displayStartTime = entry.HitObject.StartTime;
                 break;
         }
 
-        return algorithm.Value.GetDisplayStartTime(entry.HitObject.StartTime, startOffset, timeRange.Value, scrollLength);
+        return displayStartTime;
     }
 
     private void setComputedLifetime(HitObjectLifetimeEntry entry)
@@ -221,7 +242,6 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         if (hitObject is DrawableTraceLine traceLine)
         {
             traceLine.ComputeDistance(scrollingInfo);
-            traceLine.ComputeSegments(scrollingInfo);
 
             traceLine.SliderBody.Refresh();
         }
@@ -274,5 +294,22 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         {
             traceLine.UpdatePosition(traceLine.GetProgressFromTime(time, scrollingInfo), null);
         }
+    }
+
+    private void computePath(TraceLine traceLine)
+    {
+        traceLine.ConvertedPath.ControlPoints.Clear();
+
+        // Generate the curve
+        List<Vector2> fullCurve = [];
+        traceLine.ComputeSegments(scrollingInfo);
+        if (traceLine.Segments.Count == 0) return;
+
+        traceLine.Path.GetScaledVertices(fullCurve, traceLine.Segments);
+
+        var pathControlPoints = fullCurve.Select(c => new PathControlPoint(c, PathType.LINEAR)).ToArray();
+
+        traceLine.ConvertedPath.ControlPoints.Clear();
+        traceLine.ConvertedPath.ControlPoints.AddRange(pathControlPoints);
     }
 }

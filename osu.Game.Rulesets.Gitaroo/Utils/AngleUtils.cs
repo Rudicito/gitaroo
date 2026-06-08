@@ -1,4 +1,5 @@
 using System;
+using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
@@ -89,7 +90,7 @@ public static class AngleUtils
     /// <param name="progress">Ranges from 0 (beginning of the path) to 1 (end of the path).</param>
     /// <param name="lookAhead">Distance to look ahead for calculating the direction. Defaults to a small value.</param>
     /// <returns>The angle in degrees, where 0 is pointing up.</returns>
-    public static float AngleAtProgress(this SliderPath sliderPath, double progress, double lookAhead = 0.01)
+    public static float AngleAtProgress(this GitarooSliderPath sliderPath, double progress, double lookAhead = 0.01)
     {
         Vector2 direction;
         Vector2 currentPos = sliderPath.PositionAt(progress);

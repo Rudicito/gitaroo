@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Gitaroo.Objects;
 /// <summary>
 /// Represents a hit object which requires press and holding a key.
 /// </summary>
-public class HoldNote : GitarooHitObject, IHasDuration
+public class HoldNote : TraceLineHitObject, IHasDuration
 {
     public double EndTime
     {

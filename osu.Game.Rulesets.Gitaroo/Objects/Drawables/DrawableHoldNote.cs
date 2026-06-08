@@ -50,7 +50,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     /// <summary>
     /// The Path of the related TraceLine
     /// </summary>
-    public SliderPath? Path { get; set; }
+    public GitarooSliderPath? Path { get; set; }
 
     public IBindable<int> PathVersion => pathVersion;
     private readonly Bindable<int> pathVersion = new Bindable<int>();
@@ -258,6 +258,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     {
         base.OnFree();
 
+        //todo: can crash if no TraceLine
         PathVersion.UnbindFrom(Path?.Version!);
 
         Path = null;

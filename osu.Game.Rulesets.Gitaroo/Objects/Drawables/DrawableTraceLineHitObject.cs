@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 /// </summary>
 public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
 {
-    public DrawableTraceLineHitObject(GitarooHitObject? hitObject)
+    public DrawableTraceLineHitObject(TraceLineHitObject? hitObject)
         : base(hitObject)
     {
     }
@@ -30,15 +30,15 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
     }
 
     /// <summary>
-    /// Causes this <see cref="DrawableGitarooHitObject"/> to get missed, disregarding all conditions in implementations of DrawableHitObject.CheckForResult.
+    /// Causes this <see cref="DrawableTraceLineHitObject"/> to get missed, disregarding all conditions in implementations of DrawableHitObject.CheckForResult.
     /// </summary>
     public virtual void MissForcefully() => ApplyMinResult();
 
     /// <summary>
-    /// Whether this <see cref="DrawableGitarooHitObject"/> can be hit, given a time value.
+    /// Whether this <see cref="DrawableTraceLineHitObject"/> can be hit, given a time value.
     /// If non-null, judgements will be ignored whilst the function returns false.
     /// </summary>
-    public Func<DrawableHitObject, double, bool>? CheckHittable;
+    public Func<DrawableTraceLineHitObject, double, bool>? CheckHittable;
 
     /// <summary>
     /// Whether the FanShaped is being tracked.
@@ -87,7 +87,7 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
 }
 
 public abstract partial class DrawableTraceLineHitObject<TObject> : DrawableTraceLineHitObject
-    where TObject : GitarooHitObject
+    where TObject : TraceLineHitObject
 {
     public new TObject? HitObject => (TObject?)base.HitObject;
 

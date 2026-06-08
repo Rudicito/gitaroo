@@ -4,7 +4,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Gitaroo.Objects;
-using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
 using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects;
@@ -62,8 +61,6 @@ public partial class TestDrawableTraceLine : TestSceneOsuGitaroo
             EndTime = endTime,
         };
 
-        var drawableTraceLine = new DrawableTraceLine(traceLine);
-
         var scrollingInfo = new TestGitarooScrollingInfo
         {
             ControlPoints =
@@ -76,9 +73,9 @@ public partial class TestDrawableTraceLine : TestSceneOsuGitaroo
             }
         };
 
-        drawableTraceLine.ComputeSegments(scrollingInfo);
+        traceLine.ComputeSegments(scrollingInfo);
 
-        return drawableTraceLine.Segments;
+        return traceLine.Segments;
     }
 
     public class TestGitarooScrollingInfo : IGitarooScrollingInfo
