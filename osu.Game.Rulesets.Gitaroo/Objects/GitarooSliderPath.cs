@@ -549,5 +549,31 @@ public class GitarooSliderPath
         //todo: maybe interpolation?
         return cumulativeLength[i] / Distance;
     }
+
+    /// <summary>
+    /// Returns the forward exit progress of a circle centered at centerProgress
+    /// with a given radius.
+    /// </summary>
+    public double? ForwardFirstCircleIntersection(double centerProgress, float radius)
+    {
+        ensureValid();
+
+        float r2 = radius * radius;
+        double centerDistance = progressToDistance(centerProgress);
+        Vector2 center = PositionAt(centerProgress);
+
+        int indexDistance = indexOfDistance(centerDistance);
+
+        // Start of the path don't intersect with the circle
+        if ((calculatedPath[^1] - center).LengthSquared < r2)
+            return null;
+
+        int i;
+        for (i = indexDistance; (calculatedPath[i] - center).LengthSquared < r2; i++) ;
+
+        // Return the first point not in the circle
+        //todo: maybe interpolation?
+        return cumulativeLength[i] / Distance;
+    }
 }
 
