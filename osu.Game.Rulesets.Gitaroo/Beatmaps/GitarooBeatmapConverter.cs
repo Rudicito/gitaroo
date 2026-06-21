@@ -135,7 +135,6 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
     private List<TraceLine> generateTraceLine(GitarooBeatmap beatmap)
     {
-        double velocity = beatmap.Difficulty.SliderMultiplier / 5;
         // todo: Do a much better TraceLine generator algorithm
 
         const float max_line_trace_length = 1000;

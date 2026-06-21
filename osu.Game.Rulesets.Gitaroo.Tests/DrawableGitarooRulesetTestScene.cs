@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -7,6 +8,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.UI;
+using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
+using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -115,6 +118,9 @@ public abstract partial class DrawableGitarooRulesetTestScene : TestSceneOsuGita
             Path = sliderPath
         };
 
+        IGitarooScrollingInfo scrollingInfo = (IGitarooScrollingInfo)DrawableRuleset.Dependencies.Get(typeof(IGitarooScrollingInfo));
+        traceLine.ComputePath(scrollingInfo);
+
         Add(traceLine);
     }
 
@@ -124,6 +130,20 @@ public abstract partial class DrawableGitarooRulesetTestScene : TestSceneOsuGita
         var difficulty = new BeatmapDifficulty();
 
         hitObject.ApplyDefaults(cpi, difficulty);
+
+        if (hitObject is TraceLineHitObject traceLineHitObject)
+        {
+            var traceLine = (TraceLine?)DrawableRuleset.Playfield.HitObjectContainer.Entries.FirstOrDefault(e
+                => e.HitObject is TraceLine t && t.StartTime <= hitObject.StartTime && t.EndTime >= hitObject.StartTime)?.HitObject ?? null;
+
+            traceLineHitObject.TraceLine = traceLine;
+
+            foreach (var nestedHitObject in traceLineHitObject.NestedHitObjects)
+            {
+                var nestedTraceLineHitObject = (TraceLineHitObject)nestedHitObject;
+                nestedTraceLineHitObject.TraceLine = traceLine;
+            }
+        }
 
         DrawableRuleset.Playfield.Add(hitObject);
     }

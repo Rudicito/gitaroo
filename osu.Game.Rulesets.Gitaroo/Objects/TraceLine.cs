@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -20,6 +19,7 @@ public class TraceLine : GitarooHitObject, IHasPath
     }
 
     public double Duration { get; set; }
+
     public double Distance => Path.Distance;
 
     private readonly SliderPath path = new SliderPath();
@@ -34,7 +34,7 @@ public class TraceLine : GitarooHitObject, IHasPath
         }
     }
 
-    public List<(double progress, float length)> Segments { get; set; } = [];
+    public double ConvertedDistance => ConvertedPath.Distance;
 
     private readonly GitarooSliderPath convertedPath = new GitarooSliderPath();
 

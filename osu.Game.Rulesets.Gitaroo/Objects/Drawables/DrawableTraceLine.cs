@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -26,8 +25,6 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
     }
 
-    public float? Distance = null;
-
     public Action<DrawableTraceLine>? SetCurrentTraceLine { get; set; }
 
     public float? AngleStart;
@@ -45,7 +42,6 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
 
     public double? PathStart { get; set; } = 0;
     public double? PathEnd { get; set; } = 1;
-    public List<(double progress, float length)> Segments { get; set; } = [];
 
     public DefaultTraceLineBody SliderBody = null!;
 
@@ -61,7 +57,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         });
     }
 
-    public void UpdatePosition(double progress, float? length)
+    public void UpdatePosition(double startProgress, double endProgress, float? length)
     {
         if (HitObject == null) return;
 
@@ -78,7 +74,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
 
             if (AngleStart != null)
             {
-                SliderBody.UpdateProgress(0);
+                SliderBody.UpdateProgress(0, endProgress);
 
                 offset = -SliderBody.PathOffset;
 
@@ -87,13 +83,13 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         }
 
         // Move the TraceLine current progression to the center
-        else if (progress < 1)
+        else if (startProgress < 1)
         {
             SetCurrentTraceLine!(this);
 
-            Direction = Path!.AngleAtProgress((float)progress);
+            Direction = Path!.AngleAtProgress((float)startProgress);
 
-            SliderBody.UpdateProgress(progress);
+            SliderBody.UpdateProgress(startProgress, endProgress);
 
             offset = -SliderBody.PathOffset;
 

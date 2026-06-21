@@ -13,7 +13,8 @@ using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
 namespace osu.Game.Rulesets.Gitaroo.Tests;
 
-public partial class TestDrawableTraceLine : TestSceneOsuGitaroo
+[TestFixture]
+public class TestDrawableTraceLine
 {
     [Test]
     public void TestComputeSegments()
@@ -73,9 +74,7 @@ public partial class TestDrawableTraceLine : TestSceneOsuGitaroo
             }
         };
 
-        traceLine.ComputeSegments(scrollingInfo);
-
-        return traceLine.Segments;
+        return traceLine.ComputeSegments(scrollingInfo);
     }
 
     public class TestGitarooScrollingInfo : IGitarooScrollingInfo

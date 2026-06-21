@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Gitaroo.Objects;
+using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Utils;
 using osuTK;
@@ -43,7 +45,14 @@ public static class SliderPathUtils
             }
 
             // We don't add the first point when it's not the first ever curve, because it's the same as the last curve point
+            //todo: looks like there's a lot of same points, fix this me
             finalCurve.AddRange(i == 0 ? curve : curve.Skip(1));
         }
+    }
+
+    public static void GetScaledVertices(this SliderPath path, List<Vector2> finalCurve, TraceLine traceLine, IGitarooScrollingInfo scrollingInfo)
+    {
+        var segments = traceLine.ComputeSegments(scrollingInfo);
+        path.GetScaledVertices(finalCurve, segments);
     }
 }

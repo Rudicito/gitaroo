@@ -1,23 +1,26 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
+using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Utils;
 
 public static class TraceLineUtils
 {
-    /// <inheritdoc cref="GetProgressFromTime(TraceLine, double, IGitarooScrollingInfo, float?)"/>
+    /// <inheritdoc cref="GetProgressFromTime(TraceLine, double, IGitarooScrollingInfo)"/>
     public static double GetProgressFromTime(this DrawableTraceLine drawableTraceLine, double time, IGitarooScrollingInfo scrollingInfo)
     {
-        if (drawableTraceLine.Distance == null) drawableTraceLine.ComputeDistance(scrollingInfo);
-        return drawableTraceLine.HitObject!.GetProgressFromTime(time, scrollingInfo, drawableTraceLine.Distance);
+        return drawableTraceLine.HitObject!.GetProgressFromTime(time, scrollingInfo);
     }
 
-    /// <inheritdoc cref="GetProgressFromTime(TraceLine, double, IGitarooScrollingInfo, float?)"/>
+    /// <inheritdoc cref="GetProgressFromTime(TraceLine, double, IGitarooScrollingInfo)"/>
     public static double GetProgressFromTime(this TraceLineHitObject traceLineHitObject, double time, IGitarooScrollingInfo scrollingInfo)
         => traceLineHitObject.TraceLine?.GetProgressFromTime(time, scrollingInfo) ?? 0;
 
@@ -26,47 +29,42 @@ public static class TraceLineUtils
     /// This progression value is used to calculate the position of hit objects along the trace line.
     /// </summary>
     /// <returns>A value between 0 and 1 representing how far along the trace line has progressed, where 0 is the start and 1 is the end.</returns>
-    public static double GetProgressFromTime(this TraceLine traceLine, double time, IGitarooScrollingInfo scrollingInfo, float? distance = null)
+    public static double GetProgressFromTime(this TraceLine traceLine, double time, IGitarooScrollingInfo scrollingInfo)
     {
         double traceLineStartTime = traceLine.StartTime;
-        double traceLineEndTime = traceLine.EndTime;
+        double distance = traceLine.ConvertedDistance;
         var algorithm = scrollingInfo.Algorithm.Value;
         double timeRange = scrollingInfo.TimeRange.Value;
 
-        distance ??= algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1000);
         float traveledDistance = algorithm.GetLength(traceLineStartTime, time, timeRange, 1000);
 
         if (distance == 0)
             return 0;
 
-        float progress = traveledDistance / distance.Value;
+        double progress = traveledDistance / distance;
 
-        return Math.Clamp(progress, 0f, 1f);
+        return Math.Clamp(progress, 0d, 1d);
     }
 
     public static double GetTimeFromProgress(this DrawableTraceLine drawableTraceLine, double progress, IGitarooScrollingInfo scrollingInfo)
     {
-        if (drawableTraceLine.Distance == null) drawableTraceLine.ComputeDistance(scrollingInfo);
-        return drawableTraceLine.HitObject!.GetTimeFromProgress(progress, scrollingInfo, drawableTraceLine.Distance);
+        return drawableTraceLine.HitObject!.GetTimeFromProgress(progress, scrollingInfo);
     }
 
     public static double GetTimeFromProgress(this TraceLineHitObject traceLineHitObject, double progress, IGitarooScrollingInfo scrollingInfo)
         => traceLineHitObject.TraceLine?.GetTimeFromProgress(progress, scrollingInfo) ?? 0;
 
-    public static double GetTimeFromProgress(this TraceLine traceLine, double progress, IGitarooScrollingInfo scrollingInfo, float? distance = null)
+    public static double GetTimeFromProgress(this TraceLine traceLine, double progress, IGitarooScrollingInfo scrollingInfo)
     {
-        double traceLineStartTime = traceLine.StartTime;
-        double traceLineEndTime = traceLine.EndTime;
+        double distance = traceLine.ConvertedDistance;
         var algorithm = scrollingInfo.Algorithm.Value;
         double timeRange = scrollingInfo.TimeRange.Value;
 
-        distance ??= algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1000);
-
-        float targetPosition = (float)(progress * distance.Value);
+        float targetPosition = (float)(progress * distance);
         return algorithm.TimeAt(targetPosition, traceLine.StartTime, timeRange, 1000);
     }
 
-    public static void ComputeSegments(this TraceLine traceLine, IGitarooScrollingInfo scrollingInfo)
+    public static List<(double progress, float length)> ComputeSegments(this TraceLine traceLine, IGitarooScrollingInfo scrollingInfo)
     {
         double traceLineStartTime = traceLine.StartTime;
         double traceLineEndTime = traceLine.EndTime;
@@ -106,19 +104,21 @@ public static class TraceLineUtils
         if (segmentLengths.Count == 0)
             segmentLengths.Add((0, algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1000)));
 
-        traceLine.Segments = segmentLengths;
+        return segmentLengths;
     }
 
-    public static float ComputeDistance(this TraceLine traceLine, IGitarooScrollingInfo scrollingInfo)
+    public static void ComputePath(this TraceLine traceLine, IGitarooScrollingInfo scrollingInfo)
     {
-        double traceLineStartTime = traceLine.StartTime;
-        double traceLineEndTime = traceLine.EndTime;
-        var algorithm = scrollingInfo.Algorithm.Value;
-        double timeRange = scrollingInfo.TimeRange.Value;
+        traceLine.ConvertedPath.ControlPoints.Clear();
 
-        return algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1000);
+        // Generate the curve
+        List<Vector2> fullCurve = [];
+        var segments = traceLine.ComputeSegments(scrollingInfo);
+        if (segments.Count == 0) return;
+
+        traceLine.Path.GetScaledVertices(fullCurve, segments);
+
+        var pathControlPoints = fullCurve.Select(c => new PathControlPoint(c, PathType.LINEAR)).ToArray();
+        traceLine.ConvertedPath.ControlPoints.AddRange(pathControlPoints);
     }
-
-    public static void ComputeDistance(this DrawableTraceLine drawableTraceLine, IGitarooScrollingInfo scrollingInfo)
-        => drawableTraceLine.Distance = drawableTraceLine.HitObject!.ComputeDistance(scrollingInfo);
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,12 +12,10 @@ using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
 using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
-using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
@@ -102,7 +99,7 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         if (IsLoaded)
         {
             if (entry.HitObject is TraceLine traceLine)
-                computePath(traceLine);
+                traceLine.ComputePath(scrollingInfo);
 
             setComputedLifetime(entry);
         }
@@ -144,7 +141,7 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         foreach (var entry in Entries)
         {
             if (entry.HitObject is TraceLine traceLine)
-                computePath(traceLine);
+                traceLine.ComputePath(scrollingInfo);
 
             setComputedLifetime(entry);
         }
@@ -241,8 +238,6 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
 
         if (hitObject is DrawableTraceLine traceLine)
         {
-            traceLine.ComputeDistance(scrollingInfo);
-
             traceLine.SliderBody.Refresh();
         }
 
@@ -287,29 +282,13 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
 
         if (time < traceLine.HitObject.StartTime)
         {
-            float lenght = algorithm.Value.GetLength(time, traceLine.HitObject.StartTime, timeRange.Value, 1);
-            traceLine.UpdatePosition(0, lenght);
+            float lenght = algorithm.Value.GetLength(time, traceLine.HitObject.StartTime, timeRange.Value, 1000);
+            traceLine.UpdatePosition(0, 1, lenght);
         }
         else
         {
-            traceLine.UpdatePosition(traceLine.GetProgressFromTime(time, scrollingInfo), null);
+            double startProgress = traceLine.GetProgressFromTime(time, scrollingInfo);
+            traceLine.UpdatePosition(startProgress, traceLine.Path!.ForwardFirstCircleIntersection(startProgress, 300) ?? 1, null);
         }
-    }
-
-    private void computePath(TraceLine traceLine)
-    {
-        traceLine.ConvertedPath.ControlPoints.Clear();
-
-        // Generate the curve
-        List<Vector2> fullCurve = [];
-        traceLine.ComputeSegments(scrollingInfo);
-        if (traceLine.Segments.Count == 0) return;
-
-        traceLine.Path.GetScaledVertices(fullCurve, traceLine.Segments);
-
-        var pathControlPoints = fullCurve.Select(c => new PathControlPoint(c, PathType.LINEAR)).ToArray();
-
-        traceLine.ConvertedPath.ControlPoints.Clear();
-        traceLine.ConvertedPath.ControlPoints.AddRange(pathControlPoints);
     }
 }
