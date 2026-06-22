@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Gitaroo.Beatmaps;
 using osu.Game.Rulesets.Gitaroo.Configuration;
 using osu.Game.Rulesets.Gitaroo.Mods;
+using osu.Game.Rulesets.Gitaroo.Scoring;
 using osu.Game.Rulesets.Gitaroo.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -79,6 +80,9 @@ public class GitarooRuleset : Ruleset
                 return Array.Empty<Mod>();
         }
     }
+
+    public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context)
+        => new GitarooScoreMultiplierCalculator(context);
 
     public override string ShortName => "gitaroo";
 
