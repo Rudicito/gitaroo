@@ -22,6 +22,7 @@ public static class SliderPathUtils
     {
         finalCurve.Clear();
         List<Vector2> curve = [];
+        double totalDistance = path.Distance;
 
         for (int i = 0; i < segments.Count; i++)
         {
@@ -31,7 +32,7 @@ public static class SliderPathUtils
 
             path.GetPathToProgress(curve, startProgress, endProgress);
 
-            float length = (float)(rangeProgress * path.Distance);
+            float length = (float)(rangeProgress * totalDistance);
 
             float curveScale = segments[i].length / length;
 

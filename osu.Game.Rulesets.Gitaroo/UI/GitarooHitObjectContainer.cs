@@ -44,20 +44,6 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
     private readonly IBindable<SortedList<MultiplierControlPoint>> controlPoints = new Bindable<SortedList<MultiplierControlPoint>>();
 
     /// <summary>
-    /// Whether the scrolling direction is horizontal or vertical.
-    /// </summary>
-    private Direction scrollingAxis => direction.Value == ScrollingDirection.Left || direction.Value == ScrollingDirection.Right ? Direction.Horizontal : Direction.Vertical;
-
-    /// <summary>
-    /// The scrolling axis is inverted if objects temporally farther in the future have a smaller position value across the scrolling axis.
-    /// </summary>
-    /// <example>
-    /// <see cref="ScrollingDirection.Down"/> is inverted, because given two objects, one of which is at the current time and one of which is 1000ms in the future,
-    /// in the current time instant the future object is spatially above the current object, and therefore has a smaller value of the Y coordinate of its position.
-    /// </example>
-    private bool axisInverted => direction.Value == ScrollingDirection.Down || direction.Value == ScrollingDirection.Right;
-
-    /// <summary>
     /// A set of top-level <see cref="DrawableHitObject"/>s which have an up-to-date layout.
     /// </summary>
     private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
@@ -288,7 +274,8 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         else
         {
             double startProgress = traceLine.GetProgressFromTime(time, scrollingInfo);
-            traceLine.UpdatePosition(startProgress, traceLine.Path!.ForwardFirstCircleIntersection(startProgress, 300) ?? 1, null);
+            // traceLine.Path!.ForwardFirstCircleIntersection(startProgress, 300)
+            traceLine.UpdatePosition(startProgress, 1, null);
         }
     }
 }

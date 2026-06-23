@@ -35,12 +35,6 @@ public class GitarooBeatmapProcessor : BeatmapProcessor
                 t.StartTime <= hitObject.StartTime && t.EndTime >= hitObject.StartTime);
 
             hitObject.TraceLine = traceLine;
-
-            foreach (var nestedHitObject in hitObject.NestedHitObjects)
-            {
-                var nestedTraceLineHitObject = (TraceLineHitObject)nestedHitObject;
-                nestedTraceLineHitObject.TraceLine = traceLine;
-            }
         }
     }
 }

@@ -50,18 +50,21 @@ public class HoldNote : TraceLineHitObject, IHasDuration
         AddNested(Head = new HeadNote
         {
             StartTime = StartTime,
+            TraceLine = TraceLine,
             Samples = GetNodeSamples(0),
         });
 
         AddNested(Tail = new TailNote
         {
             StartTime = EndTime,
+            TraceLine = TraceLine,
             Samples = GetNodeSamples(NodeSamples.Count - 1),
         });
 
         AddNested(Body = new HoldNoteBody
         {
             StartTime = StartTime,
+            TraceLine = TraceLine,
         });
     }
 
