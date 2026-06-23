@@ -72,6 +72,8 @@ public static class TraceLineUtils
         var algorithm = scrollingInfo.Algorithm.Value;
         double timeRange = scrollingInfo.TimeRange.Value;
 
+        float totalLength = algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1000);
+        float cumulativeLength = 0;
         List<(double progress, float length)> segmentLengths = [];
 
         int startIndex = ControlPointInfo.BinarySearch(controlPoints, traceLineStartTime, EqualitySelection.Rightmost);
@@ -85,7 +87,10 @@ public static class TraceLineUtils
 
             double endTime = controlPoints.Count == 0 ? traceLineEndTime : controlPoints[0].Time;
 
-            segmentLengths.Add(new(0, algorithm.GetLength(traceLineStartTime, endTime, timeRange, 1000)));
+            float length = algorithm.GetLength(traceLineStartTime, endTime, timeRange, 1000);
+            segmentLengths.Add(new(0, length));
+
+            cumulativeLength += length;
         }
 
         for (int i = startIndex; i < controlPoints.Count; i++)
@@ -98,11 +103,14 @@ public static class TraceLineUtils
                 ? traceLineEndTime
                 : controlPoints[i + 1].Time;
 
-            segmentLengths.Add(new(segmentLengths.Count == 0 ? 0 : traceLine.GetProgressFromTime(controlPoints[i].Time, scrollingInfo), algorithm.GetLength(startTime, endTime, timeRange, 1000)));
+            float lenght = algorithm.GetLength(startTime, endTime, timeRange, 1000);
+            segmentLengths.Add(new(segmentLengths.Count == 0 ? 0 : cumulativeLength / totalLength, lenght));
+
+            cumulativeLength += lenght;
         }
 
         if (segmentLengths.Count == 0)
-            segmentLengths.Add((0, algorithm.GetLength(traceLineStartTime, traceLineEndTime, timeRange, 1000)));
+            segmentLengths.Add((0, totalLength));
 
         return segmentLengths;
     }
