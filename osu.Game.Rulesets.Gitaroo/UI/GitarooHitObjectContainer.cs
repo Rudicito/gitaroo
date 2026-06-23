@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Layout;
 using osu.Framework.Lists;
+using osu.Framework.Logging;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
@@ -177,7 +178,7 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
 
             case TraceLineHitObject traceLineHitObject:
                 double progress = traceLineHitObject.GetProgressFromTime(traceLineHitObject.StartTime, scrollingInfo);
-                double? lifetimeStartProgress = traceLineHitObject.TraceLine!.ConvertedPath.BackwardFirstCircleIntersection(progress, 100);
+                double? lifetimeStartProgress = traceLineHitObject.TraceLine!.ConvertedPath.BackwardFirstCircleIntersection(progress, 300);
 
                 if (lifetimeStartProgress == null)
                 {
@@ -250,6 +251,7 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
                     traceLineHitObject.UpdateOffsetPosition(startTimeProgress);
 
                     double currentProgress = traceLineHitObject.TraceLine.GetProgressFromTime(currentTime, scrollingInfo);
+                    Logger.Log($"{traceLineHitObject.Name}, {currentProgress}%");
                     traceLineHitObject.UpdateVisual(currentProgress);
                 }
 
@@ -274,8 +276,9 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         else
         {
             double startProgress = traceLine.GetProgressFromTime(time, scrollingInfo);
-            // traceLine.Path!.ForwardFirstCircleIntersection(startProgress, 300)
-            traceLine.UpdatePosition(startProgress, 1, null);
+            double? endProgress = traceLine.Path!.ForwardFirstCircleIntersection(startProgress, 300);
+            Logger.Log($"start: {startProgress}, end: {endProgress}");
+            traceLine.UpdatePosition(startProgress, endProgress ?? 1, null);
         }
     }
 }
