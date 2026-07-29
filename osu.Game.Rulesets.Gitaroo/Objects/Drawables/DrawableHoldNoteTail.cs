@@ -30,7 +30,7 @@ public partial class DrawableHoldNoteTail : DrawableNote
     {
         if (DrawableHoldNote.HitObject == null || DrawableHoldNote.TraceLine == null) return;
 
-        OffsetPosition = DrawableHoldNote.TraceLine.GetPositionWithProgress(DrawableHoldNote.PathEnd!.Value);
+        OffsetPosition = DrawableHoldNote.TraceLine.GetPositionWithProgress(DrawableHoldNote.PathEnd!.Value) - DrawableHoldNote.OffsetPosition;
     }
 
     public void UpdateResult() => base.UpdateResult(true);

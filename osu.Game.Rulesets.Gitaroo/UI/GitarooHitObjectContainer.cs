@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Layout;
 using osu.Framework.Lists;
-using osu.Framework.Logging;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
@@ -225,7 +224,7 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
 
         if (hitObject is DrawableTraceLine traceLine)
         {
-            traceLine.SliderBody.Refresh();
+            traceLine.Refresh();
         }
 
         foreach (var obj in hitObject.NestedHitObjects)
@@ -246,12 +245,10 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
                 if (traceLineHitObject.TraceLine != null)
                 {
                     double startTimeProgress = traceLineHitObject.TraceLine.GetProgressFromTime(traceLineHitObject.HitObject.StartTime, scrollingInfo);
-
                     //todo: Should not be called every frame
                     traceLineHitObject.UpdateOffsetPosition(startTimeProgress);
 
                     double currentProgress = traceLineHitObject.TraceLine.GetProgressFromTime(currentTime, scrollingInfo);
-                    Logger.Log($"{traceLineHitObject.Name}, {currentProgress}%");
                     traceLineHitObject.UpdateVisual(currentProgress);
                 }
 
@@ -277,7 +274,6 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         {
             double startProgress = traceLine.GetProgressFromTime(time, scrollingInfo);
             double? endProgress = traceLine.Path!.ForwardFirstCircleIntersection(startProgress, 300);
-            Logger.Log($"start: {startProgress}, end: {endProgress}");
             traceLine.UpdatePosition(startProgress, endProgress ?? 1, null);
         }
     }

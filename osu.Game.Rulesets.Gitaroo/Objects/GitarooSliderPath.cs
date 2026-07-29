@@ -524,6 +524,10 @@ public class GitarooSliderPath
         return p0 + (p1 - p0) * (float)w;
     }
 
+    //todo: All the methods in this region is AI generated because I'm too stupid to do the math here
+
+    #region Circle Intersection
+
     /// <summary>
     /// Returns the backward exit progress of a circle centered at centerProgress
     /// with a given radius.
@@ -532,34 +536,43 @@ public class GitarooSliderPath
     {
         ensureValid();
 
-        float r2 = radius * radius;
         double centerDistance = progressToDistance(centerProgress);
         Vector2 center = PositionAt(centerProgress);
+        float r2 = radius * radius;
 
-        int indexDistance = indexOfDistance(centerDistance);
+        int startIndex = indexOfDistance(centerDistance);
+        if (startIndex == 0) startIndex = 1;
+        if (startIndex >= calculatedPath.Count) startIndex = calculatedPath.Count - 1;
 
-        // Start of the path don't intersect with the circle
-        if ((calculatedPath[0] - center).LengthSquared < r2)
-            return null;
-
-        int i;
-        for (i = indexDistance; (calculatedPath[i] - center).LengthSquared < r2; i--) ;
-
-        // i is the first point NOT in the circle (going backward), i+1 is inside the circle.
-        // Interpolate between calculatedPath[i] (outside) and calculatedPath[i + 1] (inside)
-        // to find the exact crossing point.
-        if (i + 1 < calculatedPath.Count)
+        // Walk the segments physically BACKWARD starting from the center
+        for (int i = startIndex; i >= 1; i--)
         {
-            double? t = circleIntersectionParameter(calculatedPath[i], calculatedPath[i + 1], center, r2);
+            Vector2 p0 = calculatedPath[i - 1];
+            Vector2 p1 = calculatedPath[i];
 
-            if (t != null)
+            if (getSegmentCircleIntersections(p0, p1, center, r2, out float t1, out float t2))
             {
-                double interpolatedDistance = cumulativeLength[i] + t.Value * (cumulativeLength[i + 1] - cumulativeLength[i]);
-                return interpolatedDistance / Distance;
+                double d0 = cumulativeLength[i - 1];
+                double d1 = cumulativeLength[i];
+
+                double dist2 = d0 + Math.Clamp(t2, 0f, 1f) * (d1 - d0);
+                double dist1 = d0 + Math.Clamp(t1, 0f, 1f) * (d1 - d0);
+
+                // We're looking for the LARGEST distance that is less than or equal to the center
+                // t2 is always the farthest root, so we test it first
+                if (t2 >= -0.001f && t2 <= 1.001f && dist2 <= centerDistance + 0.001)
+                    return dist2 / Distance;
+
+                if (t1 >= -0.001f && t1 <= 1.001f && dist1 <= centerDistance + 0.001)
+                    return dist1 / Distance;
             }
         }
 
-        return cumulativeLength[i] / Distance;
+        // If the entire start of the path is contained within the circle
+        if ((calculatedPath[0] - center).LengthSquared < r2)
+            return null;
+
+        return 0; // Safe fallback
     }
 
     /// <summary>
@@ -570,73 +583,74 @@ public class GitarooSliderPath
     {
         ensureValid();
 
-        float r2 = radius * radius;
         double centerDistance = progressToDistance(centerProgress);
         Vector2 center = PositionAt(centerProgress);
+        float r2 = radius * radius;
 
-        int indexDistance = indexOfDistance(centerDistance);
+        int startIndex = indexOfDistance(centerDistance);
+        if (startIndex == 0) startIndex = 1;
 
-        // End of the path don't intersect with the circle
-        if ((calculatedPath[^1] - center).LengthSquared < r2)
-            return null;
-
-        int i;
-        for (i = indexDistance; (calculatedPath[i] - center).LengthSquared < r2; i++) ;
-
-        // i is the first point NOT in the circle (going forward), i-1 is inside the circle.
-        // Interpolate between calculatedPath[i - 1] (inside) and calculatedPath[i] (outside)
-        // to find the exact crossing point.
-        if (i - 1 >= 0)
+        // Walk the segments physically FORWARD starting from the center
+        for (int i = startIndex; i < calculatedPath.Count; i++)
         {
-            double? t = circleIntersectionParameter(calculatedPath[i - 1], calculatedPath[i], center, r2);
+            Vector2 p0 = calculatedPath[i - 1];
+            Vector2 p1 = calculatedPath[i];
 
-            if (t != null)
+            if (getSegmentCircleIntersections(p0, p1, center, r2, out float t1, out float t2))
             {
-                double interpolatedDistance = cumulativeLength[i - 1] + t.Value * (cumulativeLength[i] - cumulativeLength[i - 1]);
-                return interpolatedDistance / Distance;
+                double d0 = cumulativeLength[i - 1];
+                double d1 = cumulativeLength[i];
+
+                double dist1 = d0 + Math.Clamp(t1, 0f, 1f) * (d1 - d0);
+                double dist2 = d0 + Math.Clamp(t2, 0f, 1f) * (d1 - d0);
+
+                // We're looking for the SMALLEST distance that is greater than or equal to the center
+                // t1 is the closest root, so we test it first
+                if (t1 >= -0.001f && t1 <= 1.001f && dist1 >= centerDistance - 0.001)
+                    return dist1 / Distance;
+
+                if (t2 >= -0.001f && t2 <= 1.001f && dist2 >= centerDistance - 0.001)
+                    return dist2 / Distance;
             }
         }
 
-        return cumulativeLength[i] / Distance;
+        // If the entire end of the path is contained within the circle
+        if ((calculatedPath[^1] - center).LengthSquared < r2)
+            return null;
+
+        return 1; // Safe fallback
     }
 
     /// <summary>
-    /// Finds the parameter t in [0, 1] along the segment p0 -> p1 at which the segment
-    /// crosses a circle of squared radius r2 centered at <paramref name="center"/>.
-    /// Assumes one endpoint is inside the circle and the other is outside.
+    /// Computes the intersection ratios (t1, t2) between a segment and a circle.
+    /// Returns true if there is a geometric intersection. t1 is always less than or equal to t2.
     /// </summary>
-    private static double? circleIntersectionParameter(Vector2 p0, Vector2 p1, Vector2 center, float r2)
+    private bool getSegmentCircleIntersections(Vector2 p0, Vector2 p1, Vector2 center, float radiusSquared, out float t1, out float t2)
     {
         Vector2 d = p1 - p0;
         Vector2 f = p0 - center;
 
-        double a = d.LengthSquared;
+        float a = Vector2.Dot(d, d);
+        float b = 2 * Vector2.Dot(f, d);
+        float c = Vector2.Dot(f, f) - radiusSquared;
 
-        // Degenerate segment (p0 == p1); no meaningful interpolation possible.
-        if (Precision.AlmostEquals(a, 0))
-            return null;
+        float discriminant = b * b - 4 * a * c;
 
-        double b = 2 * Vector2.Dot(f, d);
-        double c = f.LengthSquared - r2;
+        if (discriminant < 0 || a == 0)
+        {
+            t1 = t2 = -1;
+            return false;
+        }
 
-        double discriminant = b * b - 4 * a * c;
+        discriminant = (float)Math.Sqrt(discriminant);
 
-        if (discriminant < 0)
-            return null;
+        // a is always positive (Dot(d,d)), so t1 <= t2 mathematically
+        t1 = (-b - discriminant) / (2 * a);
+        t2 = (-b + discriminant) / (2 * a);
 
-        double sqrtDiscriminant = Math.Sqrt(discriminant);
-
-        double t1 = (-b - sqrtDiscriminant) / (2 * a);
-        double t2 = (-b + sqrtDiscriminant) / (2 * a);
-
-        // Prefer the smaller root that lies within [0, 1], since that corresponds
-        // to the first crossing along the segment in the direction p0 -> p1.
-        if (t1 >= 0 && t1 <= 1)
-            return t1;
-        if (t2 >= 0 && t2 <= 1)
-            return t2;
-
-        return null;
+        return true;
     }
+
+    #endregion
 }
 

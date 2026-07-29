@@ -217,8 +217,7 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     {
         if (TraceLine?.HitObject == null) return;
 
-        UpdateVisual(progress);
-        OffsetPosition = TraceLine.GetPositionWithProgress(progress) - SliderBody.PathOffset;
+        OffsetPosition = TraceLine.GetPositionWithProgress(progress) - SliderBody.PathStartOffset;
 
         Head.UpdateOffsetPosition(progress);
         Tail.UpdateOffsetPosition(progress);
@@ -232,7 +231,12 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
-        SliderBody.UpdateProgress(Math.Clamp(progress, PathStart!.Value, PathEnd!.Value), PathEnd!.Value);
+        double traceLineEnd = TraceLine.SnakingEndProgress!.Value;
+
+        double start = Math.Clamp(progress, PathStart!.Value, PathEnd!.Value);
+        double end = Math.Min(traceLineEnd, PathEnd!.Value);
+
+        SliderBody.UpdateProgress(start, end);
     }
 
     protected override void OnApply()

@@ -20,8 +20,6 @@ public class HoldNote : TraceLineHitObject, IHasDuration
 
     public double Duration { get; set; }
 
-    public double VelocityMultiplier { get; set; } = 1;
-
     public IList<IList<HitSampleInfo>>? NodeSamples { get; set; }
 
     /// <summary>

@@ -43,7 +43,12 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     public double? PathStart { get; set; } = 0;
     public double? PathEnd { get; set; } = 1;
 
-    public DefaultTraceLineBody SliderBody = null!;
+    public double? SnakingStartProgress => sliderBody.SnakedStart;
+    public double? SnakingEndProgress => sliderBody.SnakedEnd;
+
+    private DefaultTraceLineBody sliderBody = null!;
+
+    public void Refresh() => sliderBody.Refresh();
 
     [Resolved]
     private IGitarooScrollingInfo scrolling { get; set; } = null!;
@@ -53,7 +58,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
         AddRangeInternal(new Drawable[]
         {
-            SliderBody = new DefaultTraceLineBody(),
+            sliderBody = new DefaultTraceLineBody(),
         });
     }
 
@@ -61,7 +66,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
         if (HitObject == null) return;
 
-        Size = SliderBody.Size;
+        Size = sliderBody.Size;
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
@@ -74,9 +79,9 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
 
             if (AngleStart != null)
             {
-                SliderBody.UpdateProgress(0, endProgress);
+                sliderBody.UpdateProgress(0, endProgress);
 
-                offset = -SliderBody.PathOffset;
+                offset = -sliderBody.PathOffset;
 
                 Position = AngleUtils.MovePoint(offset, AngleStart.Value, length.Value);
             }
@@ -89,9 +94,9 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
 
             Direction = Path!.AngleAtProgress((float)startProgress);
 
-            SliderBody.UpdateProgress(startProgress, endProgress);
+            sliderBody.UpdateProgress(startProgress, endProgress);
 
-            offset = -SliderBody.PathOffset;
+            offset = -sliderBody.PathOffset;
 
             Position = offset;
         }
@@ -100,7 +105,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         {
             Direction = null;
 
-            SliderBody.UpdateProgress(1);
+            sliderBody.UpdateProgress(1);
         }
     }
 
@@ -137,7 +142,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     public override void OnKilled()
     {
         base.OnKilled();
-        SliderBody.RecyclePath();
+        sliderBody.RecyclePath();
     }
 
     protected override void UpdateHitStateTransforms(ArmedState state)
@@ -156,7 +161,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         if (HitObject == null) return Vector2.Zero;
 
         var pathPosition = Path!.PositionAt(progress);
-        var positionInBoundingBox = SliderBody.GetPositionInBoundingBox(pathPosition);
+        var positionInBoundingBox = sliderBody.GetPositionInBoundingBox(pathPosition);
 
         return positionInBoundingBox;
     }
