@@ -38,6 +38,11 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         return base.Compare(x, y);
     }
 
+    /// <summary>
+    /// The lenght of the TraceLine we can see, based on the beatmap AR (maybe).
+    /// </summary>
+    public float LenghtVisualisation = 300;
+
     private readonly IBindable<double> timeRange = new BindableDouble();
     private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
     private readonly IBindable<IScrollAlgorithm> algorithm = new Bindable<IScrollAlgorithm>();
@@ -242,23 +247,28 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         switch (hitObject)
         {
             case DrawableTraceLineHitObject traceLineHitObject:
-                if (traceLineHitObject.TraceLine != null)
-                {
-                    double startTimeProgress = traceLineHitObject.TraceLine.GetProgressFromTime(traceLineHitObject.HitObject.StartTime, scrollingInfo);
-                    //todo: Should not be called every frame
-                    traceLineHitObject.UpdateOffsetPosition(startTimeProgress);
-
-                    double currentProgress = traceLineHitObject.TraceLine.GetProgressFromTime(currentTime, scrollingInfo);
-                    traceLineHitObject.UpdateVisual(currentProgress);
-                }
-
-                traceLineHitObject.UpdatePosition();
+                updateTraceLineHitObjectPosition(traceLineHitObject, currentTime);
                 break;
 
             case DrawableTraceLine traceLine:
-                updateTraceLinePosition(traceLine, Time.Current);
+                updateTraceLinePosition(traceLine, currentTime);
                 break;
         }
+    }
+
+    private void updateTraceLineHitObjectPosition(DrawableTraceLineHitObject traceLineHitObject, double time)
+    {
+        if (traceLineHitObject.TraceLine != null)
+        {
+            double startTimeProgress = traceLineHitObject.TraceLine.GetProgressFromTime(traceLineHitObject.HitObject.StartTime, scrollingInfo);
+            //todo: Should not be called every frame
+            traceLineHitObject.UpdateOffsetPosition(startTimeProgress);
+
+            double currentProgress = traceLineHitObject.TraceLine.GetProgressFromTime(time, scrollingInfo);
+            traceLineHitObject.UpdateVisual(currentProgress);
+        }
+
+        traceLineHitObject.UpdatePosition();
     }
 
     private void updateTraceLinePosition(DrawableTraceLine traceLine, double time)
@@ -268,12 +278,13 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
         if (time < traceLine.HitObject.StartTime)
         {
             float lenght = algorithm.Value.GetLength(time, traceLine.HitObject.StartTime, timeRange.Value, 1000);
-            traceLine.UpdatePosition(0, 1, lenght);
+            double? endProgress = traceLine.Path!.ForwardFirstCircleIntersection(0, Math.Max(LenghtVisualisation - lenght, 0));
+            traceLine.UpdatePosition(0, endProgress ?? 1, lenght);
         }
         else
         {
             double startProgress = traceLine.GetProgressFromTime(time, scrollingInfo);
-            double? endProgress = traceLine.Path!.ForwardFirstCircleIntersection(startProgress, 300);
+            double? endProgress = traceLine.Path!.ForwardFirstCircleIntersection(startProgress, LenghtVisualisation);
             traceLine.UpdatePosition(startProgress, endProgress ?? 1, null);
         }
     }

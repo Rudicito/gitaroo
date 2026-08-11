@@ -66,6 +66,8 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     {
         if (HitObject == null) return;
 
+        Alpha = Math.Abs(startProgress - endProgress) < 0.0001 ? 0 : 1;
+
         Size = sliderBody.Size;
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
