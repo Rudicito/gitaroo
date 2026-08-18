@@ -35,30 +35,30 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
     protected override Beatmap<GitarooHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
     {
-        var beatmap = (GitarooBeatmap)base.ConvertBeatmap(original, cancellationToken);
+        var converted = (GitarooBeatmap)base.ConvertBeatmap(original, cancellationToken);
 
         if (!isForCurrentRuleset)
         {
-            beatmap.HitObjects.AddRange(generateTraceLine(beatmap));
+            converted.HitObjects.AddRange(generateTraceLine(converted));
         }
 
         // Can be more optimized?
-        beatmap.HitObjects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
+        converted.HitObjects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
+
+        // Post processing step to transform standard slider velocity changes into scroll speed changes
+        // Copied from TaikoBeatmapConverter
+        double lastScrollSpeed = 1;
 
         foreach (HitObject hitObject in original.HitObjects)
         {
-            // Post processing step to transform standard slider velocity changes into scroll speed changes
-            // Copied from TaikoBeatmapConverter
-            double lastScrollSpeed = 1;
-
             if (hitObject is not IHasSliderVelocity hasSliderVelocity) continue;
 
             double nextScrollSpeed = hasSliderVelocity.SliderVelocityMultiplier;
-            EffectControlPoint currentEffectPoint = beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime);
+            EffectControlPoint currentEffectPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
 
             if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
             {
-                beatmap.ControlPointInfo.Add(hitObject.StartTime, new EffectControlPoint
+                converted.ControlPointInfo.Add(hitObject.StartTime, new EffectControlPoint
                 {
                     KiaiMode = currentEffectPoint.KiaiMode,
                     ScrollSpeed = lastScrollSpeed = nextScrollSpeed,
@@ -66,7 +66,7 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
             }
         }
 
-        return beatmap;
+        return converted;
     }
 
     protected override IEnumerable<GitarooHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
