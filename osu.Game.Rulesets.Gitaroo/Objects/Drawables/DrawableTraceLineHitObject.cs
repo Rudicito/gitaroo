@@ -1,6 +1,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
@@ -10,6 +11,9 @@ namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 /// </summary>
 public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
 {
+    public double? TraceLineProgressStart;
+    public double? TraceLineProgressEnd;
+
     public DrawableTraceLineHitObject(TraceLineHitObject? hitObject)
         : base(hitObject)
     {
@@ -54,12 +58,26 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
         Position = TraceLine.Position + OffsetPosition;
     }
 
-    public virtual void UpdateOffsetPosition(double progress)
+    public virtual void UpdateOffsetPosition()
     {
     }
 
-    public virtual void UpdateVisual(double progress)
+    public virtual void UpdateVisual(double traceLineProgress)
     {
+        if (TraceLine?.SnakingEndProgress == null) return;
+
+        double traceLineEnd = TraceLine.SnakingEndProgress.Value;
+
+        // Don't show the HitObject if the TraceLine point where the HitObject start is not shown
+
+        // Only hide/show in Idle state to not alter UpdateHitStateTransforms() animation
+        if (State.Value == ArmedState.Idle)
+        {
+            if (TraceLineProgressStart > traceLineEnd)
+                Hide();
+            else
+                Show();
+        }
     }
 
     /// <summary>
@@ -75,13 +93,25 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
     protected override void OnApply()
     {
         base.OnApply();
-        if (UseTraceLine)
-            TraceLine = GetTraceLine!(HitObject!.StartTime);
+
+        if (!UseTraceLine) return;
+
+        TraceLine = GetTraceLine!(HitObject!.StartTime);
+
+        TraceLineProgressStart = TraceLine!.GetProgressFromTime(HitObject.StartTime);
+
+        if (HitObject is IHasDuration objectWithDuration)
+            TraceLineProgressEnd = TraceLine!.GetProgressFromTime(objectWithDuration.EndTime);
+        else
+            TraceLineProgressEnd = null;
     }
 
     protected override void OnFree()
     {
         base.OnFree();
+
+        TraceLineProgressStart = null;
+        TraceLineProgressEnd = null;
         TraceLine = null;
     }
 }

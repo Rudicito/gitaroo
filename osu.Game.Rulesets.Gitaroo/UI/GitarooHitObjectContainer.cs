@@ -260,12 +260,11 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
     {
         if (traceLineHitObject.TraceLine != null)
         {
-            double startTimeProgress = traceLineHitObject.TraceLine.GetProgressFromTime(traceLineHitObject.HitObject.StartTime, scrollingInfo);
             //todo: Should not be called every frame
-            traceLineHitObject.UpdateOffsetPosition(startTimeProgress);
+            traceLineHitObject.UpdateOffsetPosition();
 
-            double currentProgress = traceLineHitObject.TraceLine.GetProgressFromTime(time, scrollingInfo);
-            traceLineHitObject.UpdateVisual(currentProgress);
+            double traceLineProgress = traceLineHitObject.TraceLine.GetProgressFromTime(time, scrollingInfo);
+            traceLineHitObject.UpdateVisual(traceLineProgress);
         }
 
         traceLineHitObject.UpdatePosition();

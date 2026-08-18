@@ -213,18 +213,20 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         Tail.UpdatePosition();
     }
 
-    public override void UpdateOffsetPosition(double progress)
+    public override void UpdateOffsetPosition()
     {
         if (TraceLine?.HitObject == null) return;
 
-        OffsetPosition = TraceLine.GetPositionWithProgress(progress) - SliderBody.PathStartOffset;
+        OffsetPosition = TraceLine.GetPositionWithProgress(TraceLineProgressStart!.Value) - SliderBody.PathStartOffset;
 
-        Head.UpdateOffsetPosition(progress);
-        Tail.UpdateOffsetPosition(progress);
+        Head.UpdateOffsetPosition();
+        Tail.UpdateOffsetPosition();
     }
 
-    public override void UpdateVisual(double progress)
+    public override void UpdateVisual(double traceLineProgress)
     {
+        base.UpdateVisual(traceLineProgress);
+
         if (TraceLine?.HitObject == null) return;
 
         Size = SliderBody.Size;
@@ -233,8 +235,8 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
         double traceLineEnd = TraceLine.SnakingEndProgress!.Value;
 
-        double start = Math.Clamp(progress, PathStart!.Value, PathEnd!.Value);
-        double end = Math.Min(traceLineEnd, PathEnd!.Value);
+        double start = Math.Clamp(traceLineProgress, PathStart!.Value, PathEnd!.Value);
+        double end = TraceLineProgressStart > traceLineEnd ? start : Math.Min(traceLineEnd, PathEnd!.Value);
 
         SliderBody.UpdateProgress(start, end);
     }
