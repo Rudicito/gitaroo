@@ -15,7 +15,7 @@ public partial class CenterCircle : Circle, IKeyBindingHandler<GitarooAction>
 
     private const double expand_duration = 400;
 
-    private readonly ColourInfo notPressedColor = new ColourInfo
+    private static readonly ColourInfo not_pressed_color = new ColourInfo
     {
         TopLeft = new Color4(183, 115, 229, byte.MaxValue),
         TopRight = new Color4(65, 97, 225, byte.MaxValue),
@@ -24,7 +24,7 @@ public partial class CenterCircle : Circle, IKeyBindingHandler<GitarooAction>
         HasSingleColour = false
     };
 
-    private readonly ColourInfo pressedColor = new ColourInfo
+    private static readonly ColourInfo pressed_color = new ColourInfo
     {
         TopLeft = new Color4(182, 0, 228, byte.MaxValue),
         TopRight = new Color4(68, 0, 232, byte.MaxValue),
@@ -33,8 +33,8 @@ public partial class CenterCircle : Circle, IKeyBindingHandler<GitarooAction>
         HasSingleColour = false
     };
 
-    private readonly Color4 borderNotPressedColor = new Color4(34, 43, 117, byte.MaxValue);
-    private readonly Color4 borderPressedColor = new Color4(52, 9, 121, byte.MaxValue);
+    private static readonly Color4 border_not_pressed_color = new Color4(34, 43, 117, byte.MaxValue);
+    private static readonly Color4 border_pressed_color = new Color4(52, 9, 121, byte.MaxValue);
 
     private const float not_pressed_scale = 1f;
     private const float pressed_scale = 1.15f;
@@ -44,24 +44,24 @@ public partial class CenterCircle : Circle, IKeyBindingHandler<GitarooAction>
         Anchor = Anchor.Centre;
         Origin = Anchor.Centre;
         Size = new Vector2(25);
-        Colour = notPressedColor;
+        Colour = not_pressed_color;
         Masking = true;
         BorderThickness = 2.625f;
-        BorderColour = borderNotPressedColor;
+        BorderColour = border_not_pressed_color;
     }
 
     internal void UpdateCircle(int downCount)
     {
         if (downCount > 0)
         {
-            Colour = pressedColor;
-            BorderColour = borderPressedColor;
+            Colour = pressed_color;
+            BorderColour = border_pressed_color;
             expand();
         }
         else
         {
-            Colour = notPressedColor;
-            BorderColour = borderNotPressedColor;
+            Colour = not_pressed_color;
+            BorderColour = border_not_pressed_color;
             contract();
         }
     }
