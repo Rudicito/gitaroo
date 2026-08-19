@@ -182,7 +182,7 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
 
             case TraceLineHitObject traceLineHitObject:
                 double progress = traceLineHitObject.GetProgressFromTime(traceLineHitObject.StartTime, scrollingInfo);
-                double? lifetimeStartProgress = traceLineHitObject.TraceLine!.ConvertedPath.BackwardFirstCircleIntersection(progress, 300);
+                double? lifetimeStartProgress = traceLineHitObject.TraceLine!.ConvertedPath.BackwardFirstCircleIntersection(progress, LenghtVisualisation);
 
                 if (lifetimeStartProgress == null)
                 {
