@@ -129,7 +129,7 @@ public partial class GitarooPlayfield : Playfield
     /// - <see cref="FanShapedManager.Tracking"/> ensures the player is tracking the <see cref="DrawableTraceLine"/>
     /// - <see cref="OrderedHitPolicy.IsHittable"/> ensures only the most recent hit object can be hit (note lock)
     /// </remarks>
-    public bool IsHittable(DrawableHitObject hitObject, double time) => FanShaped.Tracking && hitPolicy.IsHittable(hitObject, time);
+    public bool IsHittable(DrawableTraceLineHitObject hitObject, double time) => FanShaped.Tracking && hitPolicy.IsHittable(hitObject, time);
 
     public bool CheckFanShaped() => FanShaped.Tracking;
 

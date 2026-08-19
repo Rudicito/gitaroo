@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
@@ -36,19 +35,19 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     /// <summary>
     /// The progress start of the HoldNote in the TraceLine SliderBody
     /// </summary>
-    public double? PathStart { get; set; }
+    public double? PathStart => TraceLineProgressStart;
 
     /// <summary>
     /// The progress end of the HoldNote in the TraceLine SliderBody
     /// </summary>
-    public double? PathEnd { get; set; }
+    public double? PathEnd => TraceLineProgressEnd;
 
     public PlaySliderBody SliderBody = null!;
 
     /// <summary>
     /// The Path of the related TraceLine
     /// </summary>
-    public SliderPath? Path { get; set; }
+    public GitarooSliderPath? Path { get; set; }
 
     public IBindable<int> PathVersion => pathVersion;
     private readonly Bindable<int> pathVersion = new Bindable<int>();
@@ -102,8 +101,6 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         {
             startHoldState(holdKey!.Value);
         }
-
-        UpdateVisual();
     }
 
     protected override JudgementResult CreateResult(Judgement judgement) => new HoldNoteJudgementResult(HitObject!, judgement);
@@ -208,27 +205,40 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
             Result.ReportHoldState(Time.Current, false);
     }
 
+    public override void UpdatePosition()
+    {
+        base.UpdatePosition();
+
+        Head.UpdatePosition();
+        Tail.UpdatePosition();
+    }
+
     public override void UpdateOffsetPosition()
     {
         if (TraceLine?.HitObject == null) return;
 
-        double start = TraceLine.GetProgressWithTime(HitObject!.StartTime, PathStart!.Value, PathEnd!.Value);
-        SliderBody.UpdateProgress(start, PathEnd!.Value);
+        OffsetPosition = TraceLine.GetPositionWithProgress(TraceLineProgressStart!.Value) - SliderBody.PathStartOffset;
 
-        OffsetPosition = TraceLine.GetPositionWithProgress(start) - SliderBody.PathOffset;
+        Head.UpdateOffsetPosition();
+        Tail.UpdateOffsetPosition();
     }
 
-    protected void UpdateVisual()
+    public override void UpdateVisual(double traceLineProgress)
     {
+        base.UpdateVisual(traceLineProgress);
+
         if (TraceLine?.HitObject == null) return;
-        if (Path == null) return;
 
         Size = SliderBody.Size;
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
-        double start = TraceLine.GetProgressWithTime(Time.Current, PathStart!.Value, PathEnd!.Value);
-        SliderBody.UpdateProgress(start, PathEnd!.Value);
+        double traceLineEnd = TraceLine.SnakingEndProgress!.Value;
+
+        double start = Math.Clamp(traceLineProgress, TraceLineProgressStart!.Value, TraceLineProgressEnd!.Value);
+        double end = TraceLineProgressStart > traceLineEnd ? start : Math.Min(traceLineEnd, TraceLineProgressEnd!.Value);
+
+        SliderBody.UpdateProgress(start, end);
     }
 
     protected override void OnApply()
@@ -239,9 +249,6 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
         Path = TraceLine.Path;
 
-        PathStart = (HitObject!.StartTime - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration;
-        PathEnd = (HitObject!.EndTime - TraceLine.HitObject.StartTime) / TraceLine.HitObject.Duration;
-
         // Ensure that the version will change after the upcoming BindTo().
         pathVersion.Value = int.MaxValue;
         PathVersion.BindTo(Path?.Version);
@@ -251,12 +258,10 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     {
         base.OnFree();
 
+        //todo: can crash if no TraceLine
         PathVersion.UnbindFrom(Path?.Version!);
 
         Path = null;
-
-        PathStart = null;
-        PathEnd = null;
     }
 
     public override void OnKilled()
@@ -323,53 +328,6 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     {
         if (AllJudged)
             Expire();
-    }
-
-    //todo: Methods copied from DrawableTraceLine
-
-    /// <summary>
-    /// Get the position along the path of the <see cref="DrawableHoldNote"/> at a specific point in time.
-    /// </summary>
-    /// <param name="time">The time at which to calculate the position.</param>
-    /// <param name="minProgress">The minimum progress value to clamp to (default is 0).</param>
-    /// <param name="maxProgress">The maximum progress value to clamp to (default is 1).</param>
-    /// <returns>The position along the path of the <see cref="DrawableHoldNote"/>.</returns>
-    public Vector2 GetPositionWithTime(double time, double minProgress = 0, double maxProgress = 1)
-    {
-        if (HitObject == null) return Vector2.Zero;
-
-        double traceLineProgress = GetProgressWithTime(time, minProgress, maxProgress);
-
-        return GetPositionWithProgress(traceLineProgress);
-    }
-
-    /// <summary>
-    /// Get the progress of the <see cref="DrawableHoldNote"/> at a specific point in time.
-    /// </summary>
-    /// <param name="time">The time at which to calculate the progress.</param>
-    /// <param name="minProgress">The minimum progress value to clamp to (default is 0).</param>
-    /// <param name="maxProgress">The maximum progress value to clamp to (default is 1).</param>
-    /// <returns>The progress of the <see cref="DrawableHoldNote"/>, by default between 0 and 1.</returns>
-    public double GetProgressWithTime(double time, double minProgress = 0, double maxProgress = 1)
-    {
-        if (HitObject == null) return 0;
-
-        return Math.Clamp((time - HitObject.StartTime) / HitObject.Duration, minProgress, maxProgress);
-    }
-
-    /// <summary>
-    /// Get the position along the path of the <see cref="DrawableHoldNote"/> with the specific progress.
-    /// </summary>
-    /// <param name="progress">The progress value used to get the position</param>
-    /// <returns>The position along the path of the <see cref="DrawableHoldNote"/></returns>
-    public Vector2 GetPositionWithProgress(double progress)
-    {
-        if (HitObject == null) return Vector2.Zero;
-
-        var pathPosition = Path!.PositionAt(progress);
-        var positionInBoundingBox = SliderBody.GetPositionInBoundingBox(pathPosition);
-
-        return positionInBoundingBox;
     }
 
     public bool IsActive => HitObject != null && Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime;

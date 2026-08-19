@@ -19,7 +19,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
 [Cached]
-public partial class DrawableGitarooRuleset : DrawableRuleset<GitarooHitObject>
+public partial class DrawableGitarooRuleset : DrawableCustomScrollingRuleset<GitarooHitObject>
 {
     public new GitarooInputManager KeyBindingInputManager => (GitarooInputManager)base.KeyBindingInputManager;
 
@@ -27,9 +27,12 @@ public partial class DrawableGitarooRuleset : DrawableRuleset<GitarooHitObject>
 
     protected new GitarooRulesetConfigManager Config => (GitarooRulesetConfigManager)base.Config;
 
+    protected override bool UserScrollSpeedAdjustment => false;
+
     public DrawableGitarooRuleset(GitarooRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
         : base(ruleset, beatmap, mods)
     {
+        TimeRange.Value = 7500;
     }
 
     protected override Playfield CreatePlayfield() => new GitarooPlayfield();

@@ -9,7 +9,6 @@ public partial class TestSceneHitObjects : DrawableGitarooRulesetTestScene
     {
         base.LoadComplete();
 
-        AddSliderStep("TraceLine Velocity", 0.1, 1, DEFAULT_TRACE_LINE_VELOCITY, v => TraceLineVelocity = v);
         AddSliderStep("Spawn delay", 0, 5000, DEFAULT_DELAY, v => Delay = v);
     }
 

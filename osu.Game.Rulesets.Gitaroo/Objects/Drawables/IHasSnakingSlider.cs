@@ -1,5 +1,4 @@
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 
@@ -11,7 +10,7 @@ public interface IHasSnakingSlider
     /// <summary>
     /// The path associated with the DrawableHitObject.
     /// </summary>
-    SliderPath? Path { get; }
+    GitarooSliderPath? Path { get; }
 
     /// <summary>
     /// The Version of the <see cref="Path"/>
@@ -21,10 +20,10 @@ public interface IHasSnakingSlider
     /// <summary>
     /// The start of the <see cref="Path"/>
     /// </summary>
-    double? PathStart { get; set; }
+    double? PathStart { get; }
 
     /// <summary>
     /// The end of the <see cref="Path"/>
     /// </summary>
-    double? PathEnd { get; set; }
+    double? PathEnd { get; }
 }

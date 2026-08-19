@@ -3,8 +3,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Gitaroo.Skinning.Default;
+using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
 using osu.Game.Rulesets.Gitaroo.Utils;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
@@ -35,7 +35,7 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     /// </summary>
     public float? Direction { get; private set; }
 
-    public SliderPath? Path => HitObject?.Path;
+    public GitarooSliderPath? Path => HitObject?.ConvertedPath;
 
     public IBindable<int> PathVersion => pathVersion;
     private readonly Bindable<int> pathVersion = new Bindable<int>();
@@ -43,70 +43,71 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     public double? PathStart { get; set; } = 0;
     public double? PathEnd { get; set; } = 1;
 
-    public DefaultTraceLineBody SliderBody = null!;
+    public double? SnakingStartProgress => sliderBody.SnakedStart;
+    public double? SnakingEndProgress => sliderBody.SnakedEnd;
+
+    private DefaultTraceLineBody sliderBody = null!;
+
+    public void Refresh() => sliderBody.Refresh();
+
+    [Resolved]
+    private IGitarooScrollingInfo scrolling { get; set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load()
     {
         AddRangeInternal(new Drawable[]
         {
-            SliderBody = new DefaultTraceLineBody(),
+            sliderBody = new DefaultTraceLineBody(),
         });
     }
 
-    protected override void Update()
-    {
-        base.Update();
-
-        UpdatePosition();
-    }
-
-    protected void UpdatePosition()
+    public void UpdatePosition(double startProgress, double endProgress, float? length)
     {
         if (HitObject == null) return;
 
-        Size = SliderBody.Size;
+        Alpha = Math.Abs(startProgress - endProgress) < 0.0001 ? 0 : 1;
+
+        Size = sliderBody.Size;
         Anchor = Anchor.Centre;
         Origin = Anchor.TopLeft;
 
         Vector2 offset;
 
-        // Move the TraceLine current progression to the center
-        if (Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime)
-        {
-            SetCurrentTraceLine!(this);
-
-            double completionProgress = (Time.Current - HitObject.StartTime) / HitObject.Duration;
-
-            Direction = Path!.AngleAtProgress((float)completionProgress);
-
-            SliderBody.UpdateProgress(completionProgress);
-
-            offset = -SliderBody.PathOffset;
-
-            Position = offset;
-        }
-
         // Move the TraceLine towards the center
-        else if (Time.Current < HitObject.StartTime)
+        if (length != null)
         {
             Direction = null;
 
             if (AngleStart != null)
             {
-                SliderBody.UpdateProgress(0);
+                sliderBody.UpdateProgress(0, endProgress);
 
-                offset = -SliderBody.PathOffset;
+                offset = -sliderBody.PathOffset;
 
-                Position = AngleUtils.MovePoint(offset, AngleStart.Value, (float)(HitObject.Velocity * (HitObject.StartTime - Time.Current)));
+                Position = AngleUtils.MovePoint(offset, AngleStart.Value, length.Value);
             }
         }
 
-        else if (Time.Current > HitObject.EndTime)
+        // Move the TraceLine current progression to the center
+        else if (startProgress < 1)
+        {
+            SetCurrentTraceLine!(this);
+
+            Direction = Path!.AngleAtProgress((float)startProgress);
+
+            sliderBody.UpdateProgress(startProgress, endProgress);
+
+            offset = -sliderBody.PathOffset;
+
+            Position = offset;
+        }
+
+        else
         {
             Direction = null;
 
-            SliderBody.UpdateProgress(1);
+            sliderBody.UpdateProgress(1);
         }
     }
 
@@ -143,43 +144,13 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
     public override void OnKilled()
     {
         base.OnKilled();
-        SliderBody.RecyclePath();
+        sliderBody.RecyclePath();
     }
 
     protected override void UpdateHitStateTransforms(ArmedState state)
     {
         using (BeginAbsoluteSequence(HitObject!.EndTime))
             Expire();
-    }
-
-    /// <summary>
-    /// Get the position along the path of the <see cref="DrawableTraceLine"/> at a specific point in time.
-    /// </summary>
-    /// <param name="time">The time at which to calculate the position.</param>
-    /// <param name="minProgress">The minimum progress value to clamp to (default is 0).</param>
-    /// <param name="maxProgress">The maximum progress value to clamp to (default is 1).</param>
-    /// <returns>The position along the path of the <see cref="DrawableTraceLine"/>.</returns>
-    public Vector2 GetPositionWithTime(double time, double minProgress = 0, double maxProgress = 1)
-    {
-        if (HitObject == null) return Vector2.Zero;
-
-        double traceLineProgress = GetProgressWithTime(time, minProgress, maxProgress);
-
-        return GetPositionWithProgress(traceLineProgress);
-    }
-
-    /// <summary>
-    /// Get the progress of the <see cref="DrawableTraceLine"/> at a specific point in time.
-    /// </summary>
-    /// <param name="time">The time at which to calculate the progress.</param>
-    /// <param name="minProgress">The minimum progress value to clamp to (default is 0).</param>
-    /// <param name="maxProgress">The maximum progress value to clamp to (default is 1).</param>
-    /// <returns>The progress of the <see cref="DrawableTraceLine"/>, by default between 0 and 1.</returns>
-    public double GetProgressWithTime(double time, double minProgress = 0, double maxProgress = 1)
-    {
-        if (HitObject == null) return 0;
-
-        return Math.Clamp((time - HitObject.StartTime) / HitObject.Duration, minProgress, maxProgress);
     }
 
     /// <summary>
@@ -192,8 +163,10 @@ public partial class DrawableTraceLine : DrawableGitarooHitObject<TraceLine>, IH
         if (HitObject == null) return Vector2.Zero;
 
         var pathPosition = Path!.PositionAt(progress);
-        var positionInBoundingBox = SliderBody.GetPositionInBoundingBox(pathPosition);
+        var positionInBoundingBox = sliderBody.GetPositionInBoundingBox(pathPosition);
 
         return positionInBoundingBox;
     }
+
+    public double GetProgressFromTime(double time) => this.GetProgressFromTime(time, scrolling);
 }

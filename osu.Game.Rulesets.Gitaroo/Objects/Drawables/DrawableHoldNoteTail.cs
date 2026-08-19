@@ -28,9 +28,9 @@ public partial class DrawableHoldNoteTail : DrawableNote
 
     public override void UpdateOffsetPosition()
     {
-        if (DrawableHoldNote.HitObject == null) return;
+        if (DrawableHoldNote.HitObject == null || DrawableHoldNote.TraceLine == null) return;
 
-        OffsetPosition = DrawableHoldNote.GetPositionWithProgress(DrawableHoldNote.PathEnd!.Value);
+        OffsetPosition = DrawableHoldNote.TraceLine.GetPositionWithProgress(DrawableHoldNote.PathEnd!.Value) - DrawableHoldNote.OffsetPosition;
     }
 
     public void UpdateResult() => base.UpdateResult(true);

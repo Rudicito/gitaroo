@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -7,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Gitaroo.Objects;
 using osu.Game.Rulesets.Gitaroo.UI;
+using osu.Game.Rulesets.Gitaroo.UI.Scrolling;
 using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -67,9 +69,6 @@ public abstract partial class DrawableGitarooRulesetTestScene : TestSceneOsuGita
     public const double DEFAULT_DELAY = 1000;
     public double Delay = DEFAULT_DELAY;
 
-    public const double DEFAULT_TRACE_LINE_VELOCITY = 0.2;
-    public double TraceLineVelocity = DEFAULT_TRACE_LINE_VELOCITY;
-
     public readonly SliderPath BezierPath = new SliderPath(PathType.BEZIER, new[]
     {
         Vector2.Zero,
@@ -110,19 +109,17 @@ public abstract partial class DrawableGitarooRulesetTestScene : TestSceneOsuGita
         });
     }
 
-    protected void AddTraceLine(double start, double end, SliderPath sliderPath, double? velocity = null)
+    protected void AddTraceLine(double start, double end, SliderPath sliderPath)
     {
-        velocity ??= TraceLineVelocity;
-
         var traceLine = new TraceLine
         {
             StartTime = CurrentTime + start + Delay,
             EndTime = CurrentTime + end + Delay,
-            Velocity = velocity.Value,
             Path = sliderPath
         };
 
-        traceLine.ScaleToExpectedDistance();
+        IGitarooScrollingInfo scrollingInfo = (IGitarooScrollingInfo)DrawableRuleset.Dependencies.Get(typeof(IGitarooScrollingInfo));
+        traceLine.ComputePath(scrollingInfo);
 
         Add(traceLine);
     }
@@ -133,6 +130,20 @@ public abstract partial class DrawableGitarooRulesetTestScene : TestSceneOsuGita
         var difficulty = new BeatmapDifficulty();
 
         hitObject.ApplyDefaults(cpi, difficulty);
+
+        if (hitObject is TraceLineHitObject traceLineHitObject)
+        {
+            var traceLine = (TraceLine?)DrawableRuleset.Playfield.HitObjectContainer.Entries.FirstOrDefault(e
+                => e.HitObject is TraceLine t && t.StartTime <= hitObject.StartTime && t.EndTime >= hitObject.StartTime)?.HitObject ?? null;
+
+            traceLineHitObject.TraceLine = traceLine;
+
+            foreach (var nestedHitObject in traceLineHitObject.NestedHitObjects)
+            {
+                var nestedTraceLineHitObject = (TraceLineHitObject)nestedHitObject;
+                nestedTraceLineHitObject.TraceLine = traceLine;
+            }
+        }
 
         DrawableRuleset.Playfield.Add(hitObject);
     }

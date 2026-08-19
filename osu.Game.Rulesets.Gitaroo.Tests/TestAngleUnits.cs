@@ -3,7 +3,8 @@ using osu.Game.Rulesets.Gitaroo.Utils;
 
 namespace osu.Game.Rulesets.Gitaroo.Tests;
 
-public partial class TestAngleUnits : TestSceneOsuGitaroo
+[TestFixture]
+public class TestAngleUnits
 {
     [Test]
     public void TestIsAngleBetween()

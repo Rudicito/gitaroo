@@ -34,11 +34,11 @@ public abstract partial class SnakingSliderBody : SliderBody
     /// <summary>
     /// Path Offset of the current curve
     /// </summary>
-    public Vector2 PathOffset => Path.PositionInBoundingBox(Path.Vertices[0]) + Path.Position;
+    public Vector2 PathOffset => Path.Vertices.Count == 0 ? Vector2.Zero : Path.PositionInBoundingBox(Path.Vertices[0]) + Path.Position;
 
     public override Vector2 PathStartOffset => snakedPathOffset;
 
-    public override Vector2 PathEndOffset => snakedPathEndOffset;
+    // public override Vector2 PathEndOffset => snakedPathEndOffset;
 
     public override Vector2 GetPositionInBoundingBox(Vector2 position) => base.GetPositionInBoundingBox(position) + Path.Position;
 
@@ -52,10 +52,10 @@ public abstract partial class SnakingSliderBody : SliderBody
     /// </summary>
     private Vector2 snakedPathOffset;
 
-    /// <summary>
-    /// The offset of the end of path from <see cref="snakedPosition"/> when fully snaked.
-    /// </summary>
-    private Vector2 snakedPathEndOffset;
+    // /// <summary>
+    // /// The offset of the end of path from <see cref="snakedPosition"/> when fully snaked.
+    // /// </summary>
+    // private Vector2 snakedPathEndOffset;
 
     private IHasSnakingSlider drawableSlider = null!;
 
@@ -87,7 +87,6 @@ public abstract partial class SnakingSliderBody : SliderBody
         if (!SnakedStart.HasValue || !SnakedEnd.HasValue)
             return;
 
-        // Generate the curve
         drawableSlider.Path.GetPathToProgress(CurrentCurve, SnakedStart.Value, SnakedEnd.Value);
         SetVertices(CurrentCurve);
 
@@ -101,8 +100,6 @@ public abstract partial class SnakingSliderBody : SliderBody
         updatePathSize();
 
         snakedPosition = Path.PositionInBoundingBox(Vector2.Zero);
-        snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
-        snakedPathEndOffset = Path.PositionInBoundingBox(Path.Vertices[^1]);
 
         double lastSnakedStart = SnakedStart ?? 0;
         double lastSnakedEnd = SnakedEnd ?? 0;
@@ -111,6 +108,8 @@ public abstract partial class SnakingSliderBody : SliderBody
         SnakedEnd = null;
 
         setRange(lastSnakedStart, lastSnakedEnd);
+
+        snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]) + Path.Position;
     }
 
     public override void RecyclePath()

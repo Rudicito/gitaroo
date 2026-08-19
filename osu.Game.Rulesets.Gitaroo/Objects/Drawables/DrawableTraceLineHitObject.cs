@@ -1,6 +1,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
@@ -10,7 +11,18 @@ namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 /// </summary>
 public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
 {
-    public DrawableTraceLineHitObject(GitarooHitObject? hitObject)
+    /// <summary>
+    /// The progress start of the HitObject in the TraceLine SliderBody.
+    /// </summary>
+    public double? TraceLineProgressStart;
+
+    /// <summary>
+    /// The progress end of the HitObject in the TraceLine SliderBody.
+    /// When the HitObject has no duration, this is always null.
+    /// </summary>
+    public double? TraceLineProgressEnd;
+
+    public DrawableTraceLineHitObject(TraceLineHitObject? hitObject)
         : base(hitObject)
     {
     }
@@ -30,15 +42,15 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
     }
 
     /// <summary>
-    /// Causes this <see cref="DrawableGitarooHitObject"/> to get missed, disregarding all conditions in implementations of DrawableHitObject.CheckForResult.
+    /// Causes this <see cref="DrawableTraceLineHitObject"/> to get missed, disregarding all conditions in implementations of DrawableHitObject.CheckForResult.
     /// </summary>
     public virtual void MissForcefully() => ApplyMinResult();
 
     /// <summary>
-    /// Whether this <see cref="DrawableGitarooHitObject"/> can be hit, given a time value.
+    /// Whether this <see cref="DrawableTraceLineHitObject"/> can be hit, given a time value.
     /// If non-null, judgements will be ignored whilst the function returns false.
     /// </summary>
-    public Func<DrawableHitObject, double, bool>? CheckHittable;
+    public Func<DrawableTraceLineHitObject, double, bool>? CheckHittable;
 
     /// <summary>
     /// Whether the FanShaped is being tracked.
@@ -58,15 +70,22 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
     {
     }
 
-    protected override void Update()
+    public virtual void UpdateVisual(double traceLineProgress)
     {
-        base.Update();
+        if (TraceLine?.SnakingEndProgress == null) return;
 
-        //todo: Should not be called at every frames for better performance
-        // (should be called after Refresh() of SnakingSlider for example, or called with a bindable)
-        UpdateOffsetPosition();
+        double traceLineEnd = TraceLine.SnakingEndProgress.Value;
 
-        UpdatePosition();
+        // Don't show the HitObject if the TraceLine point where the HitObject start is not shown
+
+        // Only hide/show in Idle state to not alter UpdateHitStateTransforms() animation
+        if (State.Value == ArmedState.Idle)
+        {
+            if (TraceLineProgressStart > traceLineEnd)
+                Hide();
+            else
+                Show();
+        }
     }
 
     /// <summary>
@@ -82,19 +101,31 @@ public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
     protected override void OnApply()
     {
         base.OnApply();
-        if (UseTraceLine)
-            TraceLine = GetTraceLine!(HitObject!.StartTime);
+
+        if (!UseTraceLine) return;
+
+        TraceLine = GetTraceLine!(HitObject!.StartTime);
+
+        TraceLineProgressStart = TraceLine!.GetProgressFromTime(HitObject.StartTime);
+
+        if (HitObject is IHasDuration objectWithDuration)
+            TraceLineProgressEnd = TraceLine!.GetProgressFromTime(objectWithDuration.EndTime);
+        else
+            TraceLineProgressEnd = null;
     }
 
     protected override void OnFree()
     {
         base.OnFree();
+
+        TraceLineProgressStart = null;
+        TraceLineProgressEnd = null;
         TraceLine = null;
     }
 }
 
 public abstract partial class DrawableTraceLineHitObject<TObject> : DrawableTraceLineHitObject
-    where TObject : GitarooHitObject
+    where TObject : TraceLineHitObject
 {
     public new TObject? HitObject => (TObject?)base.HitObject;
 

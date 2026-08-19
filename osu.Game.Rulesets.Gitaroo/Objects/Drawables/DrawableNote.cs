@@ -37,7 +37,7 @@ public partial class DrawableNote : DrawableTraceLineHitObject<Note>, IKeyBindin
     {
         if (TraceLine?.HitObject == null) return;
 
-        OffsetPosition = TraceLine.GetPositionWithTime(HitObject!.StartTime);
+        OffsetPosition = TraceLine.GetPositionWithProgress(TraceLineProgressStart!.Value);
     }
 
     protected override void CheckForResult(bool userTriggered, double timeOffset)

@@ -4,10 +4,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Gitaroo.Objects;
-using osu.Game.Rulesets.Gitaroo.Utils;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -34,17 +35,38 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
     protected override Beatmap<GitarooHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
     {
-        var beatmap = (GitarooBeatmap)base.ConvertBeatmap(original, cancellationToken);
+        var converted = (GitarooBeatmap)base.ConvertBeatmap(original, cancellationToken);
 
         if (!isForCurrentRuleset)
         {
-            beatmap.HitObjects.AddRange(generateTraceLine(beatmap));
+            converted.HitObjects.AddRange(generateTraceLine(converted));
         }
 
         // Can be more optimized?
-        beatmap.HitObjects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
+        converted.HitObjects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
 
-        return beatmap;
+        // Post processing step to transform standard slider velocity changes into scroll speed changes
+        // Copied from TaikoBeatmapConverter
+        double lastScrollSpeed = 1;
+
+        foreach (HitObject hitObject in original.HitObjects)
+        {
+            if (hitObject is not IHasSliderVelocity hasSliderVelocity) continue;
+
+            double nextScrollSpeed = hasSliderVelocity.SliderVelocityMultiplier;
+            EffectControlPoint currentEffectPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
+
+            if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
+            {
+                converted.ControlPointInfo.Add(hitObject.StartTime, new EffectControlPoint
+                {
+                    KiaiMode = currentEffectPoint.KiaiMode,
+                    ScrollSpeed = lastScrollSpeed = nextScrollSpeed,
+                });
+            }
+        }
+
+        return converted;
     }
 
     protected override IEnumerable<GitarooHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
@@ -113,7 +135,6 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
 
     private List<TraceLine> generateTraceLine(GitarooBeatmap beatmap)
     {
-        double velocity = beatmap.Difficulty.SliderMultiplier / 5;
         // todo: Do a much better TraceLine generator algorithm
 
         const float max_line_trace_length = 1000;
@@ -133,15 +154,9 @@ public class GitarooBeatmapConverter : BeatmapConverter<GitarooHitObject>
             {
                 StartTime = start - 1000,
                 EndTime = end + 10000,
-                Velocity = velocity,
                 Path = sliderPath,
             }
         ];
-
-        foreach (var traceLine in traceLines)
-        {
-            traceLine.ScaleToExpectedDistance();
-        }
 
         return traceLines;
     }

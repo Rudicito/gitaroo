@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Gitaroo.Objects;
 /// <summary>
 /// Represents a hit object which requires press and holding a key.
 /// </summary>
-public class HoldNote : GitarooHitObject, IHasDuration
+public class HoldNote : TraceLineHitObject, IHasDuration
 {
     public double EndTime
     {
@@ -19,8 +19,6 @@ public class HoldNote : GitarooHitObject, IHasDuration
     }
 
     public double Duration { get; set; }
-
-    public double VelocityMultiplier { get; set; } = 1;
 
     public IList<IList<HitSampleInfo>>? NodeSamples { get; set; }
 
@@ -50,18 +48,21 @@ public class HoldNote : GitarooHitObject, IHasDuration
         AddNested(Head = new HeadNote
         {
             StartTime = StartTime,
+            TraceLine = TraceLine,
             Samples = GetNodeSamples(0),
         });
 
         AddNested(Tail = new TailNote
         {
             StartTime = EndTime,
+            TraceLine = TraceLine,
             Samples = GetNodeSamples(NodeSamples.Count - 1),
         });
 
         AddNested(Body = new HoldNoteBody
         {
             StartTime = StartTime,
+            TraceLine = TraceLine,
         });
     }
 

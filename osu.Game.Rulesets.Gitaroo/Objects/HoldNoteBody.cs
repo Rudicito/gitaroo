@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Gitaroo.Objects;
 /// On hit - the hold note was held correctly for the full duration.<br />
 /// On miss - the hold note was released at some point during its judgement period.
 /// </summary>
-public class HoldNoteBody : GitarooHitObject
+public class HoldNoteBody : TraceLineHitObject
 {
     public override Judgement CreateJudgement() => new HoldNoteBodyJudgement();
     protected override HitWindows CreateHitWindows() => HitWindows.Empty;

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 using osu.Game.Rulesets.Objects;
@@ -36,7 +37,7 @@ public class OrderedHitPolicy
     /// <returns>Whether <paramref name="hitObject"/> can be hit at the given <paramref name="time"/>.</returns>
     public bool IsHittable(DrawableHitObject hitObject, double time)
     {
-        var nextObject = hitObjectContainer.AliveObjects.GetNext(hitObject);
+        var nextObject = hitObjectContainer.AliveObjects.Where(o => o is DrawableTraceLineHitObject).GetNext(hitObject);
         return nextObject == null || time < nextObject.HitObject.StartTime;
     }
 
@@ -57,20 +58,12 @@ public class OrderedHitPolicy
 
     private IEnumerable<DrawableHitObject> enumerateHitObjectsUpTo(double targetTime)
     {
-        foreach (var obj in hitObjectContainer.AliveObjects)
+        foreach (var obj in hitObjectContainer.AliveObjects.Where(o => o is DrawableTraceLineHitObject))
         {
             if (obj.HitObject.GetEndTime() >= targetTime)
                 yield break;
 
             yield return obj;
-
-            foreach (var nestedObj in obj.NestedHitObjects)
-            {
-                if (nestedObj.HitObject.GetEndTime() >= targetTime)
-                    break;
-
-                yield return nestedObj;
-            }
         }
     }
 }
