@@ -32,6 +32,7 @@ public partial class DrawableGitarooRuleset : DrawableCustomScrollingRuleset<Git
     public DrawableGitarooRuleset(GitarooRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
         : base(ruleset, beatmap, mods)
     {
+        TimeRange.Value = 7500;
     }
 
     protected override Playfield CreatePlayfield() => new GitarooPlayfield();
