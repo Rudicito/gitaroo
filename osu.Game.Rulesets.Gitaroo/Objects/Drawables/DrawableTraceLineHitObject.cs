@@ -11,7 +11,15 @@ namespace osu.Game.Rulesets.Gitaroo.Objects.Drawables;
 /// </summary>
 public partial class DrawableTraceLineHitObject : DrawableGitarooHitObject
 {
+    /// <summary>
+    /// The progress start of the HitObject in the TraceLine SliderBody.
+    /// </summary>
     public double? TraceLineProgressStart;
+
+    /// <summary>
+    /// The progress end of the HitObject in the TraceLine SliderBody.
+    /// When the HitObject has no duration, this is always null.
+    /// </summary>
     public double? TraceLineProgressEnd;
 
     public DrawableTraceLineHitObject(TraceLineHitObject? hitObject)

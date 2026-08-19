@@ -35,12 +35,12 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
     /// <summary>
     /// The progress start of the HoldNote in the TraceLine SliderBody
     /// </summary>
-    public double? PathStart { get; set; }
+    public double? PathStart => TraceLineProgressStart;
 
     /// <summary>
     /// The progress end of the HoldNote in the TraceLine SliderBody
     /// </summary>
-    public double? PathEnd { get; set; }
+    public double? PathEnd => TraceLineProgressEnd;
 
     public PlaySliderBody SliderBody = null!;
 
@@ -235,8 +235,8 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
 
         double traceLineEnd = TraceLine.SnakingEndProgress!.Value;
 
-        double start = Math.Clamp(traceLineProgress, PathStart!.Value, PathEnd!.Value);
-        double end = TraceLineProgressStart > traceLineEnd ? start : Math.Min(traceLineEnd, PathEnd!.Value);
+        double start = Math.Clamp(traceLineProgress, TraceLineProgressStart!.Value, TraceLineProgressEnd!.Value);
+        double end = TraceLineProgressStart > traceLineEnd ? start : Math.Min(traceLineEnd, TraceLineProgressEnd!.Value);
 
         SliderBody.UpdateProgress(start, end);
     }
@@ -248,9 +248,6 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         if (TraceLine?.HitObject == null) return;
 
         Path = TraceLine.Path;
-
-        PathStart = TraceLine.GetProgressFromTime(HitObject!.StartTime);
-        PathEnd = TraceLine.GetProgressFromTime(HitObject!.EndTime);
 
         // Ensure that the version will change after the upcoming BindTo().
         pathVersion.Value = int.MaxValue;
@@ -265,9 +262,6 @@ public partial class DrawableHoldNote : DrawableTraceLineHitObject<HoldNote>, IH
         PathVersion.UnbindFrom(Path?.Version!);
 
         Path = null;
-
-        PathStart = null;
-        PathEnd = null;
     }
 
     public override void OnKilled()
