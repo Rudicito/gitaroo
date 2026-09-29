@@ -20,7 +20,7 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/bin/Release/net8.0/osu.Game.Rulesets.Gitaroo.Tests.dll"
+                "${workspaceRoot}/bin/Release/net10.0/osu.Game.Rulesets.Gitaroo.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release)",

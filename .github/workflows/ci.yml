@@ -21,13 +21,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Install .NET 8.0.x
+      - name: Install .NET 10.0.x
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
-      - name: Build with .NET
+      - name: Build (strict)
+        id: strict
+        continue-on-error: true
         run: dotnet build -c Debug -warnaserror -p:EnforceCodeStyleInBuild=true
+
+      - name: Build (fallback)
+        if: steps.strict.outcome == 'failure'
+        run: |
+          dotnet build -c Debug -p:EnforceCodeStyleInBuild=true
 
       - name: Unit Tests
         run: dotnet test --no-build --no-restore
+
+      - name: Crash
+        if: steps.strict.outcome == 'failure'
+        run: |
+          echo ::error title=Build has warnings!::
+          exit 1
