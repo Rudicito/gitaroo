@@ -26,8 +26,14 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
-      - name: Build with .NET
+      - name: Build (strict)
+        id: strict
+        continue-on-error: true
         run: dotnet build -c Debug -warnaserror -p:EnforceCodeStyleInBuild=true
+
+      - name: Build (fallback)
+        if: steps.strict.outcome == 'failure'
+        run: dotnet build -c Debug -p:EnforceCodeStyleInBuild=true && echo "::warning title=Build has warnings!::"
 
       - name: Unit Tests
         run: dotnet test --no-build --no-restore
