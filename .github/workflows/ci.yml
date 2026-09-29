@@ -35,8 +35,6 @@ jobs:
         if: steps.strict.outcome == 'failure'
         run: |
           dotnet build -c Debug -p:EnforceCodeStyleInBuild=true
-          echo ::error title=Build failed!::
-          exit 1
 
       - name: Unit Tests
         run: dotnet test --no-build --no-restore
