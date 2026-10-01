@@ -190,10 +190,10 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
                 {
                     var startPos = traceLineHitObject.TraceLine!.ConvertedPath.PositionAt(0);
                     //todo: maybe stored AngleProgress 0 to the HitObject, because also stored in the dho
-                    var directionPos = AngleUtils.MovePoint(startPos, traceLineHitObject.TraceLine.ConvertedPath.AngleAtProgress(0), 100);
+                    var directionPos = AngleUtils.MovePoint(startPos, traceLineHitObject.TraceLine.ConvertedPath.AngleAtProgress(0) - 180, 100);
                     var circlePos = traceLineHitObject.TraceLine!.ConvertedPath.PositionAt(progress);
 
-                    var point = CircleUtils.CircleLineIntersectionSingle(startPos, directionPos, circlePos, LenghtVisualisation, startPos);
+                    var point = CircleUtils.CircleLineIntersectionSingle(startPos, directionPos, circlePos, LenghtVisualisation);
                     if (point == null)
                         throw new InvalidOperationException("Lifetime calculation error");
 
