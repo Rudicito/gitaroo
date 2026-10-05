@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
-using osuTK;
 
 namespace osu.Game.Rulesets.Gitaroo.UI;
 
@@ -185,21 +184,10 @@ public partial class GitarooHitObjectContainer : HitObjectContainer
                 double progress = traceLineHitObject.GetProgressFromTime(traceLineHitObject.StartTime, scrollingInfo);
                 double? lifetimeStartProgress = traceLineHitObject.TraceLine!.ConvertedPath.BackwardFirstCircleIntersection(progress, LenghtVisualisation);
 
-                // The object is visible before the traceLine start
                 if (lifetimeStartProgress == null)
                 {
-                    var startPos = traceLineHitObject.TraceLine!.ConvertedPath.PositionAt(0);
-                    //todo: maybe stored AngleProgress 0 to the HitObject, because also stored in the dho
-                    var directionPos = AngleUtils.MovePoint(startPos, traceLineHitObject.TraceLine.ConvertedPath.AngleAtProgress(0) - 180, 100);
-                    var circlePos = traceLineHitObject.TraceLine!.ConvertedPath.PositionAt(progress);
-
-                    var point = CircleUtils.CircleLineIntersectionSingle(startPos, directionPos, circlePos, LenghtVisualisation);
-                    if (point == null)
-                        throw new InvalidOperationException("Lifetime calculation error");
-
-                    float distance = Vector2.Distance(startPos, point.Value);
-
-                    displayStartTime = algorithm.Value.TimeAt(-distance, traceLineHitObject.TraceLine.StartTime, timeRange.Value, 1000);
+                    //todo: same as TraceLine
+                    displayStartTime = algorithm.Value.GetDisplayStartTime(entry.HitObject.StartTime, GitarooHitObject.OBJECT_RADIUS + 100, timeRange.Value, scrollLength);
                     break;
                 }
 
